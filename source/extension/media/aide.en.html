@@ -1,0 +1,495 @@
+<nav aria-label="Manual contents">
+  <h1>Red Stack · Manual</h1>
+  <p>Version {{version}}</p>
+  <input id="filtre" type="search" placeholder="Search the manual…" aria-label="Search the manual">
+  <div id="sommaire"></div>
+  <button id="ouvrir" type="button">Open the Red Stack page</button>
+</nav>
+<main id="texte">
+
+<section id="principe" data-groupe="Getting started">
+<h2>The idea in one minute</h2>
+<p>Red Stack is a mod manager for Cyberpunk 2077 that lives in VS Code. It starts from one simple idea: <b>your folder of zips is the library</b>. You file your downloads the way you like; Red Stack reads them where they are, without copying them elsewhere or reorganising them.</p>
+<p>Five words are enough to understand everything else:</p>
+<table>
+<tr><th>Repository</th><td>The folder where you keep the zips of your mods.</td></tr>
+<tr><th>Stack</th><td>A subfolder of the repository (for example <code>1_Core</code>, <code>12_Weapons</code>). The page shows one table per stack.</td></tr>
+<tr><th>Profile</th><td>The list of what you want in the game: which mods are enabled, which options and which files of each. You can have several.</td></tr>
+<tr><th>Store</th><td>A working folder where each enabled mod is extracted into its own tree. The game files are links to these trees: a mod takes its space on the disk only once.</td></tr>
+<tr><th>Plan</th><td>The difference between what the profile wants and what the game contains: what would be installed, replaced, removed.</td></tr>
+</table>
+<div class="note garde"><b>The rule that never changes.</b> Ticking a box only writes the profile. The game is written only by <b class="b">Apply</b>, after you have read the plan preview and confirmed, and only the plan you saw is applied. Every action that writes the repository or the game is confirmed in a list at the top of VS Code, whose first choice, selected by default, is “Write nothing”.</div>
+</section>
+
+<section id="demarrage" data-groupe="Getting started">
+<h2>Getting started</h2>
+<ol>
+<li><b>Python 3.11 or later</b> must be installed on the machine: the Red Stack engine is a Python script shipped inside the extension. Nothing else to install. Red Stack tries <code>python</code>, then <code>py -3</code> and <code>python3</code>; if it finds none, the page says so and offers to download it or to set its command.</li>
+<li>Open the page: the Red Stack icon of the activity bar (on the left), the “Red Stack” button of the status bar (at the bottom), or the command <code>Red Stack: Open</code> (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>).</li>
+<li>On first launch, the “Settings” page asks for two folders: <b>your zip repository</b> and <b>the game folder</b>. Save.</li>
+<li>The page then offers to <b>read the game</b> to create the profile “actuel” (current). This reading writes nothing: it recognises in the game the files of your zips and ticks the mods that are already there.</li>
+<li>Read the <b class="b">Plan preview</b>. On a game that is already modded, the first plan mostly replaces copies with links to the store. <b class="b">Apply</b>, with the game closed.</li>
+</ol>
+<p>After that, the routine is three actions: tick or untick, read the plan, apply.</p>
+<div class="note">If your repository does not follow the expected layout (which folders are stacks, where parked or new zips go), it can be set: see <a href="#reglages">Settings</a>, “Repository convention”. Loose zips in a single folder work too: those placed at the very root of the repository are read as one more stack, “(repository root)”.</div>
+</section>
+
+<section id="liste" data-groupe="The page">
+<h2>The mod list</h2>
+<p>The page opens on the list: one table per stack, one row per zip.</p>
+<h3>The header</h3>
+<ul>
+<li><b>Profile</b>: the profile shown. <b class="b">New…</b> copies the current profile under another name, <b class="b">Delete</b> erases the profile file (the game does not change).</li>
+<li><b>Filter mods…</b>: filters by name, as you type.</li>
+<li><b>Which mod owns this file?</b>: type part of the path of a game file, then <kbd>Enter</kbd>. Red Stack says which mod installed it.</li>
+<li><b class="b">Arrivals</b>, <b class="b">Updates</b>, <b class="b">History</b>, <b class="b">Store</b>: managing the repository.</li>
+<li><b class="b">Conflicts</b>, <b class="b">Scripts</b>: the two analyses, each in its own tab.</li>
+<li><b class="b">Settings</b>, <b class="b">?</b> (this manual), <b class="b">↻</b> (re-read now; hovering it gives the time of the last reading), <b class="b">Plan preview</b>.</li>
+</ul>
+<h3>The checkboxes</h3>
+<ul>
+<li>The checkbox of a row enables or disables a mod. The checkbox of a stack title enables or disables the whole stack.</li>
+<li>You can tick several mods in a row: Red Stack waits for a short silence, then plays all your ticks together and re-reads the state only once. No tick is undone on the way.</li>
+<li><b>While an action is writing</b> (park, move into the stack, retire, rename, apply…), a banner says so and the page is locked from the confirmation to the end of the action: nothing can be ticked or clicked. It unlocks on its own.</li>
+<li>A click on the title of a stack folds or unfolds it. A click on a row opens <a href="#detail">the detail of the mod</a>.</li>
+</ul>
+<h3>The “State” column</h3>
+<table>
+<tr><th>installed</th><td>Enabled, and the game holds its files. “(modified in game)”: one of its settings has changed since it was installed; it is kept as it is.</td></tr>
+<tr><th>to install</th><td>Enabled in the profile, not in the game yet. Waiting for “Apply”.</td></tr>
+<tr><th>to complete</th><td>Already installed, but the plan still has files to install or to replace for it (option added, new version).</td></tr>
+<tr><th>disabled, to remove</th><td>Unticked, its files are still in the game. Waiting for “Apply”.</td></tr>
+<tr><th>disabled</th><td>Unticked by you, out of the game.</td></tr>
+<tr><th>never installed</th><td>Known to the profile, never entered the game.</td></tr>
+<tr><th>new in the repository</th><td>A zip that arrived in a stack and that the profile does not know yet. Unticked by default (this can be set).</td></tr>
+<tr><th>parked, retired</th><td>A zip filed in the parked folder or the retired folder of its stack: visible, not installable until it is moved back into the stack.</td></tr>
+</table>
+<h3>The “Kind” column</h3>
+<p>What the zip installs, read from its content: <code>archive</code>, <code>xl</code> (ArchiveXL), <code>REDmod</code>, <code>scripts</code> (Redscript), <code>tweaks</code> (TweakXL), <code>CET</code>, <code>RED4ext</code>, <code>asi</code>, <code>audio</code>, <code>ReShade</code>, <code>settings</code>, <code>other</code>. A click on a chip filters the list on that kind; a second click shows everything again.</p>
+<p><b>Core</b> marks a mod that others depend on: it ships a loader (CET, RED4ext, Redscript, ArchiveXL, TweakXL, Codeware), or other mods of the repository call it in their code. Limit: a core mod used without a call that can be read in the code is not recognised as one.</p>
+<h3>Badges, chips and sorting</h3>
+<ul>
+<li><b>▼ ▲</b> on a row: this mod loses or wins resources against other archives. <b>⇄</b>: its own archives overlap each other. Hovering gives the detail, a click opens <a href="#conflits">the conflict analysis</a> on this mod.</li>
+<li>The <b>FOMOD</b> chip marks a zip installed by <a href="#fomod">its installer</a>.</li>
+<li>The chips under the header filter by state; the line of figures sums up the profile. <b>New</b> shows the zips of the arrival folders and those of the stack that the profile does not know yet; <b>Parked</b> and <b>Retired</b> show the content of the parked and retired folders.</li>
+<li>A click on a column header sorts; the third click restores the order of the repository.</li>
+<li><b class="b">⇕ Fold / unfold all</b>, on the line of figures, folds every stack at once; if everything is already folded, it unfolds everything. In “Updates” and “Arrivals”, it folds the stack bands. The same button folds the rows of the “Conflicts” and “Scripts and tweaks” tabs, and a <b class="b">⇕</b> at the top of a panel does the same for its rows (history, plan).</li>
+<li><b>Full names</b> shows the whole name of the zip instead of the title read from a Nexus download name. <b>Folders</b> shows where a parked, new or retired zip is. <b>Kinds</b> shows or hides the “Kind” column: unticked, it gives its width back to the names.</li>
+<li>At the end of a row: <b>park</b> a mod that is disabled and out of the game; for a filed zip (arrived, parked, retired), <b>move</b> it into the stack, <b>park</b> an arrival, or <b>retire</b> it (the bin): the zip goes to the retired folder of its stack. Each action is confirmed and is only a move of the zip inside its stack: nothing is erased, a retired zip is moved back from the “Retired” filter. In that filter only, the bin <b>deletes</b> the zip: it leaves the repository for the Windows recycle bin. The choices of the mod stay in the profile for its return.</li>
+<li><b>Several filed zips at once</b>: in the “New”, “Parked” and “Retired” filters, each filed zip has a checkbox, and the checkbox of a stack ticks all those of the stack shown on screen. These checkboxes never touch the profile or the plan. As soon as a zip is ticked, the buttons <b class="b">Move into the stack…</b>, <b class="b">Park…</b>, <b class="b">Retire…</b>, <b class="b">Delete…</b> (retired zips only) and “Untick all” appear to the right of the chips; the lot goes in a single confirmation, and the boxes stay ticked until the action ends.</li>
+</ul>
+</section>
+
+<section id="profils" data-groupe="The page">
+<h2>Profiles</h2>
+<p>A profile is a file that says what you want in the game. Changing profile only changes what the page shows: the game follows when you apply the plan of that profile.</p>
+<ul>
+<li>The profile keeps, for each mod: enabled or not, the options of a pack, the files taken one by one, the choices of a FOMOD installer, the names changed in the game, the priorities between mods and the wanted load order.</li>
+<li><b class="b">New…</b> always starts from a copy of the current profile: handy for trying a batch of mods without losing the state that works.</li>
+<li>Going from one profile to another means reading the plan (what comes in, what goes out) and then applying. Thanks to the links, this takes a few seconds even for hundreds of mods.</li>
+</ul>
+</section>
+
+<section id="detail" data-groupe="The page">
+<h2>The detail of a mod</h2>
+<p>A click on a row opens the detail: everything the zip contains, where each file goes in the game and in what state it is there.</p>
+<h3>States of a file</h3>
+<table>
+<tr><th>linked</th><td>The game file is a link to the tree of the mod in the store.</td></tr>
+<tr><th>copied</th><td>Installed as a copy: this is the case of settings (so that they survive an update) and of files in the territory of a third-party installer.</td></tr>
+<tr><th>shared with X</th><td>Another enabled mod ships the same file, identical: it stays in the game as long as one of the two is enabled.</td></tr>
+<tr><th>overwritten by X</th><td>Another enabled mod ships a different file at the same place, and its file is the one installed.</td></tr>
+<tr><th>modified in game</th><td>The file has changed since it was installed (a setting written by the game or by you). It is kept, never silently replaced.</td></tr>
+<tr><th>outside Red Stack</th><td>The file is in the territory of a third-party installer (ReShade…) and Red Stack did not install it: it leaves it alone.</td></tr>
+</table>
+<h3>Choosing what to take</h3>
+<ul>
+<li><b>Pack with options</b>: a zip that files its variants in folders shows them as options to tick.</li>
+<li><b>One checkbox per file</b>: take or leave a single file. The game only changes at “Apply”.</li>
+<li><b>“This file belongs to this mod”</b>: on an “outside Red Stack” file, ticking the box says that this file belongs to the mod. Red Stack records it in its registry without modifying it, and it will leave with the mod when you disable it. Unticking hands it back to the third-party installer and leaves it in the game.</li>
+<li><b>Priority between two mods</b>: when two enabled mods want the same file with a different content, the plan stops on a conflict to settle. You say which one wins, file by file or for the whole mod; the profile remembers.</li>
+</ul>
+<h3>The buttons of the detail</h3>
+<ul>
+<li><b class="b">Installer…</b>: the choice pages of a <a href="#fomod">FOMOD</a>.</li>
+<li><b class="b">In-game names…</b>: install the files of the mod <a href="#noms">under other names</a>, without touching the zip.</li>
+<li><b class="b">Rename the content…</b>: rewrite the zip with names <a href="#arrivages">that follow your convention</a>.</li>
+<li><b class="b">Archive conflicts…</b>: the conflict analysis, centred on this mod.</li>
+<li>The Nexus link opens the page of the mod when the name of the zip carries its number.</li>
+</ul>
+</section>
+
+<section id="plan" data-groupe="The page">
+<h2>Plan preview and “Apply”</h2>
+<p><b class="b">Plan preview</b> compares the profile with the game and lists what would be done, without writing anything:</p>
+<table>
+<tr><th>to install</th><td>Files missing from the game, brought by an enabled mod.</td></tr>
+<tr><th>to replace</th><td>Files present with another content (new version, another mod with priority).</td></tr>
+<tr><th>to remove</th><td>Files of a disabled mod that no enabled mod ships any more.</td></tr>
+<tr><th>to link / to unlink</th><td>An identical copy becomes a link to the store, or the reverse (a file that became a setting or moved into third-party territory). The content of the game does not change. After an update, the files that stayed identical from one version to the next are “to link”: they move to the tree of the new version, nothing is copied. A “to link” taken over from another mod says which one. Under each mod of the plan, “Show the files” lists the touched files one by one; the block of choices made folds with a click on its title. The details of a mod being updated say “to replace” or “unchanged since the previous version” instead of naming its own old version.</td></tr>
+<tr><th>taken / handed back</th><td>A file recorded in the registry by “this file belongs to this mod”, or handed back to the third-party installer.</td></tr>
+<tr><th>modlist.txt</th><td>The load order file to write or to remove, if the profile holds it.</td></tr>
+<tr><th>conflicts</th><td>Two enabled mods want the same file, different content, with no priority given. To settle before applying.</td></tr>
+<tr><th>disabled mods</th><td>One line per disabled mod: what leaves the game, what another mod takes over as it is, what another already holds.</td></tr>
+</table>
+<h3>Apply</h3>
+<ul>
+<li><b class="b">Apply to the game…</b> opens a list at the top of VS Code. The first choice, “Write nothing”, is selected by default: <kbd>Enter</kbd> alone never writes the game. You have to go down to “Apply” and then confirm.</li>
+<li><b>The game must be closed.</b> If it is running, nothing is written.</li>
+<li>If the disk has changed between the preview and the click, the plan is no longer the one you saw: nothing is written and the new plan is shown to you.</li>
+<li>A file modified in game since it was installed (a setting, most often) is <b>kept as it is</b>: the plan counts it apart and “Apply” does not replace it.</li>
+<li><b>File present but not installed by Red Stack</b>: the game already holds this file, which Red Stack did not put there, with another content than the one in the zip (a mod installed by hand in another version, for example). It is left in place. To take the one from the zip, unfold this line of the plan: <b class="b">Replace with the zip</b> on one file, or <b class="b">Replace all with the zips</b>. The file then moves to “to replace”; when applying, the old one is first copied to the backups folder. <b class="b">Leave in place</b> goes back as long as nothing is applied.</li>
+<li><b>Taking over a mod installed by hand</b>: drop its zip in the arrival folder of its stack, move it into the stack, tick it, open the plan preview. Identical files are taken over without writing anything; the others are replaced as above.</li>
+<li>The “Before applying” command of the Settings, if you have set one, is run first; if it fails, nothing is written.</li>
+</ul>
+</section>
+
+<section id="arrivages" data-groupe="The repository">
+<h2>Arrivals</h2>
+<p><b class="b">Arrivals</b> shows what has just entered the repository: the archives of the arrival folders of each stack, the zips that still carry a name from the Nexus app, and the <code>.7z</code> / <code>.rar</code> files. The rows are grouped by stack, in the order of the mod list; a click on the band of a stack folds or unfolds it.</p>
+<h3>Bringing names to the form of the site</h3>
+<ul>
+<li>For each archive, Red Stack proposes the name the Nexus site gives: <code>Name-modId-version-timestamp.zip</code>. It reads it through the public Nexus API, without a key, and keeps the answer for six hours (<b class="b">Re-read Nexus</b> asks again).</li>
+<li>This is the name that later makes it possible to <a href="#maj">look for updates</a>.</li>
+<li>The proposed name can be edited in its field. When several files of the mod fit, the row is “to settle”, with the list of candidates.</li>
+<li>Tick the rows, then <b class="b">Rename the ticked archives…</b>. Only the file name changes.</li>
+</ul>
+<h3>Convert, move into the stack, park</h3>
+<ul>
+<li><b class="b">Convert to .zip…</b>: a <code>.7z</code> or a <code>.rar</code> is rewritten as a <code>.zip</code> (by 7-Zip, UnRAR or the Windows <code>tar</code>), read back, then the original is deleted.</li>
+<li><b class="b">Move into the stack…</b>: the zip leaves the arrival folder and becomes a mod “new in the repository”, to tick in the list.</li>
+<li><b class="b">Park…</b>: the zip goes to the parked folder of its stack.</li>
+<li>“Move the ticked ones into the stack…” and “Park the ticked ones…” handle a lot in a single confirmation.</li>
+</ul>
+<h3>Recognising an update</h3>
+<p>When an arrival is a more recent version of a mod already in place, the row says so. <b class="b">File the update…</b> puts the new zip in place of the old one, which goes to the retired folder of its stack; the profile follows the new version. “In place of…” lets you name another zip of the same mod. This action needs no API key: downloading the file by hand into an arrival folder is enough.</p>
+<p><b>Mod without a Nexus number</b> (your own mod, a zip from GitHub): Red Stack recognises it by its name and its version. An arrival <code>My Mod 1.0.1.zip</code> is proposed as the update of <code>My Mod 1.0.0.zip</code> (spaces, dashes and capitals do not count; the version must be higher). The new zip keeps its name. These zips do not appear in “Updates”, which only reads Nexus.</p>
+<p><b>Naming the replaced zip yourself</b>: when Red Stack recognises nothing (name changed, no version in the name), the <b class="b">File in place of…</b> list of the row offers every zip in place in the same stack. Choose the one the arrival replaces: nothing is compared, the arrival takes the name of the “Wanted name” field, the old zip goes to the retired folder. A confirmation comes before the writing.</p>
+<h3>“Content…”: the names inside the zip</h3>
+<ul>
+<li><b class="b">Content…</b> proposes to rename what the zip ships (archives, <code>.xl</code>, script and tweak folders) according to your convention: capitalised words, name of the mod, useless top folder removed.</li>
+<li>Before proposing, Red Stack reads the references of the whole repository. A name hard-coded in some code, a folder shared with another mod, a load order prefix are <b>kept</b>, with the reason shown.</li>
+<li>Each proposed path can be edited. The proposal recommends, it does not block you.</li>
+<li><b>Restructuring</b>: an edited path can change folder. Type it in full (<code>r6/tweaks/Family/My_Mod.yaml</code>): a folder that does not exist is created in the zip. Nothing checks what the mod expects at that place; that is for you to know.</li>
+<li><b class="b">Add the folder</b> does this for scripts and tweaks: the name typed in “Folder to add” is inserted right under <code>r6/scripts</code> and <code>r6/tweaks</code>, in every path of the table. Nothing is written: you read it again, then you rename. Archives are left alone, the game does not read them in a subfolder.</li>
+<li><b>Family folder</b>: when at least two other zips of the repository whose names start the same way (<code>Family - …</code>) keep their scripts or their tweaks in one same subfolder, Red Stack proposes it for those of the newcomer, and says so.</li>
+<li>Confirming <b>rewrites the zip</b> (same files, same dates, new names), reads it back, then replaces the old one. If the mod is in the game, the plan will replace its files.</li>
+</ul>
+<div class="note">This action is different from <a href="#noms">“In-game names…”</a>, which does not touch the zip and only records in the profile under which name to install. “Content…” tidies your repository; “In-game names…” settles one case in one profile.</div>
+</section>
+
+<section id="maj" data-groupe="The repository">
+<h2>Updates (Nexus)</h2>
+<p><b class="b">Updates</b> compares each zip named in the form of the site with the files its mod publishes on Nexus. <b>The search needs no key</b> and downloads nothing. The rows are grouped by stack, in the order of the mod list, then by name; a click on the band of a stack folds or unfolds it. A zip without a Nexus number (your own mod) is not compared: its new version is filed from “Arrivals”.</p>
+<h3>Reading the list</h3>
+<ul>
+<li><b>Update</b>: a more recent file, with the same name apart from the version and in the same category. Ticked by default.</li>
+<li><b>To check</b>: a doubtful case (file archived by the author, several candidates, variant for another patch of the game). Never ticked by default; the row lists the more recent files to choose from.</li>
+<li>A zip that you annotated in its name (your own edit) is proposed but not ticked, with a warning: the update would replace your edit.</li>
+<li><b>Ignore</b> leaves a mod out of the searches; it can be undone from the same view.</li>
+<li>The name of the new zip can be edited before downloading.</li>
+<li>Not compared: zips without a mod number in their name, and mods published elsewhere than on Nexus.</li>
+</ul>
+<h3>Downloading</h3>
+<p>Downloading needs <b>your personal Nexus API key</b>:</p>
+<ol>
+<li><b class="b">Nexus API key…</b> opens an input box in VS Code. <b class="b">Where to find it?</b> opens the keys page of your account: the personal key is <b>at the very bottom</b> of that page, under the list of applications (“Personal API Key”).</li>
+<li>The key is kept in the VS Code secret storage. It is written in no file and is never given to the MCP server. An empty field forgets it.</li>
+<li>Tick, then <b class="b">Download…</b>: one confirmation for the lot, then the zips arrive one by one.</li>
+</ol>
+<ul>
+<li>Each new version takes the place of the old one, which goes to the retired folder of its stack. The profile follows. What remains is to read the plan preview and apply.</li>
+<li><b>Premium account</b>: direct link, nothing else to do.</li>
+<li><b>Free account</b>: Nexus reserves the direct link for Premium accounts. For each zip, Red Stack opens the page of the file; you click “Mod manager download” (or “Slow download”). The link arrives on its own if Red Stack is <a href="#nxm">registered for nxm:// links</a>; otherwise you paste it in the box opened at the top of VS Code.</li>
+<li>During a download, the view is locked (one lot at a time) and the zips concerned can be neither parked nor rewritten. The rest of the tool stays free.</li>
+</ul>
+<div class="note">The quota of API calls is attached to your key, and so to your account. The chip of your account, on hover, says what is left of it.</div>
+</section>
+
+<section id="nxm" data-groupe="The repository">
+<h2>nxm:// links (“Mod manager download”)</h2>
+<p>On Nexus, the “Mod manager download” button sends an <code>nxm://</code> link to the mod manager registered on the machine. Red Stack can be that manager (Windows).</p>
+<ol>
+<li><b class="b">Settings</b>, “This machine” section: the page says which program receives these links today.</li>
+<li><b class="b">Receive nxm:// links in Red Stack…</b> (confirmed) writes one key in the registry of your Windows account, without administrator rights. The previous program is recorded.</li>
+<li><b class="b">Stop receiving nxm:// links…</b> undoes the registration and hands over to the previous program.</li>
+</ol>
+<p>Once registered, a click on “Mod manager download” opens a list of choices in VS Code:</p>
+<ul>
+<li><b>Update</b> such a zip of the repository: the file received is from the same mod. The new version takes its place.</li>
+<li><b>New mod</b>: choose the stack; the zip is filed in its arrival folder and appears in <a href="#arrivages">Arrivals</a>.</li>
+<li><b>Download nothing</b>, the choice selected by default.</li>
+</ul>
+<p>The API key is still needed: Nexus does not deliver the file without it, even with the link.</p>
+</section>
+
+<section id="fomod" data-groupe="The repository">
+<h2>FOMOD installers</h2>
+<p>A zip that carries <code>fomod/ModuleConfig.xml</code> describes its own installation choices. Red Stack replays that installer.</p>
+<ul>
+<li>In the detail of the mod, <b class="b">Installer…</b> opens a panel with its pages, its groups (exactly one choice, or several), the descriptions, and the images on demand.</li>
+<li>A click records the choice in the profile. The pages and the files that depend on a choice follow at once; a page ruled out by an earlier choice is said to be hidden.</li>
+<li>The files the installer copies <b>outside the game folders</b> (documentation, tools) are installed by default, as any installer would do; a checkbox lets you leave them out.</li>
+<li><b>“Ignore the installer: pick by hand”</b> gives the zip back to the per-file checkboxes. <b class="b">Follow the installer</b> returns to it.</li>
+<li>As always, the game only changes at “Apply”.</li>
+</ul>
+<div class="note garde"><b>Limits, also stated on screen.</b> A condition on the presence of a file in the game is taken as “missing”; a condition on the version of the game is taken as true.</div>
+</section>
+
+<section id="noms" data-groupe="The repository">
+<h2>In-game names</h2>
+<p><b class="b">In-game names…</b> (detail of a mod) installs what the mod ships under other names: archives, <code>.xl</code>, files and folders of <code>r6\scripts</code> and <code>r6\tweaks</code>, CET folder, REDmod folder.</p>
+<ul>
+<li>One field per name. <b>The zip does not change</b>: the profile records the wanted name; “Apply” installs the new one and removes the old one. An emptied field restores the author's name.</li>
+<li>Each row says <b>who quotes this name</b> in the code of the repository, the mod itself included. A quoted name is a name that some code looks for as it is: renaming it can break the mod that quotes it. Red Stack warns, without blocking you.</li>
+<li>Refused: a change of case alone, and a name that would take the place of the file of another enabled mod.</li>
+<li>A renamed CET folder leaves its settings written in game under the old name.</li>
+</ul>
+<p>Common use: changing the place of an archive in the load order (see <a href="#ordre">below</a>), or tidying the script folders of a family of mods.</p>
+</section>
+
+<section id="conflits" data-groupe="Analyses">
+<h2>Archive conflicts</h2>
+<p>Several archives can ship the same resource (a mesh, a texture). The game takes each resource from <b>the first loaded archive</b> that contains it. So an archive <b>wins</b> over those loaded after it and <b>loses</b> against those before it.</p>
+<p>On screen, “archive” means the <code>.archive</code> file and “resource” what it contains.</p>
+<p><b class="b">Conflicts</b> opens the analysis in a tab beside the page (it can be detached into a window by a right click on its title). It is read-only, done on the order <b>wanted by the profile</b>; a chip says how many archive changes are still to apply.</p>
+<h3>Four readings</h3>
+<ul>
+<li><b>Per archive</b>: for each one, over whom it wins and against whom it loses, in number of resources.</li>
+<li><b>Per mod</b> and <b>per mod pair</b>: “A wins over B”, with “show all” for the list of resources.</li>
+<li><b>Per archive pair</b>.</li>
+<li><b>Per resource</b>: in which archive it is taken, by which ones it is lost.</li>
+</ul>
+<ul>
+<li>The chips with figures can be clicked: archives, resources in conflict, pairs, resources in identical copy, resources that replace the base game.</li>
+<li>The filter field takes the name of a mod, of an archive, or part of a resource path (at least three letters).</li>
+<li><b>Identical copy</b>: two archives ship the same resource, byte for byte. It does not matter which one wins; they are counted apart.</li>
+<li><b>Base game</b>: the resource replaces a file of the game itself. That is the purpose of many mods; the information is useful when two mods replace the same one.</li>
+<li>Archives installed by hand, outside Red Stack, count too; they are marked “outside Red Stack”.</li>
+</ul>
+
+<h3 id="ordre">Changing the load order</h3>
+<p>Archives load in the order of their names, character by character: <code>!</code> and <code>#</code> first, then digits, CAPITALS, <code>_</code>, lower case. REDmod archives come after. A file <code>archive\pc\mod\modlist.txt</code>, if it exists, imposes its order.</p>
+<p>In the “per archive” reading, unfold an archive: <b class="b">Move ahead…</b> on the one that wins against it, <b class="b">Move behind…</b> on the one it beats. Two ways to choose from:</p>
+<ul>
+<li><b>Rename in the game</b>: Red Stack proposes a name as close as possible to the target (often a prefix). The zip is not touched, the profile records the name, and <b class="b">Restore the author's name</b> cancels it. If the old name is quoted in the code of the repository, you are told before.</li>
+<li><b>Hold the order with modlist.txt</b>: no name changes. The profile records the wanted order, “Apply” writes the file (the old one is copied to the backups). “Stop holding it” removes it at the next “Apply”.</li>
+</ul>
+<p>In both cases only the profile is written: read the plan preview, then apply.</p>
+<div class="note garde">REDmod archives cannot be reordered here. An archive outside Red Stack cannot be renamed: only <code>modlist.txt</code> moves it.</div>
+</section>
+
+<section id="scripts" data-groupe="Analyses">
+<h2>Scripts and tweaks (code conflicts)</h2>
+<p><b class="b">Scripts</b> opens a separate analysis: the mods that step on each other in their code. The first reading takes a few dozen seconds, the following ones a few seconds. Read-only.</p>
+<h3>What is looked for</h3>
+<ul>
+<li><b>Redscript</b>: two mods replace the same method (<code>@replaceMethod</code>); a wrapper (<code>@wrapMethod</code>) that does not call <code>wrappedMethod</code> and so cuts the chain.</li>
+<li><b>TweakXL</b>: the same property set to two values; an addition against a removal in a list; a record defined twice.</li>
+<li><b>Hard-coded SetFlat</b>: a value written by code against the tweak of another mod.</li>
+</ul>
+<h3>Three levels</h3>
+<table>
+<tr><th>to look at</th><td>Only one of the two can work: two different replacements of the same method.</td></tr>
+<tr><th>to review</th><td>Probably a problem, to be judged: opposite values, a wrapper that cuts, a duplicate.</td></tr>
+<tr><th>no action</th><td>The mods cross each other but stay compatible.</td></tr>
+</table>
+<ul>
+<li>The chips filter by level and by sort; the field filters by mod, method, property or file.</li>
+<li>An unfolded row explains the case and says who writes what. A click on <code>file:line</code> opens the file at that line in the editor; a click on the mod opens its detail.</li>
+<li>Mods written to live together (<code>@if(ModuleExists(…))</code>) are recognised.</li>
+</ul>
+<div class="note garde">The “<b>last word predicted</b>” is deduced from the order of the file names. It is not observed in the game: take it as an indication. Not analysed: the Lua overlaps of CET (<code>Override</code>, <code>Observe</code>) and the <code>.tweak</code> files of the old format. Detection taken from Conflict Studio (MIT licence).</div>
+</section>
+
+<section id="historique" data-groupe="Tracking">
+<h2>History</h2>
+<p><b class="b">History</b> opens a panel: what Red Stack has written, action by action, from the most recent to the oldest.</p>
+<ul>
+<li>Each “Apply” unfolds mod by mod: installed, removed, updated from such a version, modified.</li>
+<li>The actions on the repository are there too: park, move into the stack, retire, delete a retired zip, rename, convert, rewrite a content, download an update, file an arrival.</li>
+<li>Useful to answer “what has changed since the last time the game worked?”.</li>
+</ul>
+</section>
+
+<section id="magasin" data-groupe="Tracking">
+<h2>Store</h2>
+<p>The store holds one extracted tree per enabled mod. The game files are <b>hard links</b> to these trees: the same file has two names on the disk and takes its space only once.</p>
+<p><b class="b">Store</b> opens a panel that says:</p>
+<ul>
+<li>how many game files are linked and how many are copied (settings always are);</li>
+<li><b>the real size</b> on the disk, next to the one Windows Explorer adds up. Explorer counts a linked file twice, in the tree and in the game: its total is misleading, and that is normal;</li>
+<li>the free space;</li>
+<li>the <b>trees with no enabled mod</b>, with <b class="b">Purge…</b>: they are deleted, the zips are not touched, and a tree is rebuilt from its zip;</li>
+<li>the <b>local edits</b>: a file of a tree modified by hand. <b class="b">Undo…</b> puts back the one from the zip; the game follows at “Apply”.</li>
+</ul>
+<div class="note">Put the store on the same disk as the game: a hard link does not cross disks. On another disk, Red Stack installs copies; everything works, but each mod takes its space twice.</div>
+</section>
+
+<section id="reglages" data-groupe="Settings">
+<h2>Settings</h2>
+<p><b class="b">Settings</b> opens a full page. Almost everything is confirmed by <b class="b">Save</b>, at the bottom; the first two sections, “Language” and “Theme”, and the action buttons (backups, reference, nxm:// links) act right away.</p>
+<h3 id="langue">Language</h3>
+<ul>
+<li>The page, the side bar and the messages of Red Stack exist in eleven languages: <b>French</b>, <b>English</b>, German, Spanish, Brazilian Portuguese, Italian, Polish, Russian, Simplified Chinese, Japanese and Korean. <b>Automatic</b> follows the display language of VS Code; a language Red Stack does not have falls back to English.</li>
+<li>French is the language the tool is written in, and English was written alongside it. The nine other languages are translations made by an AI and checked by an automatic bench (values, tags, plural forms), not yet proofread by native speakers: a wrong or clumsy phrase can be reported with an issue on the project repository.</li>
+<li>The choice applies right away: the page reloads in the new language. Save your other settings first, an entry in progress would be lost.</li>
+<li>The messages of the engine (mod states, reasons, refusals, errors) follow this choice. A text kept in a cache before the change of language can stay in the old one until it is next read.</li>
+<li>This manual exists in French and in English: it opens in French when Red Stack is in French, in English in any other language. The MCP servers (driving by a Claude Code session) speak English, whatever language is chosen; the names of their tools and the state codes stay those of the engine. The titles of the commands and settings in VS Code follow the language of VS Code, not this choice.</li>
+</ul>
+<h3 id="theme">Theme</h3>
+<ul>
+<li>Two complete colour themes come with the extension: <b>Red Stack Rouge</b> (red) and <b>Red Stack Jaune</b> (yellow). A button activates each one, right away, for all your VS Code windows.</li>
+<li><b class="b">Other theme…</b> opens the list of all installed themes (the one of <kbd>Ctrl</kbd>+<kbd>K</kbd> <kbd>Ctrl</kbd>+<kbd>T</kbd>), to go back to yours. The Red Stack page follows any theme.</li>
+<li><b>Coloured activity bar icons</b>: with a Red Stack theme, all the icons of the left bar take the accent colour, the same as the buttons; the active icon is recognised by its line. Unticked, only the active icon is coloured.</li>
+</ul>
+<h3>Folders</h3>
+<ul>
+<li><b>Repository</b> and <b>game</b>: the only two that are required.</li>
+<li><b>Store</b> and <b>game reference</b>: left empty, they are placed next to the game folder (“… - Red Stack”, “… - Référence”). <b>Backups</b> and <b>log</b>: left empty, they go to the data folder.</li>
+<li><b>New zips</b>: unticked by default, a zip that arrived in a stack is left for you to tick. Ticked, it is enabled by default: all that remains is to apply.</li>
+</ul>
+<h3>Repository convention</h3>
+<p>How to read your layout: which folders are stacks, which subfolders are those of the parked, new (arrivals) and retired zips, which folders of a zip are never installed (documentation, sources). A button restores the default convention.</p>
+<p>Red Stack reads three places and no more: the zips placed at the root of the repository, those of each stack, and those of the convention subfolders of a stack. A folder that holds archives and that the convention does not read (its name does not match the stack pattern, or it sits deeper inside a stack) is named under these fields, and on the list as long as it is empty: nothing is left out silently.</p>
+<h3>Convention for the content of zips</h3>
+<p>The tables of <a href="#arrivages">“Content…”</a>: words kept as they are, prefixes by type, stacks where the full name of the mod is used.</p>
+<h3>Mod settings, never linked</h3>
+<p>Patterns of the settings files. A file that matches one is <b>copied</b> instead of being linked: what you set in game does not damage the tree of the mod and survives its update. The first reading of the game adds on its own what it finds modified.</p>
+<h3>Settings backups</h3>
+<ul>
+<li><b class="b">Back up now</b>: a dated copy of all the settings of the mods present in the game, shipped by a zip or written in game.</li>
+<li><b class="b">Compare with the game</b>: what has changed since that backup.</li>
+<li><b class="b">Restore…</b>: puts back the files that differ or are missing, with the game closed; today's files are copied first.</li>
+</ul>
+<h3>Outside Red Stack</h3>
+<p>The territory of a third-party installer (ReShade installs its shaders itself). Under these patterns, a file that is present and that Red Stack did not install is never linked, replaced or removed.</p>
+<h3>Before applying</h3>
+<p>A command run before any writing of the game (your own backup, for example). If it fails, nothing is written.</p>
+<h3>Game reference</h3>
+<ul>
+<li><b class="b">Create the reference…</b> copies the game without its archives (executables, libraries, base scripts). The files installed by Red Stack are left out of the copy: no need to empty the game first.</li>
+<li><b class="b">Check the base game</b> says what has changed since; <b class="b">Restore the base game…</b> puts it back, for example after an update forced by the launcher.</li>
+</ul>
+<h3>This machine</h3>
+<ul>
+<li><b>Python command</b> and <b>data folder</b> (profiles, install registry, <code>config.json</code>).</li>
+<li><a href="#nxm">nxm:// links</a>: register Red Stack, or undo the registration.</li>
+<li><a href="#claude">MCP server</a>: the command that declares it, to copy.</li>
+</ul>
+<h3>WolvenKit, for a Claude Code session</h3>
+<ul>
+<li><b>WolvenKit CLI</b>: the folder that holds <code>WolvenKit.CLI.exe</code> (“WolvenKit Console”, to download separately from the WolvenKit releases page; it needs the .NET Runtime). The row says whether the CLI is found.</li>
+<li><b>Workshop</b>: the only folder this part writes to. A folder of its own, outside the game, the repository, the store, the backups and the data; otherwise everything is refused.</li>
+<li>The command that declares this second server can be copied under the two fields. See <a href="#wolvenkit">Reading and rebuilding archives with WolvenKit</a>.</li>
+</ul>
+</section>
+
+<section id="vscode" data-groupe="Settings">
+<h2>Red Stack in VS Code</h2>
+<ul>
+<li><b>Side bar</b> (Red Stack icon of the activity bar): the profile (click = change it), the enabled mods, what is waiting for “Apply”, the new zips, the conflicts, and a shortcut to each view, this manual included.</li>
+<li><b>Tabs</b>: the page, “Conflicts”, “Scripts and tweaks” and this manual are ordinary tabs. They can be moved, detached into a window, and they come back to their place when VS Code restarts.</li>
+<li><b>Automatic refresh</b>: the list re-reads itself when a zip arrives, leaves or changes in a stack, when <code>archive\pc\mod</code> changes, or when a profile is written elsewhere. It waits for a copy in progress to finish. The setting <code>redStack.actualisationAuto</code> turns it off; the ↻ button then re-reads on demand.</li>
+<li><b>Searching this manual</b>: the field of the contents filters the sections; <kbd>Ctrl</kbd>+<kbd>F</kbd> searches the text.</li>
+</ul>
+<h3>VS Code settings (<kbd>Ctrl</kbd>+<kbd>,</kbd> then “Red Stack”)</h3>
+<table>
+<tr><th><code>redStack.python</code></th><td>Python command (default: <code>python</code>).</td></tr>
+<tr><th><code>redStack.donnees</code></th><td>Data folder. Empty: the storage folder of the extension.</td></tr>
+<tr><th><code>redStack.actualisationAuto</code></th><td>Re-read on its own when the disk changes (ticked by default).</td></tr>
+<tr><th><code>redStack.barreEnCouleur</code></th><td>Activity bar icons in the accent colour (also in “Settings”, “Theme”).</td></tr>
+<tr><th><code>redStack.langue</code></th><td>Interface language: <code>auto</code> (that of VS Code), <code>fr</code>, <code>en</code>, <code>de</code>, <code>es</code>, <code>pt-br</code>, <code>it</code>, <code>pl</code>, <code>ru</code>, <code>zh-cn</code>, <code>ja</code> or <code>ko</code> (also in “Settings”, “Language”).</td></tr>
+<tr><th><code>redStack.moteur</code></th><td>Another engine than the packaged one (development).</td></tr>
+</table>
+</section>
+
+<section id="claude" data-groupe="Settings">
+<h2>Driving by a Claude Code session</h2>
+<p>The extension carries an MCP server. Once declared (the command can be copied from “Settings”, “This machine”), a Claude Code session can read the state, the conflicts, the history, change a profile and prepare a plan.</p>
+<h3>What a session can do</h3>
+<ul>
+<li><b>Read</b>: the state of the mods (by stack, by state, by kind), the detail of a mod, which mod owns a game file, the plan, the archive conflicts (per pair, per mod, per archive, per resource), the script and tweak conflicts, the load order, the history, the store, the game reference, the settings backups, the updates proposed by Nexus, the arrivals and the name each would take, the content of a zip against the convention.</li>
+<li><b>Change a profile</b>: enable or disable a mod or a stack, take or leave an option or a file, say “this file belongs to this mod”, set a priority between two mods or for a single file, rename in the game, change the load order, answer a FOMOD installer.</li>
+<li><b>Set</b>: the settings patterns and the “outside Red Stack” patterns, ignore or propose again the updates of a mod, make a settings backup.</li>
+</ul>
+<h3>What stays yours</h3>
+<ul>
+<li><b>Writing the game</b>: applying a plan, restoring settings or the reference.</li>
+<li><b>Writing the repository</b>: park, move into the stack, retire, rename or convert an arrival, file an update, rewrite the content of a zip, download from Nexus, purge the store. A session prepares these actions by reading and tells you what to do; you do them in the page.</li>
+</ul>
+<div class="note garde"><b>A session never writes the game.</b> It leaves a request; VS Code shows you the plan with its figures and its reason, and you are the one who applies or refuses, through the same confirmation as the button of the page. The Nexus API key is never given to it.</div>
+</section>
+
+<section id="wolvenkit" data-groupe="Settings">
+<h2>Reading and rebuilding archives with WolvenKit</h2>
+<p>A second MCP server, declared separately, lets a Claude Code session open the archives of the game and of the mods with the WolvenKit CLI: useful to understand a conflict, compare the resource of a mod with that of the game, edit a file or rebuild an archive. It only serves a session; the page does not change.</p>
+<h3>To use it</h3>
+<ol>
+<li>In “Settings”, “WolvenKit” section, name the folder of the CLI and a workshop folder, then “Save”.</li>
+<li>Copy the command of that section and run it once in a terminal.</li>
+</ol>
+<h3>What a session can do</h3>
+<ul>
+<li><b>Search</b> for a resource by words of its path, in the base game, Phantom Liberty and the installed mods, and know which archives hold it.</li>
+<li><b>List</b> an archive, or the archives of a mod named as in Red Stack.</li>
+<li><b>Extract</b> resources as they are, <b>export</b> a texture as an image or a mesh as <code>.glb</code>, <b>read</b> a game file (<code>.ent</code>, <code>.app</code>, <code>.mesh</code>, <code>.inkatlas</code>…) as JSON.</li>
+<li><b>Edit</b> a game file brought into the workshop: change a value, add, remove or duplicate an element. The CLI rebuilds the file, then reads it back, and the session knows whether everything it wrote is there. The first original is kept in the <code>_avant</code> folder of the workshop.</li>
+<li><b>Import</b> an image or a <code>.glb</code> of the workshop as a game file.</li>
+<li><b>Pack</b> a folder of the workshop into an <code>.archive</code>, or <b>build</b> a WolvenKit project (<code>.cpmodproj</code>) stored in the workshop. On request, a zip in the form of a mod is made beside it.</li>
+</ul>
+<h3>Trying in game what a session has made</h3>
+<p>The archive and the zip stay in the workshop. To try them, drop the zip yourself in the arrival folder of a stack, tick the mod in the list, then “Plan preview” and “Apply”: the mod is then disabled and removed like any other.</p>
+<h3>Its safeguards</h3>
+<ul>
+<li><b>It only writes in the workshop.</b> Not the game, not the repository, not the store. Putting an edited file in the game stays your action: a zip in a stack, then “Apply”.</li>
+<li><b>It only builds from the workshop.</b> The file to edit, the folder to pack and the project to build must be there: nothing is packed from the game or the repository.</li>
+<li><b>An edit is all or nothing.</b> One operation refused, and the file stays as it was. The working JSON files placed next to the files do not go into the archive.</li>
+<li><b>A pattern that would take everything is refused</b> (empty, <code>*</code>, <code>*.*</code>, fewer than three characters).</li>
+<li><b>Files are counted before extracting.</b> Above the ceiling (200 to extract, 40 to export, by default) nothing is written: the session receives the count and must narrow down.</li>
+</ul>
+<div class="note"><b>Limits.</b> An export does not follow the materials of a mesh stored in another archive. An edit goes through the WolvenKit JSON: it reads neither TweakDB nor the translated texts of the game. A built project is never installed in the game by this server. A search takes a few seconds per location.</div>
+</section>
+
+<section id="pannes" data-groupe="When in doubt">
+<h2>Frequent questions</h2>
+<h3>“Apply” refuses to write</h3>
+<ul>
+<li><b>The game is running</b>: close it.</li>
+<li><b>Conflicts to settle</b>: the plan preview lists them; say which mod wins.</li>
+<li><b>The plan has changed since the preview</b>: the disk moved in the meantime. The new plan is shown; read it again.</li>
+</ul>
+<h3>The page stays on “Reading the repository and the game…” or says Python is missing</h3>
+<p>Without Python, the page says so: install it from python.org with “Add python.exe to PATH” ticked, then <b class="b">Try again</b>; or <b class="b">Set the Python command…</b> if Python is installed elsewhere (a full path works). The same command is set in “Settings”, “This machine” (or <code>redStack.python</code>). Version 3.11 or later is needed.</p>
+<h3>A mod is ticked but missing from the list of updates</h3>
+<p>Its zip does not carry the name of the Nexus site (mod number, version). Take it through <a href="#arrivages">Arrivals</a> to rename it.</p>
+<h3>“Mod manager download” does nothing</h3>
+<p>No program is registered for <code>nxm://</code> links on the machine: see <a href="#nxm">nxm:// links</a>.</p>
+<h3>The store folder “weighs” as much as the game</h3>
+<p>Explorer counts linked files twice. The <a href="#magasin">Store</a> panel gives the real size.</p>
+<h3>I changed a setting in game, will it be overwritten?</h3>
+<p>No. A file modified in game is kept as it is and marked “modified in game”; the plan preview says how many are in that case.</p>
+<h3>I want to remove Red Stack</h3>
+<p>The game files are real files (hard links): the game works without the extension. Only delete the store after disabling the mods and applying, or accept that the files stay in the game as ordinary files. Undo the <code>nxm://</code> registration from “Settings” before uninstalling.</p>
+</section>
+
+<section id="lexique" data-groupe="When in doubt">
+<h2>Glossary</h2>
+<table>
+<tr><th>Apply</th><td>The only action that writes the game, always after a preview and a confirmation.</td></tr>
+<tr><th>Archive</th><td>An <code>.archive</code> file of <code>archive\pc\mod</code>. It contains resources.</td></tr>
+<tr><th>Arrival</th><td>An archive that has just entered the repository and is not filed in a stack yet.</td></tr>
+<tr><th>Convention</th><td>The way your repository is filed and named; it can be set.</td></tr>
+<tr><th>Disabled</th><td>An unticked mod.</td></tr>
+<tr><th>Outside Red Stack</th><td>A file or folder that another installer manages, and that Red Stack leaves alone.</td></tr>
+<tr><th>(Hard) link</th><td>A second name for the same file on the disk: no duplicate space.</td></tr>
+<tr><th>Parked</th><td>A zip set aside in its stack: kept, not installable.</td></tr>
+<tr><th>Install registry</th><td>The memory of Red Stack: which game file comes from which zip.</td></tr>
+<tr><th>Resource</th><td>A file contained in an archive (mesh, texture…).</td></tr>
+<tr><th>Retired</th><td>A zip set aside and kept in the retired folder of its stack: the old version an update replaces, or a zip you retire yourself. Nothing there is ever erased by Red Stack.</td></tr>
+<tr><th>Core / base game</th><td>In the list, “core”: a mod that others depend on. In “Game reference”, “base game”: the files of the game itself.</td></tr>
+</table>
+</section>
+
+<p id="rien">No section contains this text.</p>
+</main>

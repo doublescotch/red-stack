@@ -1,0 +1,14 @@
+{
+  "description": "Cyberpunk 2077 の MOD マネージャー。zip のリポジトリが唯一のライブラリのままです。プロファイル、MOD ごと・スタックごとの切り替え、ゲームに書き込む前のプレビュー。",
+  "cmd.ouvrir": "Red Stack: 開く",
+  "cmd.aide": "Red Stack: マニュアル",
+  "cmd.demande": "Red Stack: 保留中の要求を処理する",
+  "conf.python": "エンジンを実行する Python コマンド。",
+  "conf.moteur": "パッケージ同梱のものとは別の red_stack.py のパス (開発用)。空欄: 内蔵エンジン。",
+  "conf.donnees": "データ フォルダー (プロファイル、インストール記録、config.json)。空欄: 拡張機能のストレージ フォルダー。ページの「設定」ボタンからも設定できます。",
+  "conf.actualisationAuto": "スタックで zip が追加・削除・変更されたとき、archive\\pc\\mod が変わったとき、または別のウィンドウや Claude のセッションがプロファイルを書き込んだときに、リポジトリとゲームを自動で読み直します。オフ: ページの ↻ ボタンでのみ読み直します。",
+  "conf.barreEnCouleur": "「Red Stack Rouge」と「Red Stack Jaune」テーマ: アクティビティ バー (左側) のアイコンがすべてアクセント カラーになり、アクティブなアイコンはマーカーで区別します。オフ: アクティブなアイコンだけがカラーになります。テーマごとに 1 行を設定 (workbench.colorCustomizations) に書き込み、チェックを外すと削除します。",
+  "conf.langue.auto": "VS Code の表示言語。Red Stack にない言語の場合は英語になります。",
+  "conf.langue": "Red Stack のページ、そのサイド バー、メッセージの言語。ページの「設定」ボタンの「言語」セクションからも設定できます。",
+  "accueil": "Red Stack のページがエディターで開きます。\n[Red Stack を開く](command:redStack.ouvrir)\n[マニュアルを読む](command:redStack.aide)"
+}

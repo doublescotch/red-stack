@@ -1,0 +1,14 @@
+{
+  "description": "Menedżer modów do Cyberpunk 2077: Twoje repozytorium zipów pozostaje jedyną biblioteką. Profile, przełączanie dla każdego moda i każdego stosu, podgląd przed zapisaniem czegokolwiek w grze.",
+  "cmd.ouvrir": "Red Stack: Otwórz",
+  "cmd.aide": "Red Stack: Podręcznik",
+  "cmd.demande": "Red Stack: Obsłuż oczekujące żądanie",
+  "conf.python": "Polecenie Pythona, które uruchamia silnik.",
+  "conf.moteur": "Ścieżka do innego pliku red_stack.py niż dołączony do pakietu (programowanie). Puste: wbudowany silnik.",
+  "conf.donnees": "Folder danych (profile, rejestr instalacji, config.json). Puste: folder przechowywania rozszerzenia. Można to też ustawić na stronie, przycisk „Ustawienia”.",
+  "conf.actualisationAuto": "Samoczynnie odczytuj ponownie repozytorium i grę, gdy zip trafia do stosu, opuszcza go lub się w nim zmienia, gdy zmienia się archive\\pc\\mod albo gdy profil zostaje zapisany przez inne okno lub sesję Claude. Po odznaczeniu: tylko przycisk ↻ na stronie odczytuje ponownie.",
+  "conf.barreEnCouleur": "Motywy „Red Stack Rouge” i „Red Stack Jaune”: wszystkie ikony paska aktywności (po lewej) przyjmują kolor akcentu, a aktywną ikonę rozpoznaje się po znaczniku. Po odznaczeniu: tylko aktywna ikona jest kolorowa. Zapisuje jeden wiersz na motyw w Twoich ustawieniach (workbench.colorCustomizations), usuwany po odznaczeniu pola.",
+  "conf.langue.auto": "Język wyświetlania VS Code; język, którego Red Stack nie ma, zastępowany jest angielskim.",
+  "conf.langue": "Język strony Red Stack, jej paska bocznego i komunikatów. Można go też ustawić na stronie, przycisk „Ustawienia”, sekcja „Język”.",
+  "accueil": "Strona Red Stack otwiera się w edytorze.\n[Otwórz Red Stack](command:redStack.ouvrir)\n[Przeczytaj podręcznik](command:redStack.aide)"
+}

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-{{nonce}}'; script-src 'nonce-{{nonce}}';">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Red Stack · Manuel</title>
+<style nonce="{{nonce}}">
+:root {
+  --fond: var(--vscode-editor-background, #1e1e1e);
+  --texte: var(--vscode-foreground, #ccc);
+  --pale: var(--vscode-descriptionForeground, #8b8b8b);
+  --trait: var(--vscode-panel-border, #3c3c3c);
+  --survol: var(--vscode-list-hoverBackground, #2a2d2e);
+  --bande: var(--vscode-sideBar-background, #252526);
+  --accent: var(--vscode-button-background, #c5003c);
+  --champ: var(--vscode-input-background, #313131);
+  --champ-trait: var(--vscode-input-border, #3c3c3c);
+  --bleu: var(--vscode-textLink-foreground, #3794ff);
+  --ambre: var(--vscode-editorWarning-foreground, #cca700);
+  --code: var(--vscode-textPreformat-foreground, #d7ba7d);
+  --code-fond: var(--vscode-textPreformat-background, #2d2d2d);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; padding: 0; background: var(--fond); color: var(--texte); font: 13.5px/1.6 var(--vscode-font-family, "Segoe UI", sans-serif); display: flex; overflow: hidden; }
+nav { flex: 0 0 250px; background: var(--bande); border-right: 1px solid var(--trait); overflow-y: auto; padding: 12px 8px 24px; }
+nav h1 { font-size: 14px; margin: 0 6px 2px; color: var(--vscode-sideBarTitle-foreground, var(--texte)); }
+nav p { margin: 0 6px 10px; color: var(--pale); font-size: 12px; }
+nav input { width: 100%; font: inherit; color: inherit; background: var(--champ); border: 1px solid var(--champ-trait); border-radius: 3px; padding: 4px 7px; margin-bottom: 8px; }
+nav a { display: block; padding: 3px 8px; border-radius: 3px; color: var(--texte); text-decoration: none; border-left: 2px solid transparent; }
+nav a:hover { background: var(--survol); }
+nav a.ici { border-left-color: var(--accent); background: var(--survol); }
+nav a.cache { display: none; }
+nav .groupe { margin: 10px 8px 2px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--bleu); }
+nav button { font: inherit; color: inherit; background: transparent; border: 1px solid var(--trait); border-radius: 3px; padding: 3px 10px; cursor: pointer; margin: 12px 6px 0; }
+nav button:hover { background: var(--survol); }
+main { flex: 1 1 0; overflow-y: auto; padding: 8px 32px 80px; scroll-behavior: smooth; }
+main > section { max-width: 860px; padding-top: 14px; }
+main > section.cache { display: none; }
+h2 { font-size: 19px; margin: 18px 0 6px; padding-bottom: 5px; border-bottom: 1px solid var(--trait); color: var(--vscode-sideBarTitle-foreground, var(--texte)); }
+h3 { font-size: 14.5px; margin: 18px 0 4px; color: var(--bleu); }
+p { margin: 6px 0; }
+ul, ol { margin: 6px 0; padding-left: 22px; }
+li { margin: 3px 0; }
+code { font-family: var(--vscode-editor-font-family, Consolas, monospace); font-size: 12.5px; color: var(--code); background: var(--code-fond); padding: 0 4px; border-radius: 3px; }
+kbd { font: inherit; font-size: 12px; border: 1px solid var(--trait); border-bottom-width: 2px; border-radius: 3px; padding: 0 5px; background: var(--bande); }
+b.b { border: 1px solid var(--trait); border-radius: 3px; padding: 0 6px; font-weight: 600; white-space: nowrap; }
+.note { border-left: 3px solid var(--bleu); background: var(--bande); padding: 7px 12px; margin: 10px 0; border-radius: 0 3px 3px 0; }
+.garde { border-left-color: var(--ambre); }
+table { border-collapse: collapse; margin: 8px 0; width: 100%; }
+th, td { text-align: left; vertical-align: top; padding: 4px 10px 4px 0; border-bottom: 1px solid var(--trait); }
+th { color: var(--bleu); font-weight: 600; white-space: nowrap; }
+td:first-child { white-space: nowrap; }
+a { color: var(--bleu); }
+#rien { display: none; color: var(--pale); padding-top: 24px; }
+:focus-visible { outline: 1px solid var(--vscode-focusBorder, #007fd4); outline-offset: 1px; }
+@media (max-width: 760px) { nav { flex-basis: 170px; } main { padding: 4px 16px 60px; } td:first-child { white-space: normal; } }
+</style>
+</head>
+<body>
+<!-- corps -->
+<nav aria-label="Sommaire du manuel">
+  <h1>Red Stack · Manuel</h1>
+  <p>Version {{version}}</p>
+  <input id="filtre" type="search" placeholder="Chercher dans le manuel…" aria-label="Chercher dans le manuel">
+  <div id="sommaire"></div>
+  <button id="ouvrir" type="button">Ouvrir la page Red Stack</button>
+</nav>
+<main id="texte">
+
+<section id="principe" data-groupe="Pour commencer">
+<h2>Le principe en une minute</h2>
+<p>Red Stack est un gestionnaire de mods pour Cyberpunk 2077 qui vit dans VS Code. Il part d'une idée simple : <b>votre dossier de zips est la bibliothèque</b>. Vous rangez vos téléchargements comme vous voulez ; Red Stack les lit là où ils sont, sans les copier ailleurs ni les réorganiser.</p>
+<p>Cinq mots suffisent à comprendre tout le reste :</p>
+<table>
+<tr><th>Dépôt</th><td>Le dossier où vous gardez les zips de vos mods.</td></tr>
+<tr><th>Pile</th><td>Un sous-dossier du dépôt (par exemple <code>1_Core</code>, <code>12_Weapons</code>). La page montre une table par pile.</td></tr>
+<tr><th>Profil</th><td>La liste de ce que vous voulez dans le jeu : quels mods sont actifs, quelles options et quels fichiers de chacun. Vous pouvez en avoir plusieurs.</td></tr>
+<tr><th>Magasin</th><td>Un dossier de travail où chaque mod actif est extrait dans son propre arbre. Les fichiers du jeu sont des liens vers ces arbres : un mod ne pèse qu'une fois sur le disque.</td></tr>
+<tr><th>Plan</th><td>La différence entre ce que le profil veut et ce que le jeu contient : ce qui serait posé, remplacé, retiré.</td></tr>
+</table>
+<div class="note garde"><b>La règle qui ne change jamais.</b> Cocher une case n'écrit que le profil. Le jeu n'est écrit que par <b class="b">Appliquer</b>, après que vous avez lu l'aperçu du plan et confirmé, et seul le plan que vous avez vu est appliqué. Tout geste qui écrit le dépôt ou le jeu se confirme dans une liste en haut de VS Code, dont le premier choix, actif d'office, est « Ne rien écrire ».</div>
+</section>
+
+<section id="demarrage" data-groupe="Pour commencer">
+<h2>Mise en route</h2>
+<ol>
+<li><b>Python 3.11 ou plus récent</b> doit être installé sur le poste : le moteur de Red Stack est un script Python livré dans l'extension. Rien d'autre à installer. Red Stack essaie <code>python</code>, puis <code>py -3</code> et <code>python3</code> ; s'il n'en trouve aucun, la page le dit et offre de le télécharger ou d'indiquer sa commande.</li>
+<li>Ouvrez la page : icône Red Stack de la barre d'activité (à gauche), bouton « Red Stack » de la barre d'état (en bas), ou commande <code>Red Stack : ouvrir</code> (<kbd>Ctrl</kbd>+<kbd>Maj</kbd>+<kbd>P</kbd>).</li>
+<li>Au premier lancement, la page « Réglages » demande deux dossiers : <b>votre dépôt de zips</b> et <b>le dossier du jeu</b>. Enregistrez.</li>
+<li>La page propose alors de <b>lire le jeu</b> pour créer le profil « actuel ». Cette lecture n'écrit rien : elle reconnaît dans le jeu les fichiers de vos zips et coche les mods qui y sont déjà.</li>
+<li>Lisez l'<b class="b">Aperçu du plan</b>. Sur un jeu déjà moddé, le premier plan remplace surtout des copies par des liens vers le magasin. <b class="b">Appliquer</b>, jeu fermé.</li>
+</ol>
+<p>Ensuite, la routine tient en trois gestes : cocher ou décocher, lire le plan, appliquer.</p>
+<div class="note">Si votre dépôt ne suit pas l'organisation attendue (quels dossiers sont des piles, où vont les zips parqués ou nouveaux), elle se règle : voir <a href="#reglages">Réglages</a>, « Convention du dépôt ». Des zips en vrac dans un seul dossier conviennent aussi : ceux qui sont posés à la racine même du dépôt sont lus comme une pile de plus, « (racine du dépôt) ».</div>
+</section>
+
+<section id="liste" data-groupe="La page">
+<h2>La liste des mods</h2>
+<p>La page s'ouvre sur la liste : une table par pile, une ligne par zip.</p>
+<h3>L'en-tête</h3>
+<ul>
+<li><b>Profil</b> : le profil montré. <b class="b">Nouveau…</b> copie le profil courant sous un autre nom, <b class="b">Supprimer</b> efface le fichier du profil (le jeu ne change pas).</li>
+<li><b>Filtrer les mods…</b> : filtre par nom, au fil de la frappe.</li>
+<li><b>À quel mod est ce fichier ?</b> : tapez un bout du chemin d'un fichier du jeu, puis <kbd>Entrée</kbd>. Red Stack dit quel mod l'a posé.</li>
+<li><b class="b">Arrivages</b>, <b class="b">Mises à jour</b>, <b class="b">Historique</b>, <b class="b">Magasin</b> : la gestion du dépôt.</li>
+<li><b class="b">Conflits</b>, <b class="b">Scripts</b> : les deux analyses, chacune dans son onglet.</li>
+<li><b class="b">Réglages</b>, <b class="b">?</b> (ce manuel), <b class="b">↻</b> (relire maintenant ; son survol dit l'heure de la dernière lecture), <b class="b">Aperçu du plan</b>.</li>
+</ul>
+<h3>Les cases</h3>
+<ul>
+<li>La case d'une ligne active ou coupe un mod. La case d'un titre de pile active ou coupe toute la pile.</li>
+<li>Vous pouvez cocher plusieurs mods à la suite : Red Stack attend un court silence, puis joue toutes vos coches ensemble et relit l'état une seule fois. Aucune coche n'est défaite en route.</li>
+<li><b>Pendant qu'un geste écrit</b> (parquer, remonter, retirer, renommer, appliquer…), un bandeau le dit et la page est verrouillée de la confirmation à la fin du geste : rien ne se coche ni ne se clique. Elle se rouvre seule.</li>
+<li>Un clic sur le titre d'une pile la plie ou la déplie. Un clic sur une ligne ouvre <a href="#detail">le détail du mod</a>.</li>
+</ul>
+<h3>La colonne « État »</h3>
+<table>
+<tr><th>posé</th><td>Actif, et le jeu porte ses fichiers. « (modifié en jeu) » : un de ses réglages a changé depuis la pose ; il est gardé tel quel.</td></tr>
+<tr><th>à poser</th><td>Actif au profil, pas encore dans le jeu. Attend « Appliquer ».</td></tr>
+<tr><th>à compléter</th><td>Déjà posé, mais le plan a encore des fichiers à poser ou à remplacer pour lui (option ajoutée, nouvelle version).</td></tr>
+<tr><th>coupé, à retirer</th><td>Décoché, ses fichiers sont encore dans le jeu. Attend « Appliquer ».</td></tr>
+<tr><th>coupé</th><td>Décoché par vous, sorti du jeu.</td></tr>
+<tr><th>jamais posé</th><td>Connu du profil, jamais entré dans le jeu.</td></tr>
+<tr><th>nouveau dans le dépôt</th><td>Zip arrivé dans une pile, que le profil ne connaît pas encore. Décoché d'office (réglable).</td></tr>
+<tr><th>parqué, retiré</th><td>Zip rangé dans le dossier des parqués ou des retirés de sa pile : visible, pas posable tant qu'il n'est pas remonté.</td></tr>
+</table>
+<h3>La colonne « Nature »</h3>
+<p>Ce que le zip pose, lu dans son contenu : <code>archive</code>, <code>xl</code> (ArchiveXL), <code>REDmod</code>, <code>scripts</code> (Redscript), <code>tweaks</code> (TweakXL), <code>CET</code>, <code>RED4ext</code>, <code>asi</code>, <code>audio</code>, <code>ReShade</code>, <code>réglages</code>, <code>autre</code>. Un clic sur une puce filtre la liste sur cette nature ; un second clic rend tout.</p>
+<p><b>Socle</b> désigne un mod dont d'autres dépendent : il livre un chargeur (CET, RED4ext, Redscript, ArchiveXL, TweakXL, Codeware), ou d'autres mods du dépôt l'appellent dans leur code. Limite : un socle utilisé sans appel lisible dans le code n'est pas reconnu comme tel.</p>
+<h3>Pastilles, puces et tris</h3>
+<ul>
+<li><b>▼ ▲</b> sur une ligne : ce mod perd ou gagne des ressources contre d'autres archives. <b>⇄</b> : ses propres archives se recouvrent entre elles. Le survol détaille, le clic ouvre <a href="#conflits">l'analyse des conflits</a> sur ce mod.</li>
+<li>La puce <b>FOMOD</b> signale un zip posé par <a href="#fomod">son installateur</a>.</li>
+<li>Les puces sous l'en-tête filtrent par état ; la ligne de chiffres résume le profil. <b>Nouveaux</b> montre les zips des dossiers d'arrivée et ceux de la pile que le profil ne connaît pas encore ; <b>Parqués</b> et <b>Retirés</b> montrent le contenu des dossiers des parqués et des retirés.</li>
+<li>Un clic sur un en-tête de colonne trie ; le troisième clic rend l'ordre du dépôt.</li>
+<li><b class="b">⇕ Tout plier / déplier</b>, sur la ligne des chiffres, replie toutes les piles d'un coup ; si tout est déjà replié, il déplie tout. Dans « Mises à jour » et « Arrivages », il replie les bandes de pile. Le même bouton replie les lignes des onglets « Conflits » et « Scripts et tweaks », et un <b class="b">⇕</b> en tête d'un volet fait de même pour ses lignes (historique, plan).</li>
+<li><b>Noms complets</b> montre le nom entier du zip au lieu du titre lu dans un nom de téléchargement Nexus. <b>Dossiers</b> montre où se trouve un zip parqué, nouveau ou retiré. <b>Natures</b> montre ou cache la colonne « Nature » : décochée, elle rend sa largeur aux noms.</li>
+<li>En bout de ligne : <b>parquer</b> un mod coupé et sorti du jeu ; pour un zip rangé (arrivé, parqué, retiré), <b>remonter</b> dans la pile, <b>parquer</b> un arrivage, ou <b>retirer</b> (la corbeille) : le zip passe dans le dossier des retirés de sa pile. Chaque geste est confirmé et n'est qu'un déplacement du zip dans sa pile : rien n'est effacé, un zip retiré se remonte depuis le filtre « Retirés ». Dans ce filtre seulement, la corbeille <b>supprime</b> le zip : il quitte le dépôt pour la corbeille de Windows. Les choix du mod restent au profil pour son retour.</li>
+<li><b>Plusieurs zips rangés d'un coup</b> : dans les filtres « Nouveaux », « Parqués » et « Retirés », chaque zip rangé porte une case, et la case d'une pile coche tous ceux de la pile montrés à l'écran. Ces cases ne touchent jamais le profil ni le plan. Dès qu'un zip est coché, les boutons <b class="b">Remonter dans la pile…</b>, <b class="b">Parquer…</b>, <b class="b">Retirer…</b>, <b class="b">Supprimer…</b> (zips retirés seulement) et « Tout décocher » apparaissent à droite des puces ; le lot part en une seule confirmation, et les cases restent cochées jusqu'à la fin du geste.</li>
+</ul>
+</section>
+
+<section id="profils" data-groupe="La page">
+<h2>Les profils</h2>
+<p>Un profil est un fichier qui dit ce que vous voulez dans le jeu. Changer de profil ne change que ce que la page montre : le jeu suit quand vous appliquez le plan de ce profil.</p>
+<ul>
+<li>Le profil garde, pour chaque mod : actif ou non, les options d'un pack, les fichiers pris un à un, les choix d'un installateur FOMOD, les noms changés dans le jeu, les priorités entre mods et l'ordre de chargement voulu.</li>
+<li><b class="b">Nouveau…</b> part toujours d'une copie du profil courant : pratique pour essayer un lot de mods sans perdre l'état qui marche.</li>
+<li>Passer d'un profil à l'autre revient à lire le plan (ce qui entre, ce qui sort) puis à appliquer. Grâce aux liens, cela prend quelques secondes même pour des centaines de mods.</li>
+</ul>
+</section>
+
+<section id="detail" data-groupe="La page">
+<h2>Le détail d'un mod</h2>
+<p>Un clic sur une ligne ouvre le détail : tout ce que le zip contient, où chaque fichier va dans le jeu et dans quel état il s'y trouve.</p>
+<h3>États d'un fichier</h3>
+<table>
+<tr><th>lié</th><td>Le fichier du jeu est un lien vers l'arbre du mod dans le magasin.</td></tr>
+<tr><th>copié</th><td>Posé en copie : c'est le cas des réglages (pour qu'ils survivent à une mise à jour) et des fichiers en territoire d'un installateur tiers.</td></tr>
+<tr><th>partagé avec X</th><td>Un autre mod actif livre le même fichier, à l'identique : il reste dans le jeu tant que l'un des deux est actif.</td></tr>
+<tr><th>écrasé par X</th><td>Un autre mod actif livre un fichier différent au même endroit, et c'est le sien qui est posé.</td></tr>
+<tr><th>modifié en jeu</th><td>Le fichier a changé depuis sa pose (un réglage écrit par le jeu ou par vous). Il est gardé, jamais remplacé en silence.</td></tr>
+<tr><th>hors Red Stack</th><td>Le fichier est en territoire d'un installateur tiers (ReShade…) et Red Stack ne l'a pas posé : il n'y touche pas.</td></tr>
+</table>
+<h3>Choisir ce qu'on prend</h3>
+<ul>
+<li><b>Pack à options</b> : un zip qui range ses variantes dans des dossiers les montre comme des options à cocher.</li>
+<li><b>Une case par fichier</b> : prendre ou laisser un fichier seul. Le jeu ne change qu'à « Appliquer ».</li>
+<li><b>« Ce fichier est à ce mod »</b> : sur un fichier « hors Red Stack », cocher la case dit que ce fichier appartient au mod. Red Stack l'inscrit à son registre sans le modifier, et il partira avec le mod quand vous le couperez. Décocher le rend à l'installateur tiers et le laisse dans le jeu.</li>
+<li><b>Priorité entre deux mods</b> : quand deux mods actifs veulent le même fichier avec un contenu différent, le plan s'arrête sur un conflit à trancher. Vous dites lequel gagne, fichier par fichier ou pour tout le mod ; le profil s'en souvient.</li>
+</ul>
+<h3>Les boutons du détail</h3>
+<ul>
+<li><b class="b">Installateur…</b> : les pages de choix d'un <a href="#fomod">FOMOD</a>.</li>
+<li><b class="b">Noms dans le jeu…</b> : poser les fichiers du mod <a href="#noms">sous d'autres noms</a>, sans toucher au zip.</li>
+<li><b class="b">Renommer le contenu…</b> : récrire le zip avec des noms <a href="#arrivages">à votre convention</a>.</li>
+<li><b class="b">Conflits d'archives…</b> : l'analyse des conflits, centrée sur ce mod.</li>
+<li>Le lien Nexus ouvre la page du mod quand le nom du zip porte son numéro.</li>
+</ul>
+</section>
+
+<section id="plan" data-groupe="La page">
+<h2>Aperçu du plan et « Appliquer »</h2>
+<p><b class="b">Aperçu du plan</b> compare le profil au jeu et liste ce qui serait fait, sans rien écrire :</p>
+<table>
+<tr><th>à poser</th><td>Fichiers absents du jeu, qu'un mod actif apporte.</td></tr>
+<tr><th>à remplacer</th><td>Fichiers présents avec un autre contenu (nouvelle version, autre mod prioritaire).</td></tr>
+<tr><th>à retirer</th><td>Fichiers d'un mod coupé, que plus aucun mod actif ne livre.</td></tr>
+<tr><th>à lier / à délier</th><td>Une copie identique devient un lien vers le magasin, ou l'inverse (un fichier devenu réglage ou passé en territoire tiers). Le contenu du jeu ne change pas. Après une mise à jour, les fichiers restés identiques d'une version à l'autre sont « à lier » : ils passent à l'arbre de la nouvelle version, rien n'est copié. Un « à lier » repris d'un autre mod dit lequel. Sous chaque mod du plan, « Voir les fichiers » liste un par un les fichiers touchés ; le bloc des choix faits se replie d'un clic sur son titre. La fiche d'un mod en cours de mise à jour dit « à remplacer » ou « inchangé depuis la version d'avant » au lieu de nommer sa propre ancienne version.</td></tr>
+<tr><th>pris / rendu</th><td>Fichier inscrit au registre par « ce fichier est à ce mod », ou rendu à l'installateur tiers.</td></tr>
+<tr><th>modlist.txt</th><td>Le fichier d'ordre de chargement à écrire ou à retirer, si le profil le tient.</td></tr>
+<tr><th>conflits</th><td>Deux mods actifs veulent le même fichier, contenu différent, sans priorité dite. À trancher avant d'appliquer.</td></tr>
+<tr><th>mods coupés</th><td>Une ligne par mod coupé : ce qui sort du jeu, ce qu'un autre mod reprend à l'identique, ce qu'un autre tient déjà.</td></tr>
+</table>
+<h3>Appliquer</h3>
+<ul>
+<li><b class="b">Appliquer au jeu…</b> ouvre une liste en haut de VS Code. Le premier choix, « Ne rien écrire », est actif d'office : <kbd>Entrée</kbd> tout seul n'écrit jamais le jeu. Il faut descendre sur « Appliquer » puis valider.</li>
+<li><b>Le jeu doit être fermé.</b> S'il tourne, rien n'est écrit.</li>
+<li>Si le disque a changé entre l'aperçu et le clic, le plan n'est plus celui que vous avez vu : rien n'est écrit et le nouveau plan vous est montré.</li>
+<li>Un fichier modifié en jeu depuis sa pose (un réglage, le plus souvent) est <b>gardé tel quel</b> : le plan le compte à part et « Appliquer » ne le remplace pas.</li>
+<li><b>Fichier présent mais pas posé par Red Stack</b> : le jeu porte déjà ce fichier, que Red Stack n'y a pas mis, avec un autre contenu que celui du zip (un mod installé à la main dans une autre version, par exemple). Il est laissé en place. Pour prendre celui du zip, dépliez cette ligne du plan : <b class="b">Remplacer par le zip</b> sur un fichier, ou <b class="b">Tout remplacer par les zips</b>. Le fichier passe alors dans « à remplacer » ; à l'application, l'ancien est d'abord copié dans le dossier des sauvegardes. <b class="b">Laisser en place</b> revient en arrière tant que rien n'est appliqué.</li>
+<li><b>Reprendre un mod installé à la main</b> : déposez son zip dans le dossier d'arrivée de sa pile, remontez-le, cochez-le, ouvrez l'aperçu du plan. Les fichiers identiques sont repris sans rien écrire ; les autres se remplacent comme ci-dessus.</li>
+<li>La commande « Avant d'appliquer » des Réglages, si vous en avez mis une, est lancée d'abord ; si elle échoue, rien n'est écrit.</li>
+</ul>
+</section>
+
+<section id="arrivages" data-groupe="Le dépôt">
+<h2>Arrivages</h2>
+<p><b class="b">Arrivages</b> montre ce qui vient d'entrer dans le dépôt : les archives des dossiers d'arrivée de chaque pile, les zips qui portent encore un nom de l'application Nexus, et les <code>.7z</code> / <code>.rar</code>. Les lignes sont rangées par pile, dans l'ordre de la liste des mods ; un clic sur la bande d'une pile la replie ou la déplie.</p>
+<h3>Mettre les noms à la forme du site</h3>
+<ul>
+<li>Red Stack propose pour chaque archive le nom que donne le site Nexus : <code>Nom-numéroDuMod-version-horodatage.zip</code>. Il le lit par l'API publique de Nexus, sans clé, et garde la réponse six heures (<b class="b">Relire Nexus</b> la redemande).</li>
+<li>C'est ce nom qui permet ensuite de <a href="#maj">chercher les mises à jour</a>.</li>
+<li>Le nom proposé se retouche dans son champ. Quand plusieurs fichiers du mod conviennent, la ligne est « à trancher » avec la liste des candidats.</li>
+<li>Cochez les lignes, puis <b class="b">Renommer les archives cochées…</b>. Seul le nom du fichier change.</li>
+</ul>
+<h3>Convertir, remonter, parquer</h3>
+<ul>
+<li><b class="b">Convertir en .zip…</b> : un <code>.7z</code> ou un <code>.rar</code> est récrit en <code>.zip</code> (par 7-Zip, UnRAR ou le <code>tar</code> de Windows), relu, puis l'original est supprimé.</li>
+<li><b class="b">Remonter dans la pile…</b> : le zip quitte le dossier d'arrivée et devient un mod « nouveau dans le dépôt », à cocher dans la liste.</li>
+<li><b class="b">Parquer…</b> : le zip va dans le dossier des parqués de sa pile.</li>
+<li>« Remonter les cochées » et « Parquer les cochées » traitent un lot en une seule confirmation.</li>
+</ul>
+<h3>Reconnaître une mise à jour</h3>
+<p>Quand un arrivage est une version plus récente d'un mod déjà en place, la ligne le dit. <b class="b">Ranger la mise à jour…</b> met le nouveau zip à la place de l'ancien, qui part dans les retirés de sa pile ; le profil suit la nouvelle version. « À la place de… » permet de désigner un autre zip du même mod. Ce geste ne demande aucune clé d'API : il suffit de télécharger le fichier à la main dans un dossier d'arrivée.</p>
+<p><b>Mod sans numéro Nexus</b> (mod maison, zip venu de GitHub) : Red Stack le reconnaît à son nom et à sa version. Un arrivage <code>Mon Mod 1.0.1.zip</code> est proposé comme mise à jour de <code>Mon Mod 1.0.0.zip</code> (espaces, tirets et majuscules ne comptent pas ; la version doit être plus haute). Le nouveau zip garde son nom. Ces zips n'apparaissent pas dans « Mises à jour », qui ne lit que Nexus.</p>
+<p><b>Désigner vous-même le zip remplacé</b> : quand Red Stack ne reconnaît rien (nom changé, pas de version dans le nom), la liste <b class="b">Ranger à la place de…</b> de la ligne propose tous les zips en place de la même pile. Choisissez celui que l'arrivage remplace : rien n'est comparé, l'arrivage prend le nom du champ « Nom voulu », l'ancien zip part dans les retirés. Une confirmation précède l'écriture.</p>
+<h3>« Contenu… » : les noms à l'intérieur du zip</h3>
+<ul>
+<li><b class="b">Contenu…</b> propose de renommer ce que le zip livre (archives, <code>.xl</code>, dossiers de scripts et de tweaks) selon votre convention : mots capitalisés, nom du mod, dossier de tête inutile retiré.</li>
+<li>Avant de proposer, Red Stack lit les références de tout le dépôt. Un nom cité en dur par du code, un dossier partagé avec un autre mod, un préfixe d'ordre de chargement sont <b>gardés</b>, avec la raison affichée.</li>
+<li>Chaque chemin proposé se retouche. La proposition recommande, elle ne vous bloque pas.</li>
+<li><b>Restructurer</b> : un chemin retouché peut changer de dossier. Tapez-le en entier (<code>r6/tweaks/Famille/Mon_Mod.yaml</code>) : un dossier qui n'existe pas est créé dans le zip. Rien ne vérifie ce que le mod attend à cet endroit ; à vous de le savoir.</li>
+<li><b class="b">Ajouter le dossier</b> fait ce geste pour les scripts et les tweaks : le nom tapé dans « Dossier à ajouter » s'insère juste sous <code>r6/scripts</code> et <code>r6/tweaks</code>, dans tous les chemins de la table. Rien n'est écrit : vous relisez, puis vous renommez. Les archives ne sont pas concernées, le jeu ne les lit pas dans un sous-dossier.</li>
+<li><b>Dossier de famille</b> : quand au moins deux autres zips du dépôt au même début de nom (<code>Famille - …</code>) rangent leurs scripts ou leurs tweaks dans un même sous-dossier, Red Stack y propose ceux du nouveau venu, et le dit.</li>
+<li>Valider <b>récrit le zip</b> (mêmes fichiers, mêmes dates, nouveaux noms), le relit, puis remplace l'ancien. Si le mod est dans le jeu, le plan remplacera ses fichiers.</li>
+</ul>
+<div class="note">Ce geste est différent de <a href="#noms">« Noms dans le jeu… »</a>, qui ne touche pas au zip et note seulement au profil sous quel nom poser. « Contenu… » range votre dépôt ; « Noms dans le jeu… » règle un cas dans un profil.</div>
+</section>
+
+<section id="maj" data-groupe="Le dépôt">
+<h2>Mises à jour (Nexus)</h2>
+<p><b class="b">Mises à jour</b> compare chaque zip nommé à la forme du site aux fichiers que son mod publie sur Nexus. <b>La recherche ne demande aucune clé</b> et ne télécharge rien. Les lignes sont rangées par pile, dans l'ordre de la liste des mods, puis par nom ; un clic sur la bande d'une pile la replie ou la déplie. Un zip sans numéro Nexus (mod maison) n'est pas comparé : sa nouvelle version se range depuis « Arrivages ».</p>
+<h3>Lire la liste</h3>
+<ul>
+<li><b>Mise à jour</b> : un fichier plus récent, du même nom hors version et de la même catégorie. Cochée d'office.</li>
+<li><b>À voir</b> : cas douteux (fichier archivé par l'auteur, plusieurs candidats, variante pour un autre patch du jeu). Jamais cochée d'office ; la ligne liste les fichiers plus récents à choisir.</li>
+<li>Un zip que vous avez annoté dans son nom (retouche maison) est proposé mais pas coché, avec un avertissement : la mise à jour remplacerait votre retouche.</li>
+<li><b>Ignorer</b> écarte un mod des recherches ; c'est réversible depuis la même vue.</li>
+<li>Le nom du nouveau zip se retouche avant de télécharger.</li>
+<li>Non comparés : les zips sans numéro de mod dans leur nom, et les mods publiés ailleurs que sur Nexus.</li>
+</ul>
+<h3>Télécharger</h3>
+<p>Le téléchargement demande <b>votre clé d'API personnelle Nexus</b> :</p>
+<ol>
+<li><b class="b">Clé d'API Nexus…</b> ouvre une saisie dans VS Code. <b class="b">Où la trouver ?</b> ouvre la page des clés de votre compte : la clé personnelle est <b>tout en bas</b> de cette page, sous la liste des applications (« Personal API Key »).</li>
+<li>La clé est gardée dans le coffre de VS Code. Elle n'est écrite dans aucun fichier et n'est jamais donnée au serveur MCP. Un champ vide l'oublie.</li>
+<li>Cochez, puis <b class="b">Télécharger…</b> : une confirmation pour le lot, puis les zips arrivent un par un.</li>
+</ol>
+<ul>
+<li>Chaque nouvelle version prend la place de l'ancienne, qui part dans le dossier des retirés de sa pile. Le profil suit. Il reste à lire l'aperçu du plan et à appliquer.</li>
+<li><b>Compte Premium</b> : lien direct, rien d'autre à faire.</li>
+<li><b>Compte gratuit</b> : Nexus réserve le lien direct aux comptes Premium. Pour chaque zip, Red Stack ouvre la page du fichier ; vous cliquez « Mod manager download » (ou « Slow download »). Le lien arrive seul si Red Stack est <a href="#nxm">inscrit pour les liens nxm://</a> ; sinon vous le collez dans la boîte ouverte en haut de VS Code.</li>
+<li>Pendant un téléchargement, la vue est verrouillée (un lot à la fois) et les zips concernés ne se parquent ni ne se récrivent. Le reste de l'outil reste libre.</li>
+</ul>
+<div class="note">Le quota d'appels à l'API est attaché à votre clé, donc à votre compte. La puce de votre compte, au survol, dit ce qu'il en reste.</div>
+</section>
+
+<section id="nxm" data-groupe="Le dépôt">
+<h2>Liens nxm:// (« Mod manager download »)</h2>
+<p>Sur Nexus, le bouton « Mod manager download » envoie un lien <code>nxm://</code> au gestionnaire de mods inscrit sur le poste. Red Stack peut être ce gestionnaire (Windows).</p>
+<ol>
+<li><b class="b">Réglages</b>, section « Ce poste » : la page dit quel programme reçoit ces liens aujourd'hui.</li>
+<li><b class="b">Recevoir les liens nxm:// dans Red Stack…</b> (confirmé) écrit une clé du registre de votre compte Windows, sans droits d'administrateur. Le programme d'avant est noté.</li>
+<li><b class="b">Ne plus recevoir les liens nxm://…</b> défait l'inscription et rend la main au programme d'avant.</li>
+</ol>
+<p>Une fois inscrit, un clic sur « Mod manager download » ouvre dans VS Code une liste à choix :</p>
+<ul>
+<li><b>Mettre à jour</b> tel zip du dépôt : le fichier reçu est du même mod. La nouvelle version prend sa place.</li>
+<li><b>Mod nouveau</b> : choisissez la pile ; le zip est rangé dans son dossier d'arrivée et paraît dans <a href="#arrivages">Arrivages</a>.</li>
+<li><b>Ne rien télécharger</b>, choix actif d'office.</li>
+</ul>
+<p>La clé d'API reste nécessaire : Nexus ne délivre pas le fichier sans elle, même avec le lien.</p>
+</section>
+
+<section id="fomod" data-groupe="Le dépôt">
+<h2>Installateurs FOMOD</h2>
+<p>Un zip qui porte <code>fomod/ModuleConfig.xml</code> décrit lui-même ses choix d'installation. Red Stack rejoue cet installateur.</p>
+<ul>
+<li>Dans le détail du mod, <b class="b">Installateur…</b> ouvre un volet avec ses pages, ses groupes (un seul choix, ou plusieurs), les descriptions, et les images à la demande.</li>
+<li>Un clic note le choix au profil. Les pages et les fichiers qui dépendent d'un choix suivent aussitôt ; une page écartée par un choix d'avant est dite cachée.</li>
+<li>Les fichiers que l'installateur copie <b>hors des dossiers du jeu</b> (documentation, outils) sont posés d'office, comme le ferait tout installateur ; une case permet de les laisser.</li>
+<li><b>« Ignorer l'installateur : piocher à la main »</b> rend le zip aux cases par fichier. <b class="b">Suivre l'installateur</b> y revient.</li>
+<li>Comme toujours, le jeu ne change qu'à « Appliquer ».</li>
+</ul>
+<div class="note garde"><b>Limites, dites aussi à l'écran.</b> Une condition sur la présence d'un fichier dans le jeu est tenue pour « absent » ; une condition sur la version du jeu est tenue pour vraie.</div>
+</section>
+
+<section id="noms" data-groupe="Le dépôt">
+<h2>Noms dans le jeu</h2>
+<p><b class="b">Noms dans le jeu…</b> (détail d'un mod) pose ce que le mod livre sous d'autres noms : archives, <code>.xl</code>, fichiers et dossiers de <code>r6\scripts</code> et <code>r6\tweaks</code>, dossier CET, dossier REDmod.</p>
+<ul>
+<li>Un champ par nom. <b>Le zip ne change pas</b> : le profil note le nom voulu ; « Appliquer » pose le nouveau et retire l'ancien. Un champ vidé rend le nom de l'auteur.</li>
+<li>Chaque ligne dit <b>qui cite ce nom</b> dans le code du dépôt, le mod lui-même compris. Un nom cité est un nom que du code cherche tel quel : le renommer peut casser le mod qui le cite. Red Stack prévient, sans vous bloquer.</li>
+<li>Refusés : un changement de casse seul, et un nom qui prendrait la place du fichier d'un autre mod actif.</li>
+<li>Un dossier CET renommé laisse ses réglages écrits en jeu sous l'ancien nom.</li>
+</ul>
+<p>Usage courant : changer la place d'une archive dans l'ordre de chargement (voir <a href="#ordre">plus bas</a>), ou ranger les dossiers de scripts d'une famille de mods.</p>
+</section>
+
+<section id="conflits" data-groupe="Analyses">
+<h2>Conflits d'archives</h2>
+<p>Plusieurs archives peuvent livrer la même ressource (un maillage, une texture). Le jeu prend chaque ressource dans <b>la première archive chargée</b> qui la contient. Une archive <b>gagne</b> donc sur celles chargées après elle et <b>perd</b> contre celles d'avant.</p>
+<p>À l'écran, « archive » désigne le fichier <code>.archive</code> et « ressource » ce qu'il contient.</p>
+<p><b class="b">Conflits</b> ouvre l'analyse dans un onglet à côté de la page (il se détache en fenêtre par le clic droit sur son titre). C'est une lecture seule, faite sur l'ordre <b>voulu par le profil</b> ; une puce dit combien de changements d'archives restent à appliquer.</p>
+<h3>Quatre lectures</h3>
+<ul>
+<li><b>Par archive</b> : pour chacune, sur qui elle gagne et contre qui elle perd, en nombre de ressources.</li>
+<li><b>Par mod</b> et <b>par paire de mods</b> : « A gagne sur B », avec « tout voir » pour la liste des ressources.</li>
+<li><b>Par paire d'archives</b>.</li>
+<li><b>Par ressource</b> : dans quelle archive elle est prise, par lesquelles elle est perdue.</li>
+</ul>
+<ul>
+<li>Les puces de chiffres se cliquent : archives, ressources en conflit, paires, ressources en copie identique, ressources qui remplacent le jeu de base.</li>
+<li>Le champ de filtre prend un nom de mod, d'archive, ou un bout de chemin de ressource (trois lettres au moins).</li>
+<li><b>Copie identique</b> : deux archives livrent la même ressource, octet pour octet. Peu importe laquelle gagne ; elles sont comptées à part.</li>
+<li><b>Jeu de base</b> : la ressource remplace un fichier du jeu lui-même. C'est le but de beaucoup de mods ; l'information sert quand deux mods remplacent la même.</li>
+<li>Les archives posées à la main, hors Red Stack, comptent aussi ; elles sont dites « hors Red Stack ».</li>
+</ul>
+
+<h3 id="ordre">Changer l'ordre de chargement</h3>
+<p>Les archives se chargent dans l'ordre de leurs noms, caractère par caractère : <code>!</code> et <code>#</code> d'abord, puis les chiffres, les MAJUSCULES, <code>_</code>, les minuscules. Les archives REDmod viennent après. Un fichier <code>archive\pc\mod\modlist.txt</code>, s'il existe, impose son ordre.</p>
+<p>Dans la lecture « par archive », dépliez une archive : <b class="b">Passer devant…</b> sur celle qui gagne contre elle, <b class="b">Passer derrière…</b> sur celle qu'elle bat. Deux voies au choix :</p>
+<ul>
+<li><b>Renommer dans le jeu</b> : Red Stack propose un nom au plus près de la cible (souvent un préfixe). Le zip n'est pas touché, le profil note le nom, et <b class="b">Rendre le nom de l'auteur</b> l'annule. Si l'ancien nom est cité dans le code du dépôt, c'est dit avant.</li>
+<li><b>Tenir l'ordre par modlist.txt</b> : aucun nom ne change. Le profil note l'ordre voulu, « Appliquer » écrit le fichier (l'ancien est copié dans les sauvegardes). « Ne plus le tenir » le retire au prochain « Appliquer ».</li>
+</ul>
+<p>Dans les deux cas seul le profil est écrit : lisez l'aperçu du plan, puis appliquez.</p>
+<div class="note garde">Les archives REDmod ne se réordonnent pas ici. Une archive hors Red Stack ne se renomme pas : seule <code>modlist.txt</code> la déplace.</div>
+</section>
+
+<section id="scripts" data-groupe="Analyses">
+<h2>Scripts et tweaks (conflits de code)</h2>
+<p><b class="b">Scripts</b> ouvre une analyse à part : les mods qui se marchent dessus dans leur code. La première lecture prend quelques dizaines de secondes, les suivantes quelques secondes. Lecture seule.</p>
+<h3>Ce qui est cherché</h3>
+<ul>
+<li><b>Redscript</b> : deux mods remplacent la même méthode (<code>@replaceMethod</code>) ; une enveloppe (<code>@wrapMethod</code>) qui n'appelle pas <code>wrappedMethod</code> et coupe donc la chaîne.</li>
+<li><b>TweakXL</b> : la même propriété posée à deux valeurs ; un ajout contre un retrait dans une liste ; un enregistrement défini deux fois.</li>
+<li><b>SetFlat en dur</b> : une valeur écrite par du code contre le tweak d'un autre mod.</li>
+</ul>
+<h3>Trois niveaux</h3>
+<table>
+<tr><th>à regarder</th><td>Un seul des deux peut marcher : deux remplacements différents de la même méthode.</td></tr>
+<tr><th>à revoir</th><td>Probablement gênant, à juger : valeurs opposées, enveloppe qui coupe, doublon.</td></tr>
+<tr><th>sans action</th><td>Les mods se croisent mais restent compatibles.</td></tr>
+</table>
+<ul>
+<li>Les puces filtrent par niveau et par sorte ; le champ filtre par mod, méthode, propriété ou fichier.</li>
+<li>Une ligne dépliée explique le cas et dit qui écrit quoi. Un clic sur <code>fichier:ligne</code> ouvre le fichier à cette ligne dans l'éditeur ; un clic sur le mod ouvre son détail.</li>
+<li>Les mods écrits pour cohabiter (<code>@if(ModuleExists(…))</code>) sont reconnus.</li>
+</ul>
+<div class="note garde">Le « <b>dernier mot prévu</b> » est déduit de l'ordre des noms de fichiers. Il n'est pas observé dans le jeu : prenez-le comme une indication. Ne sont pas analysés : les recoupements Lua de CET (<code>Override</code>, <code>Observe</code>) et les fichiers <code>.tweak</code> de l'ancien format. Détection reprise de Conflict Studio (licence MIT).</div>
+</section>
+
+<section id="historique" data-groupe="Suivi">
+<h2>Historique</h2>
+<p><b class="b">Historique</b> ouvre un volet : ce que Red Stack a écrit, geste par geste, du plus récent au plus ancien.</p>
+<ul>
+<li>Chaque « Appliquer » se déplie mod par mod : posé, retiré, mis à jour depuis telle version, modifié.</li>
+<li>Les gestes sur le dépôt y sont aussi : parquer, remonter, retirer, supprimer un zip retiré, renommer, convertir, récrire un contenu, télécharger une mise à jour, ranger un arrivage.</li>
+<li>Utile pour répondre à « qu'est-ce qui a changé depuis la dernière fois que le jeu marchait ? ».</li>
+</ul>
+</section>
+
+<section id="magasin" data-groupe="Suivi">
+<h2>Magasin</h2>
+<p>Le magasin porte un arbre extrait par mod actif. Les fichiers du jeu sont des <b>liens physiques</b> vers ces arbres : le même fichier a deux noms sur le disque et ne pèse qu'une fois.</p>
+<p><b class="b">Magasin</b> ouvre un volet qui dit :</p>
+<ul>
+<li>combien de fichiers du jeu sont liés et combien sont copiés (les réglages le sont toujours) ;</li>
+<li><b>le poids réel</b> sur le disque, à côté de celui que l'Explorateur de Windows additionne. L'Explorateur compte un fichier lié deux fois, dans l'arbre et dans le jeu : son total est trompeur, c'est normal ;</li>
+<li>la place libre ;</li>
+<li>les <b>arbres sans mod actif</b>, avec <b class="b">Purger…</b> : ils sont supprimés, les zips ne sont pas touchés, et un arbre se refait depuis son zip ;</li>
+<li>les <b>retouches</b> : un fichier d'un arbre modifié à la main. <b class="b">Annuler…</b> remet celui du zip ; le jeu suit à « Appliquer ».</li>
+</ul>
+<div class="note">Mettez le magasin sur le même disque que le jeu : un lien physique ne traverse pas les disques. Sur un autre disque, Red Stack pose des copies ; tout marche, mais chaque mod pèse deux fois.</div>
+</section>
+
+<section id="reglages" data-groupe="Réglages">
+<h2>Réglages</h2>
+<p><b class="b">Réglages</b> ouvre une page pleine. Presque tout se valide par <b class="b">Enregistrer</b>, en bas ; les deux premières sections, « Langue » et « Thème », et les boutons d'action (sauvegardes, référence, liens nxm://) agissent tout de suite.</p>
+<h3 id="langue">Langue</h3>
+<ul>
+<li>La page, la barre latérale et les messages de Red Stack existent en onze langues : <b>français</b>, <b>anglais</b>, allemand, espagnol, portugais du Brésil, italien, polonais, russe, chinois simplifié, japonais et coréen. <b>Automatique</b> suit la langue d'affichage de VS Code ; une langue que Red Stack n'a pas passe en anglais.</li>
+<li>Le français est la langue d'écriture, l'anglais a été écrit avec lui. Les neuf autres langues sont des traductions faites par une IA et contrôlées par un banc automatique (valeurs, balises, formes du pluriel), pas encore relues par des locuteurs : une tournure fausse ou maladroite se signale par un ticket sur le dépôt du projet.</li>
+<li>Le choix s'applique tout de suite : la page se recharge dans la nouvelle langue. Enregistrez d'abord vos autres réglages, une saisie en cours serait perdue.</li>
+<li>Les messages du moteur (états des mods, raisons, refus, erreurs) suivent ce choix. Un texte gardé dans un cache avant le changement de langue peut rester dans l'ancienne jusqu'à sa prochaine relecture.</li>
+<li>Ce manuel existe en français et en anglais : il s'ouvre en français quand Red Stack est en français, en anglais dans toute autre langue. Les serveurs MCP (pilotage par une session Claude Code) parlent anglais, quelle que soit la langue choisie ; les noms de leurs outils et les codes d'état restent ceux du moteur. Les titres des commandes et des réglages dans VS Code suivent la langue de VS Code, pas ce choix.</li>
+</ul>
+<h3 id="theme">Thème</h3>
+<ul>
+<li>Deux thèmes de couleurs complets viennent avec l'extension : <b>Red Stack Rouge</b> et <b>Red Stack Jaune</b>. Un bouton active chacun, tout de suite, pour toutes vos fenêtres VS Code.</li>
+<li><b class="b">Autre thème…</b> ouvre la liste de tous les thèmes installés (celle de <kbd>Ctrl</kbd>+<kbd>K</kbd> <kbd>Ctrl</kbd>+<kbd>T</kbd>), pour revenir au vôtre. La page Red Stack suit n'importe quel thème.</li>
+<li><b>Icônes de la barre d'activité en couleur</b> : avec un thème Red Stack, toutes les icônes de la barre de gauche prennent la couleur d'accent, la même que celle des boutons ; l'icône active se reconnaît à son trait. Décochée, seule l'icône active est en couleur.</li>
+</ul>
+<h3>Dossiers</h3>
+<ul>
+<li><b>Dépôt</b> et <b>jeu</b> : les deux seuls obligatoires.</li>
+<li><b>Magasin</b> et <b>référence du jeu</b> : vides, ils se placent à côté du dossier du jeu (« … - Red Stack », « … - Référence »). <b>Sauvegardes</b> et <b>journal</b> : vides, ils vont dans le dossier des données.</li>
+<li><b>Zips nouveaux</b> : décochée d'office, un zip arrivé dans une pile reste à cocher. Cochée, il est activé d'office : il ne reste qu'à appliquer.</li>
+</ul>
+<h3>Convention du dépôt</h3>
+<p>Comment lire votre organisation : quels dossiers sont des piles, quels sous-dossiers sont ceux des zips parqués, nouveaux (arrivages) et retirés, quels dossiers d'un zip ne sont jamais posés (documentation, sources). Un bouton remet la convention par défaut.</p>
+<p>Red Stack lit trois endroits, pas plus : les zips posés à la racine du dépôt, ceux de chaque pile, et ceux des sous-dossiers de convention d'une pile. Un dossier qui porte des archives et que la convention ne lit pas (son nom ne suit pas le motif des piles, ou il est rangé plus bas dans une pile) est nommé sous ces champs, et sur la liste tant qu'elle est vide : rien n'est écarté en silence.</p>
+<h3>Convention du contenu des zips</h3>
+<p>Les tables de <a href="#arrivages">« Contenu… »</a> : mots gardés tels quels, préfixes par type, piles où le nom complet du mod est repris.</p>
+<h3>Réglages des mods, jamais liés</h3>
+<p>Motifs des fichiers de réglages. Un fichier qui en suit un est <b>copié</b> au lieu d'être lié : ce que vous réglez en jeu n'abîme pas l'arbre du mod et survit à sa mise à jour. La première lecture du jeu ajoute seule ce qu'elle trouve modifié.</p>
+<h3>Sauvegardes des réglages</h3>
+<ul>
+<li><b class="b">Sauvegarder maintenant</b> : copie datée de tous les réglages des mods présents dans le jeu, livrés par un zip ou écrits en jeu.</li>
+<li><b class="b">Comparer au jeu</b> : ce qui a changé depuis cette sauvegarde.</li>
+<li><b class="b">Restaurer…</b> : remet les fichiers différents ou absents, jeu fermé ; ceux d'aujourd'hui sont copiés avant.</li>
+</ul>
+<h3>Hors Red Stack</h3>
+<p>Le territoire d'un installateur tiers (ReShade pose lui-même ses shaders). Sous ces motifs, un fichier présent que Red Stack n'a pas posé n'est jamais lié, remplacé ni retiré.</p>
+<h3>Avant d'appliquer</h3>
+<p>Une commande lancée avant toute écriture du jeu (votre propre sauvegarde, par exemple). Si elle échoue, rien n'est écrit.</p>
+<h3>Référence du jeu</h3>
+<ul>
+<li><b class="b">Créer la référence…</b> copie le jeu sans ses archives (exécutables, bibliothèques, scripts de base). Les fichiers posés par Red Stack sont laissés hors de la copie : inutile de vider le jeu d'abord.</li>
+<li><b class="b">Contrôler le socle</b> dit ce qui a changé depuis ; <b class="b">Restaurer le socle…</b> le remet, par exemple après une mise à jour forcée par le lanceur.</li>
+</ul>
+<h3>Ce poste</h3>
+<ul>
+<li><b>Commande Python</b> et <b>dossier des données</b> (profils, registre de pose, <code>config.json</code>).</li>
+<li><a href="#nxm">Liens nxm://</a> : inscrire Red Stack, ou défaire l'inscription.</li>
+<li><a href="#claude">Serveur MCP</a> : la commande qui le déclare, à copier.</li>
+</ul>
+<h3>WolvenKit, pour une session Claude Code</h3>
+<ul>
+<li><b>CLI WolvenKit</b> : le dossier qui porte <code>WolvenKit.CLI.exe</code> (« WolvenKit Console », à télécharger à part sur la page des versions de WolvenKit ; elle demande le .NET Runtime). La ligne dit si la CLI est trouvée.</li>
+<li><b>Atelier</b> : le seul dossier où ce volet écrit. Un dossier à part, hors du jeu, du dépôt, du magasin, des sauvegardes et des données ; sinon tout est refusé.</li>
+<li>La commande qui déclare ce second serveur se copie sous les deux champs. Voir <a href="#wolvenkit">Lire et refaire des archives par WolvenKit</a>.</li>
+</ul>
+</section>
+
+<section id="vscode" data-groupe="Réglages">
+<h2>Red Stack dans VS Code</h2>
+<ul>
+<li><b>Barre latérale</b> (icône Red Stack de la barre d'activité) : le profil (clic = en changer), les mods actifs, ce qui attend « Appliquer », les zips nouveaux, les conflits, et un raccourci vers chaque vue, ce manuel compris.</li>
+<li><b>Onglets</b> : la page, « Conflits », « Scripts et tweaks » et ce manuel sont des onglets ordinaires. Ils se déplacent, se détachent en fenêtre, et reviennent à leur place au redémarrage de VS Code.</li>
+<li><b>Actualisation automatique</b> : la liste se relit seule quand un zip arrive, part ou change dans une pile, quand <code>archive\pc\mod</code> change, ou quand un profil est écrit ailleurs. Elle attend qu'une copie en cours soit finie. Le réglage <code>redStack.actualisationAuto</code> la coupe ; le bouton ↻ relit alors sur demande.</li>
+<li><b>Chercher dans ce manuel</b> : le champ du sommaire filtre les sections ; <kbd>Ctrl</kbd>+<kbd>F</kbd> cherche dans le texte.</li>
+</ul>
+<h3>Réglages de VS Code (<kbd>Ctrl</kbd>+<kbd>,</kbd> puis « Red Stack »)</h3>
+<table>
+<tr><th><code>redStack.python</code></th><td>Commande Python (défaut : <code>python</code>).</td></tr>
+<tr><th><code>redStack.donnees</code></th><td>Dossier des données. Vide : le dossier de stockage de l'extension.</td></tr>
+<tr><th><code>redStack.actualisationAuto</code></th><td>Relire seul quand le disque change (coché d'office).</td></tr>
+<tr><th><code>redStack.barreEnCouleur</code></th><td>Icônes de la barre d'activité à la couleur d'accent (aussi dans « Réglages », « Thème »).</td></tr>
+<tr><th><code>redStack.langue</code></th><td>Langue de l'interface : <code>auto</code> (celle de VS Code), <code>fr</code>, <code>en</code>, <code>de</code>, <code>es</code>, <code>pt-br</code>, <code>it</code>, <code>pl</code>, <code>ru</code>, <code>zh-cn</code>, <code>ja</code> ou <code>ko</code> (aussi dans « Réglages », « Langue »).</td></tr>
+<tr><th><code>redStack.moteur</code></th><td>Un autre moteur que celui du paquet (développement).</td></tr>
+</table>
+</section>
+
+<section id="claude" data-groupe="Réglages">
+<h2>Pilotage par une session Claude Code</h2>
+<p>L'extension porte un serveur MCP. Une fois déclaré (la commande se copie depuis « Réglages », « Ce poste »), une session Claude Code peut lire l'état, les conflits, l'historique, changer un profil et préparer un plan.</p>
+<h3>Ce qu'une session peut faire</h3>
+<ul>
+<li><b>Lire</b> : l'état des mods (par pile, par état, par nature), le détail d'un mod, à qui est un fichier du jeu, le plan, les conflits d'archives (par paire, par mod, par archive, par ressource), les conflits de scripts et de tweaks, l'ordre de chargement, l'historique, le magasin, la référence du jeu, les sauvegardes de réglages, les mises à jour proposées par Nexus, les arrivages et le nom que chacun prendrait, le contenu d'un zip face à la convention.</li>
+<li><b>Changer un profil</b> : activer ou couper un mod ou une pile, prendre ou laisser une option ou un fichier, dire « ce fichier est à ce mod », régler une priorité entre deux mods ou pour un seul fichier, renommer dans le jeu, changer l'ordre de chargement, répondre à un installateur FOMOD.</li>
+<li><b>Régler</b> : les motifs de réglages et les motifs « hors Red Stack », ignorer ou reproposer les mises à jour d'un mod, faire une sauvegarde des réglages.</li>
+</ul>
+<h3>Ce qui reste à vous</h3>
+<ul>
+<li><b>Écrire le jeu</b> : appliquer un plan, restaurer des réglages ou la référence.</li>
+<li><b>Écrire le dépôt</b> : parquer, remonter, retirer, renommer ou convertir un arrivage, ranger une mise à jour, récrire le contenu d'un zip, télécharger depuis Nexus, purger le magasin. Une session prépare ces gestes en lecture et vous dit quoi faire ; vous les faites dans la page.</li>
+</ul>
+<div class="note garde"><b>Une session n'écrit jamais le jeu.</b> Elle dépose une demande ; VS Code vous montre le plan chiffré et son motif, et c'est vous qui appliquez ou refusez, par la même confirmation que le bouton de la page. La clé d'API Nexus ne lui est jamais donnée.</div>
+</section>
+
+<section id="wolvenkit" data-groupe="Réglages">
+<h2>Lire et refaire des archives par WolvenKit</h2>
+<p>Un second serveur MCP, à déclarer à part, laisse une session Claude Code ouvrir les archives du jeu et des mods avec la CLI WolvenKit : utile pour comprendre un conflit, comparer la ressource d'un mod à celle du jeu, retoucher un fichier ou refaire une archive. Il ne sert qu'à une session ; la page ne change pas.</p>
+<h3>Pour s'en servir</h3>
+<ol>
+<li>Dans « Réglages », section « WolvenKit », désignez le dossier de la CLI et un dossier d'atelier, puis « Enregistrer ».</li>
+<li>Copiez la commande de cette section et lancez-la une fois dans un terminal.</li>
+</ol>
+<h3>Ce qu'une session peut faire</h3>
+<ul>
+<li><b>Chercher</b> une ressource par des mots de son chemin, dans le jeu de base, Phantom Liberty et les mods installés, et savoir quelles archives la portent.</li>
+<li><b>Lister</b> une archive, ou les archives d'un mod désigné par son nom dans Red Stack.</li>
+<li><b>Extraire</b> des ressources telles quelles, <b>exporter</b> une texture en image ou un mesh en <code>.glb</code>, <b>lire</b> un fichier du jeu (<code>.ent</code>, <code>.app</code>, <code>.mesh</code>, <code>.inkatlas</code>…) en JSON.</li>
+<li><b>Retoucher</b> un fichier du jeu amené dans l'atelier : changer une valeur, ajouter, retirer ou doubler un élément. La CLI refait le fichier, puis le relit, et la session sait si tout ce qu'elle a écrit y est. Le premier original est gardé dans le dossier <code>_avant</code> de l'atelier.</li>
+<li><b>Importer</b> une image ou un <code>.glb</code> de l'atelier en fichier du jeu.</li>
+<li><b>Packer</b> un dossier de l'atelier en <code>.archive</code>, ou <b>construire</b> un projet WolvenKit (<code>.cpmodproj</code>) rangé dans l'atelier. Sur demande, un zip à la forme d'un mod est fait à côté.</li>
+</ul>
+<h3>Essayer en jeu ce qu'une session a fabriqué</h3>
+<p>L'archive et le zip restent dans l'atelier. Pour les essayer, déposez vous-même le zip dans le dossier d'arrivée d'une pile, cochez le mod dans la liste, puis « Aperçu du plan » et « Appliquer » : le mod se coupe et se retire ensuite comme n'importe quel autre.</p>
+<h3>Ses gardes</h3>
+<ul>
+<li><b>Il n'écrit que dans l'atelier.</b> Ni le jeu, ni le dépôt, ni le magasin. Mettre un fichier retouché dans le jeu reste votre geste : un zip dans une pile, puis « Appliquer ».</li>
+<li><b>Il ne fabrique que depuis l'atelier.</b> Le fichier à retoucher, le dossier à packer et le projet à construire doivent s'y trouver : rien n'est packé depuis le jeu ou le dépôt.</li>
+<li><b>Une retouche est tout ou rien.</b> Une opération refusée, et le fichier reste tel qu'il était. Les JSON de travail posés à côté des fichiers n'entrent pas dans l'archive.</li>
+<li><b>Un motif qui prendrait tout est refusé</b> (vide, <code>*</code>, <code>*.*</code>, moins de trois caractères).</li>
+<li><b>Les fichiers sont comptés avant d'extraire.</b> Au-dessus du plafond (200 pour extraire, 40 pour exporter, d'office) rien n'est écrit : la session reçoit le compte et doit resserrer.</li>
+</ul>
+<div class="note"><b>Limites.</b> Un export ne suit pas les matières d'un mesh rangées dans une autre archive. Une retouche passe par le JSON de WolvenKit : elle ne lit ni TweakDB ni les textes traduits du jeu. Un projet construit n'est jamais installé dans le jeu par ce serveur. Une recherche prend quelques secondes par lieu.</div>
+</section>
+
+<section id="pannes" data-groupe="En cas de doute">
+<h2>Questions fréquentes</h2>
+<h3>« Appliquer » refuse d'écrire</h3>
+<ul>
+<li><b>Le jeu tourne</b> : fermez-le.</li>
+<li><b>Des conflits à trancher</b> : l'aperçu du plan les liste ; dites quel mod gagne.</li>
+<li><b>Le plan a changé depuis l'aperçu</b> : le disque a bougé entre-temps. Le nouveau plan est montré ; relisez-le.</li>
+</ul>
+<h3>La page reste sur « Lecture du dépôt et du jeu… » ou dit que Python manque</h3>
+<p>Sans Python, la page le dit : installez-le depuis python.org en cochant « Add python.exe to PATH », puis <b class="b">Réessayer</b> ; ou <b class="b">Indiquer la commande Python…</b> si Python est installé ailleurs (un chemin complet convient). La même commande se règle dans « Réglages », « Ce poste » (ou <code>redStack.python</code>). Il faut la version 3.11 ou plus récente.</p>
+<h3>Un mod est coché mais absent de la liste des mises à jour</h3>
+<p>Son zip ne porte pas le nom du site Nexus (numéro du mod, version). Passez-le par <a href="#arrivages">Arrivages</a> pour le renommer.</p>
+<h3>« Mod manager download » ne fait rien</h3>
+<p>Aucun programme n'est inscrit pour les liens <code>nxm://</code> sur le poste : voir <a href="#nxm">Liens nxm://</a>.</p>
+<h3>Le dossier du magasin « pèse » autant que le jeu</h3>
+<p>L'Explorateur compte deux fois les fichiers liés. Le volet <a href="#magasin">Magasin</a> donne le poids réel.</p>
+<h3>J'ai modifié un réglage en jeu, va-t-il être écrasé ?</h3>
+<p>Non. Un fichier modifié en jeu est gardé tel quel et signalé « modifié en jeu » ; l'aperçu du plan dit combien sont dans ce cas.</p>
+<h3>Je veux retirer Red Stack</h3>
+<p>Les fichiers du jeu sont de vrais fichiers (des liens physiques) : le jeu marche sans l'extension. Ne supprimez le magasin qu'après avoir coupé les mods et appliqué, ou acceptez que les fichiers restent dans le jeu comme des fichiers ordinaires. Défaites l'inscription <code>nxm://</code> depuis « Réglages » avant de désinstaller.</p>
+</section>
+
+<section id="lexique" data-groupe="En cas de doute">
+<h2>Lexique</h2>
+<table>
+<tr><th>Appliquer</th><td>Le seul geste qui écrit le jeu, toujours après un aperçu et une confirmation.</td></tr>
+<tr><th>Archive</th><td>Un fichier <code>.archive</code> de <code>archive\pc\mod</code>. Elle contient des ressources.</td></tr>
+<tr><th>Arrivage</th><td>Une archive qui vient d'entrer dans le dépôt et n'est pas encore rangée dans une pile.</td></tr>
+<tr><th>Convention</th><td>La façon dont votre dépôt est rangé et nommé ; elle se règle.</td></tr>
+<tr><th>Coupé</th><td>Un mod décoché.</td></tr>
+<tr><th>Hors Red Stack</th><td>Fichier ou dossier qu'un autre installateur gère, et que Red Stack laisse.</td></tr>
+<tr><th>Lien (physique)</th><td>Un second nom pour le même fichier sur le disque : aucun doublon de poids.</td></tr>
+<tr><th>Parqué</th><td>Un zip mis de côté dans sa pile : gardé, pas posable.</td></tr>
+<tr><th>Registre de pose</th><td>La mémoire de Red Stack : quel fichier du jeu vient de quel zip.</td></tr>
+<tr><th>Ressource</th><td>Un fichier contenu dans une archive (maillage, texture…).</td></tr>
+<tr><th>Retiré</th><td>Un zip écarté et gardé dans le dossier des retirés de sa pile : l'ancienne version qu'une mise à jour remplace, ou un zip que vous retirez vous-même. Rien n'y est jamais effacé par Red Stack.</td></tr>
+<tr><th>Socle</th><td>Dans la liste : un mod dont d'autres dépendent. Dans « Référence du jeu » : les fichiers du jeu lui-même.</td></tr>
+</table>
+</section>
+
+<p id="rien">Aucune section ne contient ce texte.</p>
+</main>
+<!-- /corps -->
+<script nonce="{{nonce}}">
+(() => {
+  'use strict';
+  const vscode = typeof acquireVsCodeApi === 'function' ? acquireVsCodeApi() : { postMessage() {}, getState() {}, setState() {} };
+  const texte = document.getElementById('texte'), sommaire = document.getElementById('sommaire');
+  const sections = [...texte.querySelectorAll('section')];
+  let groupe = '';
+  for (const s of sections) {                        // le sommaire se déduit des sections : un titre de groupe, un lien par section
+    if (s.dataset.groupe !== groupe) {
+      groupe = s.dataset.groupe;
+      const g = document.createElement('div');
+      g.className = 'groupe'; g.textContent = groupe;
+      sommaire.appendChild(g);
+    }
+    const a = document.createElement('a');
+    a.href = '#' + s.id; a.textContent = s.querySelector('h2').textContent; a.dataset.vers = s.id;
+    sommaire.appendChild(a);
+  }
+  const liens = [...sommaire.querySelectorAll('a')];
+  function va(id) {
+    const c = document.getElementById(id);
+    if (!c) return;
+    const s = c.closest('section');
+    if (s && s.classList.contains('cache')) { document.getElementById('filtre').value = ''; filtre(); }
+    c.scrollIntoView({ block: 'start' });
+    vscode.setState({ id });
+  }
+  document.addEventListener('click', (e) => {         // les ancres défilent dans la page, sans navigation
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    e.preventDefault();
+    va(a.getAttribute('href').slice(1));
+  });
+  function ici() {                                   // la section en vue est marquée dans le sommaire
+    const haut = texte.getBoundingClientRect().top + 40;
+    let courant = sections.find((s) => !s.classList.contains('cache'));
+    for (const s of sections) if (!s.classList.contains('cache') && s.getBoundingClientRect().top <= haut) courant = s;
+    for (const a of liens) a.classList.toggle('ici', !!courant && a.dataset.vers === courant.id);
+  }
+  texte.addEventListener('scroll', ici, { passive: true });
+  const plat = (t) => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  function filtre() {
+    const mots = plat(document.getElementById('filtre').value).split(/\s+/).filter(Boolean);
+    let n = 0;
+    for (const s of sections) {
+      const t = plat(s.textContent), vu = mots.every((m) => t.includes(m));
+      s.classList.toggle('cache', !vu);
+      liens.find((a) => a.dataset.vers === s.id).classList.toggle('cache', !vu);
+      if (vu) n += 1;
+    }
+    document.getElementById('rien').style.display = n ? 'none' : 'block';
+    texte.scrollTop = 0;
+    ici();
+  }
+  document.getElementById('filtre').addEventListener('input', filtre);
+  document.getElementById('ouvrir').addEventListener('click', () => vscode.postMessage({ t: 'ouvrir' }));
+  window.addEventListener('message', (e) => { if (e.data && e.data.t === 'section') va(e.data.id); });
+  const etat = vscode.getState();
+  if (etat && etat.id) va(etat.id);
+  ici();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# paquets fabriqués par source/empaquette.py : ils se refont depuis la source
+releases/*.vsix
+__pycache__/
+*.pyc
+node_modules/
+# documents de travail (passation, journal, roadmap) : jamais au dépôt
+/HANDOVER.md
+/LOG.md
+/ROADMAP.md
+# logo et ses sources de travail
+releases/
+/NEXUS.md

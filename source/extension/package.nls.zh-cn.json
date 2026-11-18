@@ -1,0 +1,14 @@
+{
+  "description": "Cyberpunk 2077 模组管理器：您的 zip 仓库始终是唯一的模组库。配置文件、按模组和按栈切换，写入游戏之前先预览。",
+  "cmd.ouvrir": "Red Stack: 打开",
+  "cmd.aide": "Red Stack: 手册",
+  "cmd.demande": "Red Stack: 处理等待中的请求",
+  "conf.python": "用于运行引擎的 Python 命令。",
+  "conf.moteur": "替代包内自带版本的另一个 red_stack.py 的路径（开发用）。留空：使用内置引擎。",
+  "conf.donnees": "数据文件夹（配置文件、安装登记表、config.json）。留空：扩展的存储文件夹。也可在页面中通过“设置”按钮设置。",
+  "conf.actualisationAuto": "当栈中有 zip 到达、离开或变化，archive\\pc\\mod 发生变化，或另一个窗口或 Claude 会话写入配置文件时，自动重新读取仓库和游戏。取消勾选：只有页面上的 ↻ 按钮会重新读取。",
+  "conf.barreEnCouleur": "“Red Stack Rouge”和“Red Stack Jaune”主题：活动栏（左侧）的所有图标都使用强调色，活动图标以其标记线区分。取消勾选：只有活动图标着色。在您的设置（workbench.colorCustomizations）中为每个主题写入一行，取消勾选时移除。",
+  "conf.langue.auto": "VS Code 的显示语言；Red Stack 不支持的语言将回退为英语。",
+  "conf.langue": "Red Stack 页面、其侧边栏和消息的语言。也可在页面中通过“设置”按钮的“语言”部分设置。",
+  "accueil": "Red Stack 页面在编辑器中打开。\n[打开 Red Stack](command:redStack.ouvrir)\n[阅读手册](command:redStack.aide)"
+}

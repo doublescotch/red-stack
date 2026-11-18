@@ -1,0 +1,14 @@
+{
+  "description": "Gestionnaire de mods Cyberpunk 2077 : votre dépôt de zips reste la seule bibliothèque. Profils, bascule par mod et par pile, aperçu avant d'écrire le jeu.",
+  "cmd.ouvrir": "Red Stack : ouvrir",
+  "cmd.aide": "Red Stack : manuel",
+  "cmd.demande": "Red Stack : traiter la demande en attente",
+  "conf.python": "Commande Python qui lance le moteur.",
+  "conf.moteur": "Chemin d'un autre red_stack.py que celui du paquet (développement). Vide : le moteur embarqué.",
+  "conf.donnees": "Dossier des données (profils, registre de pose, config.json). Vide : le dossier de stockage de l'extension. Se règle aussi dans la page, bouton « Réglages ».",
+  "conf.actualisationAuto": "Relire seul le dépôt et le jeu quand un zip arrive, part ou change dans une pile, quand archive\\pc\\mod change, ou quand un profil est écrit par une autre fenêtre ou une session Claude. Décoché : seul le bouton ↻ de la page relit.",
+  "conf.barreEnCouleur": "Thèmes « Red Stack Rouge » et « Red Stack Jaune » : toutes les icônes de la barre d'activité (à gauche) prennent la couleur d'accent, l'icône active se reconnaît à son trait. Décoché : seule l'icône active est en couleur. Écrit une ligne par thème dans vos réglages (workbench.colorCustomizations), retirée quand la case est décochée.",
+  "conf.langue.auto": "La langue d'affichage de VS Code ; une langue que Red Stack n'a pas passe en anglais.",
+  "conf.langue": "Langue de la page Red Stack, de sa barre latérale et de ses messages. Se règle aussi dans la page, bouton « Réglages », section « Langue ».",
+  "accueil": "La page Red Stack s'ouvre dans l'éditeur.\n[Ouvrir Red Stack](command:redStack.ouvrir)\n[Lire le manuel](command:redStack.aide)"
+}

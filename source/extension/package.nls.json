@@ -1,0 +1,14 @@
+{
+  "description": "Cyberpunk 2077 mod manager: your zip repository stays the only library. Profiles, per-mod and per-stack toggles, a preview before anything is written to the game.",
+  "cmd.ouvrir": "Red Stack: Open",
+  "cmd.aide": "Red Stack: Manual",
+  "cmd.demande": "Red Stack: Handle the Pending Request",
+  "conf.python": "Python command that runs the engine.",
+  "conf.moteur": "Path of another red_stack.py than the packaged one (development). Empty: the built-in engine.",
+  "conf.donnees": "Data folder (profiles, install registry, config.json). Empty: the extension's storage folder. Can also be set from the page, \"Settings\" button.",
+  "conf.actualisationAuto": "Re-read the repository and the game on its own when a zip arrives, leaves or changes in a stack, when archive\\pc\\mod changes, or when a profile is written by another window or a Claude session. Unchecked: only the ↻ button of the page re-reads.",
+  "conf.barreEnCouleur": "\"Red Stack Rouge\" and \"Red Stack Jaune\" themes: every activity bar icon (on the left) takes the accent colour, the active icon is told by its marker. Unchecked: only the active icon is coloured. Writes one line per theme in your settings (workbench.colorCustomizations), removed when the box is unchecked.",
+  "conf.langue.auto": "VS Code's display language; a language Red Stack does not have falls back to English.",
+  "conf.langue": "Language of the Red Stack page, its side bar and its messages. Can also be set from the page, \"Settings\" button, \"Language\" section.",
+  "accueil": "The Red Stack page opens in the editor.\n[Open Red Stack](command:redStack.ouvrir)\n[Read the manual](command:redStack.aide)"
+}

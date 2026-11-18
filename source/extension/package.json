@@ -1,0 +1,167 @@
+{
+  "name": "red-stack",
+  "displayName": "Red Stack",
+  "description": "%description%",
+  "version": "1.0.0",
+  "publisher": "doublescotch",
+  "license": "MIT",
+  "icon": "media/icone.png",
+  "galleryBanner": {
+    "color": "#121620",
+    "theme": "dark"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/doublescotch/red-stack.git"
+  },
+  "bugs": {
+    "url": "https://github.com/doublescotch/red-stack/issues"
+  },
+  "homepage": "https://github.com/doublescotch/red-stack#readme",
+  "keywords": [
+    "cyberpunk 2077",
+    "cyberpunk",
+    "mod manager",
+    "mods",
+    "modding",
+    "nexus mods",
+    "redscript",
+    "redmod",
+    "fomod",
+    "wolvenkit",
+    "mcp"
+  ],
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other",
+    "Themes"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished",
+    "onUri",
+    "onWebviewPanel:redStack",
+    "onWebviewPanel:redStackAnalyse",
+    "onWebviewPanel:redStackCode",
+    "onWebviewPanel:redStackAide",
+    "onView:redStack.accueil"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "redStack.ouvrir",
+        "title": "%cmd.ouvrir%",
+        "icon": "$(layers)"
+      },
+      {
+        "command": "redStack.aide",
+        "title": "%cmd.aide%",
+        "icon": "$(book)"
+      },
+      {
+        "command": "redStack.demande",
+        "title": "%cmd.demande%"
+      }
+    ],
+    "configuration": {
+      "title": "Red Stack",
+      "properties": {
+        "redStack.python": {
+          "type": "string",
+          "default": "python",
+          "description": "%conf.python%"
+        },
+        "redStack.moteur": {
+          "type": "string",
+          "default": "",
+          "description": "%conf.moteur%"
+        },
+        "redStack.donnees": {
+          "type": "string",
+          "default": "",
+          "description": "%conf.donnees%"
+        },
+        "redStack.actualisationAuto": {
+          "type": "boolean",
+          "default": true,
+          "description": "%conf.actualisationAuto%"
+        },
+        "redStack.barreEnCouleur": {
+          "type": "boolean",
+          "default": false,
+          "description": "%conf.barreEnCouleur%"
+        },
+        "redStack.langue": {
+          "type": "string",
+          "default": "auto",
+          "enum": [
+            "auto",
+            "fr",
+            "en",
+            "de",
+            "es",
+            "pt-br",
+            "it",
+            "pl",
+            "ru",
+            "zh-cn",
+            "ja",
+            "ko"
+          ],
+          "enumDescriptions": [
+            "%conf.langue.auto%",
+            "Français",
+            "English",
+            "Deutsch",
+            "Español",
+            "Português (Brasil)",
+            "Italiano",
+            "Polski",
+            "Русский",
+            "简体中文",
+            "日本語",
+            "한국어"
+          ],
+          "description": "%conf.langue%"
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "redStack",
+          "title": "Red Stack",
+          "icon": "media/icone.svg"
+        }
+      ]
+    },
+    "views": {
+      "redStack": [
+        {
+          "id": "redStack.accueil",
+          "name": "Red Stack"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "redStack.accueil",
+        "contents": "%accueil%"
+      }
+    ],
+    "themes": [
+      {
+        "label": "Red Stack Rouge",
+        "uiTheme": "vs-dark",
+        "path": "./themes/red-stack-rouge.json"
+      },
+      {
+        "label": "Red Stack Jaune",
+        "uiTheme": "vs-dark",
+        "path": "./themes/red-stack-jaune.json"
+      }
+    ]
+  }
+}
