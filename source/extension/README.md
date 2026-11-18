@@ -148,9 +148,9 @@ The messages of the engine follow this choice (`red_stack.py --langue <code>`, s
 exists in French and in English (English for any language other than French). A catalogue is a file
 `langues/<code>.json` whose keys are the French texts of the code (extension, page and engine); `tests/langues_test.py`
 says what is missing. A plural is written `N(n, '{n} fichier', '{n} fichiers')` (extension, page and engine): the
-catalogue then carries an object of forms (`one`, `few`, `many`, `other`, those the language needs). French is the
-language the tool is written in. The ten other languages, English included, are translations made by an AI, checked by the
-bench and not yet proofread by native speakers: corrections are welcome as issues.
+catalogue then carries an object of forms (`one`, `few`, `many`, `other`, those the language needs). All the texts,
+in the eleven languages, are written by an AI: French is the source language, the ten others, English included, are
+translations of it, checked by the bench and not yet proofread by native speakers. Corrections are welcome as issues.
 
 ## Themes
 

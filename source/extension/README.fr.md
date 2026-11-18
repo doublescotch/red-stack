@@ -146,9 +146,9 @@ Les messages du moteur suivent ce choix (`red_stack.py --langue <code>`, même c
 intégré existe en français et en anglais (l'anglais pour toute langue autre que le français). Un catalogue est un fichier `langues/<code>.json` dont les clés sont les textes
 français du code (extension, page et moteur) ; `tests/langues_test.py` dit ce qui manque. Un pluriel s'écrit
 `N(n, '{n} fichier', '{n} fichiers')` (extension, page et moteur) : le catalogue porte alors un objet de formes (`one`,
-`few`, `many`, `other`, celles que la langue demande). Les dix langues autres que le français, anglais compris, sont des
-traductions faites par une IA, contrôlées par le banc et pas encore relues par des locuteurs : les corrections se
-proposent par ticket.
+`few`, `many`, `other`, celles que la langue demande). Tous les textes, dans les onze langues, sont écrits par
+une IA : le français est la langue source, les dix autres, anglais compris, en sont des traductions, contrôlées par le
+banc et pas encore relues par des locuteurs. Les corrections se proposent par ticket.
 
 ## Thèmes
 
