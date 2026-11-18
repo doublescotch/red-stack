@@ -1800,5 +1800,10 @@
  },
  "{0} et {n} autre": {
   "other": "{0} 외 {n}개"
+ },
+ "tenu par un autre dossier de ce zip": "이 zip의 다른 폴더가 보유",
+ "Glisser pour régler la largeur du volet. Double-clic : largeur d'origine.": "끌어서 패널 너비를 조절합니다. 두 번 클릭: 원래 너비.",
+ "{n} encore servie au jeu": {
+  "other": "{n}개는 여전히 게임에 제공"
  }
 }

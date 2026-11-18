@@ -2313,5 +2313,13 @@
   "few": "{0} i jeszcze {n}",
   "many": "{0} i jeszcze {n}",
   "other": "{0} i jeszcze {n}"
+ },
+ "tenu par un autre dossier de ce zip": "trzymany przez inny folder tego zipa",
+ "Glisser pour régler la largeur du volet. Double-clic : largeur d'origine.": "Przeciągnij, aby ustawić szerokość panelu. Dwukrotne kliknięcie: pierwotna szerokość.",
+ "{n} encore servie au jeu": {
+  "one": "nadal trafia do gry: {n}",
+  "few": "nadal trafia do gry: {n}",
+  "many": "nadal trafia do gry: {n}",
+  "other": "nadal trafia do gry: {n}"
  }
 }

@@ -1971,5 +1971,11 @@
  "{0} et {n} autre": {
   "one": "{0} und {n} weiteres",
   "other": "{0} und {n} weitere"
+ },
+ "tenu par un autre dossier de ce zip": "von einem anderen Ordner dieses Zips gehalten",
+ "Glisser pour régler la largeur du volet. Double-clic : largeur d'origine.": "Ziehen, um die Breite des Bereichs einzustellen. Doppelklick: ursprüngliche Breite.",
+ "{n} encore servie au jeu": {
+  "one": "{n} weiterhin ans Spiel geliefert",
+  "other": "{n} weiterhin ans Spiel geliefert"
  }
 }

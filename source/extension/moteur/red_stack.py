@@ -3239,8 +3239,11 @@ def nexus_recoit(urls, part, taille):
         url = urls[essai % len(urls)]
         try:
             if curl:
+                # premier tour : un miroir sous 500 Ko/s pendant 15 s est lâché pour le suivant (la reprise garde l'acquis) ;
+                # second tour sans plancher, pour une ligne lente partout
+                lent = ["--speed-limit", "500000", "--speed-time", "15"] if essai < len(urls) and len(urls) > 1 else []
                 p = subprocess.run([curl, "-sS", "--fail", "-L", "-A", f"RedStack/{version_outil()}", "-C", "-", "--retry", "1",
-                                    "--connect-timeout", "15", "-o", part, url], capture_output=True)
+                                    "--connect-timeout", "15", *lent, "-o", part, url], capture_output=True)
                 if p.returncode:
                     raise OSError(p.stderr.decode("utf-8", "replace").strip()[-200:] or T("curl, code {0}", p.returncode))
             else:
@@ -3299,6 +3302,9 @@ def nexus_obtient(mod, neuf, cible, conf, params):
                  + (T(" Le lien `nxm://` a peut-être expiré : recliquer « Mod manager download ».") if params else ""))
     os.makedirs(dossier, exist_ok=True)
     part = fichier_partiel(cible)
+    # « Nexus CDN » d'abord : mesuré le 18/11 à 9 Mo/s quand les miroirs de ville, dont le préféré du compte, donnaient
+    # 0,05 à 0,3 Mo/s ; les autres suivent dans l'ordre de Nexus
+    d = sorted(d, key=lambda x: x.get("short_name") != "Nexus CDN")
     err = nexus_recoit([x["URI"] for x in d if x.get("URI")], part, neuf["taille"])
     if err:
         if os.path.exists(part):

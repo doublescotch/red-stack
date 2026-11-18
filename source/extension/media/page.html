@@ -69,9 +69,12 @@ body.verrou [inert] { opacity: .55; cursor: progress; }
 
 main { flex: 1; display: flex; min-height: 0; }
 #liste { flex: 1 1 0; min-width: 0; overflow: auto; }
-#volet { flex: 0 0 44%; max-width: 760px; min-width: 300px; border-left: 1px solid var(--trait); background: var(--bande); overflow: auto; display: none; }
+#poignee { flex: 0 0 5px; margin-right: -5px; z-index: 2; cursor: col-resize; display: none; }
+main:has(#volet.on) > #poignee { display: block; }
+#poignee:hover, #poignee.tire { background: var(--bleu); }
+#volet { flex: 0 0 var(--volet, 44%); max-width: calc(100% - 240px); min-width: 300px; border-left: 1px solid var(--trait); background: var(--bande); overflow: auto; display: none; }
 #volet.on { display: block; }
-@media (max-width: 760px) { main { flex-direction: column; } #volet { flex: 0 0 50%; max-width: none; border-left: 0; border-top: 1px solid var(--trait); } }
+@media (max-width: 760px) { main { flex-direction: column; } #volet { flex: 0 0 50%; max-width: none; border-left: 0; border-top: 1px solid var(--trait); } main:has(#volet.on) > #poignee { display: none; } }
 
 .pile > summary { list-style: none; display: flex; gap: 8px; align-items: center; padding: 5px 12px; background: var(--bande);
   border-bottom: 1px solid var(--trait); position: sticky; top: 25px; z-index: 1; cursor: pointer; user-select: none; }
@@ -153,6 +156,9 @@ button.puce:hover, button.puce.on { background: var(--trait); }
 .mot { font-weight: 600; } .mot.vert { color: var(--vert); } .mot.rouge { color: var(--rouge); } .mot.ambre { color: var(--ambre); }
 #volet li .casef { margin: 0 6px 0 0; vertical-align: middle; }
 #volet li .vers { padding-left: 22px; }
+#volet details.dossier > summary { cursor: pointer; padding: 4px 0; border-bottom: 1px solid var(--trait); overflow-wrap: anywhere; }
+#volet details.dossier > summary .n { float: right; margin-left: 8px; color: var(--pale); font-size: 12px; }
+#volet details.dossier > ul { margin-left: 14px; }
 #volet .option { display: flex; gap: 8px; align-items: center; padding: 3px 0; }
 #volet .fo-groupe { border: 1px solid var(--trait); border-radius: 4px; margin: 6px 0 10px; padding: 4px 10px 8px; min-width: 0; }
 #volet .fo-groupe legend { font-weight: 600; padding: 0 4px; color: var(--bleu); } #volet .fo-groupe legend small, #volet .fo-cache { color: var(--pale); font-weight: 400; text-transform: none; letter-spacing: 0; }
@@ -355,6 +361,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
 <div id="puces" role="toolbar" aria-label="Filtrer par état"></div>
 <main>
   <div id="liste"></div>
+  <div id="poignee" role="separator" aria-orientation="vertical"></div>
   <aside id="volet" aria-label="Détail"></aside>
 </main>
 <section id="conflits" class="vue" aria-label="Conflits d'archives"></section>
@@ -384,8 +391,10 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
   if (CODE) { document.getElementById('cherche').placeholder = T('Filtrer : mod, méthode, propriété ou fichier…'); document.getElementById('cherche').setAttribute('aria-label', T('Filtrer par mod, par méthode, par propriété ou par fichier')); }
   const E = { profil: '', profils: [], data: null, plies: new Set(), choisi: '', volet: null, sauve: vscode.getState() || {}, filtre: 'tous', tri: { col: '', sens: 1 }, nature: '', lot: new Set(), attente: new Map(), vol: new Map() };
   if (E.sauve.tri && E.sauve.tri.col) E.tri = E.sauve.tri;
-  const memorise = () => vscode.setState({ plies: [...E.plies], tri: E.tri, complets: E.complets, dossiers: E.dossiers, natures: E.natures });
+  const memorise = () => vscode.setState({ plies: [...E.plies], tri: E.tri, complets: E.complets, dossiers: E.dossiers, natures: E.natures, voletL: E.voletL });
   E.complets = !!E.sauve.complets;
+  E.voletL = +E.sauve.voletL || 0;                  // largeur du volet réglée à la poignée, en pixels ; 0 = 44 % de la page
+  E.dossiersOuverts = new Set();                    // dossiers dépliés dans la fiche d'un mod, le temps de la séance
   E.dossiers = E.sauve.dossiers !== false;          // montrés d'office
   E.natures = E.sauve.natures !== false;            // colonne « Nature » montrée d'office
   E.choixOuverts = true;                            // plan : bloc des choix faits, déplié d'office, replié à la demande
@@ -555,7 +564,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
   // État d'un fichier : pastille de couleur + mot. Vert = dans le jeu comme le veut le profil, rouge = non pris,
   // ambre = le jeu et le profil diffèrent (à poser, à retirer) ou le fichier demande un regard (écrasé, modifié).
   const memeMod = (a, b) => { const x = lit(a.split('/').pop()), y = lit(b.split('/').pop()); return x.titre === y.titre && (x.variante || '') === (y.variante || ''); };
-  function etatFichier(e, moi) {
+  function etatFichier(e, moi, jumelle) {
     const present = e.etat === 'lié' || e.etat === 'copié' || e.etat.startsWith('partagé avec ');
     const autre = /^(partagé avec|écrasé par) (.+)$/.exec(e.etat);
     let mot = autre ? `${dit(autre[1])} ${lit(autre[2].split('/').pop()).titre}` : dit(e.etat), ton = 'ambre';
@@ -569,6 +578,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     else if (e.pris && present) ton = 'vert';
     else if (e.pris && e.etat === 'absent') mot = T('à poser');
     else if (!e.pris && autre && autre[1] === 'partagé avec') { mot = T`déjà chargé par ${lit(autre[2].split('/').pop()).titre}`; ton = 'gris'; }
+    else if (!e.pris && present && jumelle) { mot = T('tenu par un autre dossier de ce zip'); ton = 'gris'; }   // même cible, entrée jumelle cochée : rien ne sort du jeu
     else if (!e.pris && present) mot = T('à retirer');
     else if (!e.pris) { mot = T('non pris'); ton = 'rouge'; }
     return `<span class="pastille ${ton}"></span><b class="mot ${ton}">${h(mot)}</b>`;
@@ -614,14 +624,30 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       c += `<h3>${T`Écrasé par un autre mod`}</h3>` + dessus.map((z) => `<div class="conflit"><div>${T`${h(lit(z.split('/').pop()).titre)} tient dans le jeu des fichiers que ce mod livre aussi.`}</div>`
         + `<div class="choix"><button data-gagne="${h(d.cle)}" data-contre="${h(JSON.stringify([z]))}" data-retour="detail">${T`Ce mod gagne sur ${h(lit(z.split('/').pop()).titre)}`}</button></div></div>`).join('');
     }
-    c += `<h3>${T`Fichiers`}</h3><p class="faits">${T`Case cochée = fichier pris dans le profil. Le jeu ne change qu\'à « Aperçu du plan » puis « Appliquer ».`}</p><ul>` + d.entrees.map((e) =>
-      `<li class="${e.pris ? '' : 'non'}"><span class="etatf">${etatFichier(e, d.nom)}${e.reglage ? ` · ${T('réglage')}` : ''} · ${taille(e.taille)}</span>`
+    c += `<h3>${T`Fichiers`}</h3><p class="faits">${T`Case cochée = fichier pris dans le profil. Le jeu ne change qu\'à « Aperçu du plan » puis « Appliquer ».`}</p>`;
+    // triés par chemin (le zip les donne dans son ordre d'écriture) ; un pack, ou un gros mod, se lit par dossiers repliables
+    const cibles = new Set(d.entrees.filter((e) => e.pris && e.dest).map((e) => e.dest.toLowerCase()));
+    const ordre = (x, y) => x.localeCompare(y, undefined, { numeric: true, sensitivity: 'base' });
+    const ligne = (e, court) =>
+      `<li class="${e.pris ? '' : 'non'}"><span class="etatf">${etatFichier(e, d.nom, !e.pris && !!e.dest && cibles.has(e.dest.toLowerCase()))}${e.reglage ? ` · ${T('réglage')}` : ''} · ${taille(e.taille)}</span>`
       + (e.hors ? `<input type="checkbox" class="casef" data-entree="${h(e.entree)}" data-mien="1" title="${T`Hors Red Stack : fichier d'un installateur tiers, jamais lié, remplacé ni retiré. Cocher = ce fichier est à ce mod : il est pris au registre au prochain « Appliquer » et part avec le mod.`}">`
         : e.mien ? `<input type="checkbox" class="casef" data-entree="${h(e.entree)}" data-mien="1" checked title="${T`Ce fichier est à ce mod, par votre choix. Décocher = le rendre à l'installateur tiers : il reste dans le jeu et sort du registre.`}">`
         : e.option === null ? `<input type="checkbox" class="casef" disabled title="${T`Jamais posé : ce fichier ne va pas dans le jeu`}">`
         : parFo ? `<input type="checkbox" class="casef" disabled${e.pris ? ' checked' : ''} title="${T`Choisi par l'installateur : « Installateur… » pour changer ses choix`}">`
         : `<input type="checkbox" class="casef" data-entree="${h(e.entree)}"${e.pris ? ' checked' : ''} title="${T`Prendre ou laisser ce fichier`}">`)
-      + `<code>${h(e.entree)}</code>${e.dest && e.dest !== e.entree ? `<span class="vers">→ ${h(e.dest)}</span>` : ''}</li>`).join('') + '</ul>';
+      + `<code>${h(court)}</code>${e.dest && e.dest !== e.entree ? `<span class="vers">→ ${h(e.dest)}</span>` : ''}</li>`;
+    const parDossier = pack || d.entrees.length > 40;
+    const dossierDe = (e) => (pack ? e.option : e.entree.includes('/') ? e.entree.split('/')[0] : '');
+    const groupes = new Map();
+    for (const e of [...d.entrees].sort((x, y) => ordre(x.entree, y.entree))) { const g = parDossier ? dossierDe(e) : ''; if (!groupes.has(g)) groupes.set(g, []); groupes.get(g).push(e); }
+    const cles = [...groupes.keys()].sort((x, y) => (x === null) - (y === null) || (y === '') - (x === '') || ordre(String(x), String(y)));
+    if (cles.length < 2) c += '<ul>' + cles.map((g) => groupes.get(g).map((e) => ligne(e, e.entree)).join('')).join('') + '</ul>';
+    else for (const g of cles) {
+      const lg = groupes.get(g), p = lg.filter((e) => e.pris), id = g === null ? '|' : g;       // « | » : aucun dossier de zip ne porte ce nom
+      const nom = g === null ? T('jamais posé') : g === '' ? T('Fichiers directs') : g === '(racine)' ? T('Archives en vrac, à la racine du zip') : g;
+      c += `<details class="dossier" data-dossier="${h(id)}"${E.dossiersOuverts.has(d.cle + '|' + id) ? ' open' : ''}><summary><span class="n">${N(p.length, '{n} fichier pris sur {0}', '{n} fichiers pris sur {0}', lg.length)} · ${taille(p.reduce((n, e) => n + e.taille, 0))}</span><b>${h(nom)}</b></summary><ul>`
+        + lg.map((e) => ligne(e, g && e.entree.toLowerCase().startsWith(g.toLowerCase() + '/') ? e.entree.slice(g.length + 1) : e.entree)).join('') + '</ul></details>';
+    }
     ouvre(h(l.titre) + (l.variante ? ` <small>${h(l.variante)}</small>` : ''), c);
     $('volet').dataset.cle = d.cle;
     $('volet').querySelectorAll('input[data-partiel]').forEach((x) => { x.indeterminate = true; });
@@ -989,9 +1015,11 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     const groupes = new Map();
     for (const a of o) {
       const id = C.grille === 'mod' ? (a.zip || 'hors:' + a.archive) : String(a.rang);
-      const g = groupes.get(id) || groupes.set(id, { id, rangs: new Set(), premier: a, gagne: [], perd: [], egal: [], g: 0, p: 0, e: 0, base: 0 }).get(id);
+      const g = groupes.get(id) || groupes.set(id, { id, rangs: new Set(), premier: a, gagne: [], perd: [], egal: [], g: 0, p: 0, e: 0, base: 0, total: 0, perdues: 0 }).get(id);
       g.rangs.add(a.rang);
       g.base += a.base || 0;
+      g.total += a.ressources || 0;                  // ce que le groupe livre, et ce qu'une archive chargée avant lui prend
+      g.perdues += a.perd || 0;
     }
     const idDe = (i) => (C.grille === 'mod' ? (o[i].zip || 'hors:' + o[i].archive) : String(i));
     for (const x of d.paires) {
@@ -1135,6 +1163,8 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       const renommee = C.grille !== 'mod' && a.origine && a.origine !== a.archive;
       const sous = (C.grille === 'mod' ? N(g.rangs.size, '{n} archive · à partir du rang {0}', '{n} archives · à partir du rang {0}', a.rang + 1) : h(nomModArch(a)) + (a.genre === 'redmod' ? ' · REDmod' : '')
         + (renommee ? ` · ${T`nom de l'auteur : ${h(a.origine)}`}` : ''))
+        + (g.total ? ` · ${N(g.total, '{n} ressource', '{n} ressources')}` : '')
+        + (g.total && g.perdues ? ` · ${N(Math.max(0, g.total - g.perdues), '{n} encore servie au jeu', '{n} encore servies au jeu')}` : '')
         + (g.base ? ` · ${N(g.base, '{n} du jeu de base remplacée', '{n} du jeu de base remplacées')}` : '');
       html.push(`<details class="arch" data-groupe="${h(g.id)}"${ouvert ? ' open' : ''}><summary><span class="rang">${a.rang + 1}</span><b>${titre}</b>`
         + `<span class="du">${sous}</span><span class="bilan">`
@@ -1716,10 +1746,18 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     const b = $('bulle'), r = s.getBoundingClientRect();
     b.innerHTML = bulleConflits(s.dataset.cf);
     b.className = 'on';
+    const td = s.closest('td[title]');               // l'infobulle native de la cellule (nom du zip) se tait le temps de la boîte
+    if (td) { td.dataset.titre = td.title; td.removeAttribute('title'); }
     b.style.left = Math.max(8, Math.min(r.left, window.innerWidth - b.offsetWidth - 12)) + 'px';
     b.style.top = (r.bottom + b.offsetHeight + 8 > window.innerHeight ? Math.max(8, r.top - b.offsetHeight - 4) : r.bottom + 4) + 'px';
   });
-  $('liste').addEventListener('mouseout', (e) => { if (e.target.closest('.cf')) $('bulle').className = ''; });
+  $('liste').addEventListener('mouseout', (e) => {
+    const s = e.target.closest('.cf');
+    if (!s) return;
+    $('bulle').className = '';
+    const td = s.closest('td[data-titre]');
+    if (td) { td.title = td.dataset.titre; delete td.dataset.titre; }
+  });
 
   // ---------------------------------------------------------------- réglages (config.json et réglages du poste)
   const CHEMINS = [
@@ -2024,6 +2062,27 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     if (B.contains('arriv') && E.arr && E.arr.data) return plieVue('arr', E.arr.data.lignes);
     plieTout(SEULE ? $('conflits') : $('liste'));
   });
+  $('volet').addEventListener('toggle', (e) => {     // dossiers de la fiche d'un mod : gardés dépliés d'un dessin à l'autre
+    const g = e.target.dataset && e.target.dataset.dossier;
+    if (g === undefined || !$('volet').dataset.cle) return;
+    const k = $('volet').dataset.cle + '|' + g;
+    if (e.target.open) E.dossiersOuverts.add(k); else E.dossiersOuverts.delete(k);
+  }, true);
+  // poignée entre la liste et le volet : glisser règle la largeur, double-clic revient aux 44 % d'origine
+  const largeurVolet = () => document.querySelector('main').style.setProperty('--volet', E.voletL ? E.voletL + 'px' : '44%');
+  largeurVolet();
+  $('poignee').title = T("Glisser pour régler la largeur du volet. Double-clic : largeur d'origine.");
+  $('poignee').addEventListener('pointerdown', (e) => { e.preventDefault(); $('poignee').setPointerCapture(e.pointerId); $('poignee').classList.add('tire'); });
+  $('poignee').addEventListener('pointermove', (e) => {
+    if (!$('poignee').hasPointerCapture(e.pointerId)) return;
+    const r = document.querySelector('main').getBoundingClientRect();
+    E.voletL = Math.round(Math.max(300, Math.min(r.width - 240, r.right - e.clientX)));
+    largeurVolet();
+  });
+  const lache = (e) => { if ($('poignee').hasPointerCapture(e.pointerId)) $('poignee').releasePointerCapture(e.pointerId); $('poignee').classList.remove('tire'); memorise(); };
+  $('poignee').addEventListener('pointerup', lache);
+  $('poignee').addEventListener('pointercancel', lache);
+  $('poignee').addEventListener('dblclick', () => { E.voletL = 0; largeurVolet(); memorise(); });
   $('liste').addEventListener('toggle', (e) => {
     const s = e.target.dataset && e.target.dataset.pile;
     if (!s) return;

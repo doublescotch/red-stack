@@ -2313,5 +2313,13 @@
   "few": "{0} и ещё {n}",
   "many": "{0} и ещё {n}",
   "other": "{0} и ещё {n}"
+ },
+ "tenu par un autre dossier de ce zip": "удерживается другой папкой этого zip",
+ "Glisser pour régler la largeur du volet. Double-clic : largeur d'origine.": "Перетащите, чтобы задать ширину панели. Двойной щелчок: исходная ширина.",
+ "{n} encore servie au jeu": {
+  "one": "по-прежнему в игре: {n}",
+  "few": "по-прежнему в игре: {n}",
+  "many": "по-прежнему в игре: {n}",
+  "other": "по-прежнему в игре: {n}"
  }
 }
