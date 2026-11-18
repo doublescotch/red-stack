@@ -1049,6 +1049,18 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
           + (res.length ? `<ul class="res">${res.map((r) => `<li><code>${h(r)}</code></li>`).join('')}</ul>` : '') + '</li>';
       }).join('') + '</ul>';
     };
+    // ressources hors conflit d'un groupe, à la demande (« Toutes ses ressources… ») : seules à être livrées, donc servies
+    const seules = (g) => {
+      const x = C.toutes[g.id];
+      if (!x) return '';
+      if (x === 'attente') return `<p class="vide">${T`Lecture des archives du profil…`}</p>`;
+      const l = x.seules || [], MAX = 1000;
+      return `<h4><span class="pastille vert"></span>${N(x.seules_total || 0, '{n} ressource hors conflit, servie au jeu', '{n} ressources hors conflit, servies au jeu')}`
+        + (l.length > MAX ? ` <small>${T`${MAX} montrées, par ordre de chemin`}</small>` : '') + '</h4>'
+        + `<ul class="res">${l.slice(0, MAX).map((r) => `<li><code>${h(r.ressource)}</code>`
+          + (r.base ? ` <span class="puce attente" title="${T`Ce chemin existe dans les archives du jeu de base : la ressource le remplace`}">${T`remplace le jeu de base`}</span>` : '')
+          + (g.rangs.size > 1 ? ` <small>${h(o[r.archive].archive)}</small>` : '') + '</li>').join('')}</ul>`;
+    };
     const vues = [...groupes.values()].filter((g) => (C.montre === 'perd' ? g.p : C.montre === 'gagne' ? g.g : (g.g || g.p || (C.egaux && g.e)))
       && (!t || g.premier.archive.toLowerCase().includes(t) || (g.premier.zip || '').toLowerCase().includes(t) || touche(g.rangs)));
     if (C.tri === 'perd') vues.sort((a, b) => b.p - a.p); else if (C.tri === 'gagne') vues.sort((a, b) => b.g - a.g);
@@ -1172,10 +1184,11 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
         + (C.egaux && g.e ? `<b class="mot">= ${g.e}</b>` : '') + '</span></summary>'
         + (ouvert ? '<div class="corps">'
           + (a.zip ? `<button class="lien" data-va="${h(a.zip)}">${T`Ouvrir le détail du mod`}</button>` : '')
+          + (g.total ? ` <button class="lien" data-toutes="${h(g.id)}" title="${T`Lister aussi les ressources hors conflit : celles que ce mod est seul à livrer, donc servies au jeu`}">${C.toutes[g.id] && C.toutes[g.id] !== 'attente' ? T('Cacher les ressources hors conflit') : T('Toutes ses ressources…')}</button>` : '')
           + (C.grille === 'archive' && a.zip && a.genre === 'mod' ? ` <button class="lien" data-renomme="${h(a.archive)}" title="${T`Donner à cette archive un autre nom DANS LE JEU (le zip ne change pas) : son nom décide de sa place dans l'ordre de chargement`}">${T`Renommer dans le jeu…`}</button>`
             + (renommee ? ` <button class="lien" data-rendnom="${h(a.archive)}">${T`Rendre le nom de l'auteur`}</button>` : '') : '')
           + bloc(g, T('Perd contre (chargées avant)'), 'rouge', g.perd, 'perd_contre') + bloc(g, T('Gagne sur (chargées après)'), 'vert', g.gagne, 'gagne_sur')
-          + (C.egaux ? bloc(g, T('Copies identiques'), 'gris', g.egal, 'identique_a') : '') + '</div>' : '') + '</details>');
+          + (C.egaux ? bloc(g, T('Copies identiques'), 'gris', g.egal, 'identique_a') : '') + seules(g) + '</div>' : '') + '</details>');
     }
     const haut = $('conflits').scrollTop;
     $('conflits').innerHTML = html.join('') + (vues.length ? '' : `<p class="vide">${c.en_conflit ? T('Rien ne correspond à ces filtres.') : T('Aucun conflit entre les archives de ce profil.')}</p>`);
@@ -1672,7 +1685,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     if (E.regle) fermeReglages();
     if (E.arr) fermeArrivages();
     if (E.maj) fermeMaj();
-    E.conf = { details: {}, ouverts: new Set(), deplies: new Set(cle ? [cle] : []), egaux: false, internes: true, grille: CODE ? 'code' : cle ? 'mod' : 'archive', montre: 'tous', tri: 'charge' };
+    E.conf = { details: {}, toutes: {}, ouverts: new Set(), deplies: new Set(cle ? [cle] : []), egaux: false, internes: true, grille: CODE ? 'code' : cle ? 'mod' : 'archive', montre: 'tous', tri: 'charge' };
     if (cle && !CODE) $('cherche').value = titreZip(cle);
     document.body.classList.add('conf');
     dessineConflits();
@@ -1725,6 +1738,14 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       if (p === 'archives') { C.grille = 'archive'; C.montre = 'tous'; }
       else if (p === 'paires') C.grille = 'archives';
       else { C.grille = 'ressource'; C.resMode = p === 'identiques' ? 'identiques' : 'conflit'; C.baseSeul = p === 'base'; }
+    }
+    else if (d.toutes) {                              // second clic : la liste se cache, sans rien redemander au moteur
+      if (C.toutes[d.toutes]) delete C.toutes[d.toutes];
+      else {
+        const horsZip = d.toutes.startsWith('hors:'), parMod = C.grille === 'mod' && !horsZip;
+        C.toutes[d.toutes] = 'attente';
+        vscode.postMessage({ t: 'conflitsToutes', id: d.toutes, mod: parMod ? d.toutes : '', nom: parMod ? '' : horsZip ? d.toutes.slice(5) : E.cf.ordre[+d.toutes].archive });
+      }
     }
     else if (d.montre) C.montre = d.montre;
     else if (d.ordre) C.tri = d.ordre;
@@ -2200,7 +2221,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
   window.addEventListener('message', (e) => {
     const m = e.data;
     // fenêtre d'analyse : elle ne garde que l'état, les conflits et les signaux du moteur
-    if (SEULE && !['etat', 'conflits', 'conflitsDetail', 'conflitsRessources', 'conflitsCode', 'conflitsCible', 'occupe', 'verrou', 'erreur'].includes(m.t)) return;
+    if (SEULE && !['etat', 'conflits', 'conflitsDetail', 'conflitsToutes', 'conflitsRessources', 'conflitsCode', 'conflitsCible', 'occupe', 'verrou', 'erreur'].includes(m.t)) return;
     if (m.t === 'conflitsCible') { if (SEULE && E.data) ouvreConflits(m.cle || ''); return; }
     if (m.t === 'reglages') {
       if (m.premier) $('chiffres').textContent = T('À régler : le dépôt de zips et le dossier du jeu.');
@@ -2297,6 +2318,8 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       else if (m.v === 'reglages' && !E.regle) $('regle').click();
       else if (m.v === 'historique') $('histo').click();
       else if (m.v === 'magasin') $('magasin').click();
+    } else if (m.t === 'conflitsToutes') {
+      if (E.conf && E.conf.toutes[m.id] === 'attente') { E.conf.toutes[m.id] = m.data; dessineConflits(); }
     } else if (m.t === 'conflitsDetail') {
       if (E.conf) { E.conf.details[m.nom] = m.data; dessineConflits(); }
     } else if (m.t === 'applique') {

@@ -1805,5 +1805,12 @@
  "Glisser pour régler la largeur du volet. Double-clic : largeur d'origine.": "끌어서 패널 너비를 조절합니다. 두 번 클릭: 원래 너비.",
  "{n} encore servie au jeu": {
   "other": "{n}개는 여전히 게임에 제공"
+ },
+ "Lister aussi les ressources hors conflit : celles que ce mod est seul à livrer, donc servies au jeu": "충돌이 없는 리소스도 나열합니다. 이 모드만 제공하므로 게임에 전달되는 리소스입니다",
+ "Cacher les ressources hors conflit": "충돌 없는 리소스 숨기기",
+ "Toutes ses ressources…": "모든 리소스…",
+ "{0} montrées, par ordre de chemin": "{0}개 표시, 경로순",
+ "{n} ressource hors conflit, servie au jeu": {
+  "other": "충돌 없는 리소스 {n}개, 게임에 제공"
  }
 }

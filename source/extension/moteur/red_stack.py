@@ -4036,6 +4036,8 @@ def main():
     ap.add_argument("--mien", action="store_true",
                     help="option --entree : « ce fichier est à ce mod », pour un fichier présent sous un motif hors Red Stack")
     ap.add_argument("--ressources", action="store_true", help="conflits : la liste de toutes les ressources en conflit")
+    ap.add_argument("--tout", action="store_true",
+                    help="conflits --mod / --nom : aussi les ressources que ces archives sont seules à livrer (sans conflit)")
     ap.add_argument("--gagnant")
     ap.add_argument("--perdant")
     ap.add_argument("--fichier", help="priorite : chemin d'UN fichier du jeu ; --gagnant le tient, quelle que soit la règle entre mods")
@@ -5305,8 +5307,15 @@ def main():
                 txt.append(f"  {r['ressource']}  ({provs[r['archive']]['archive']})")
                 txt += [f"      {mot} {lib(j)}" for mot, k in ((T("perd contre"), "perd_contre"), (T("gagne sur  "), "gagne_sur"),
                                                                (T("identique à"), "identique_a")) for j in r[k]]
+            seules = []                              # ce que ces archives sont seules à livrer : servi au jeu, aucun conflit
+            if a.tout:
+                libres = [(h, i) for i in sorted(cible) for h in provs[i]["set"] if h not in relations]
+                noms2 = noms_ressources({h for h, _ in libres}, provs, jeu, data, oodle)
+                seules = sorted(({"ressource": noms2.get(h, f"#{h:016x}"), "archive": i, "base": h in base} for h, i in libres),
+                                key=lambda r: (r["ressource"].startswith("#"), r["ressource"]))
             return out({**tete, "cible": sorted(cible), "ordre": ordre, "total": len(rows), "nommees": sum(1 for h, _ in mine if h in noms),
-                        "ressources": rows[:3000]}, "\n".join(txt))
+                        "ressources": rows[:3000], **({"seules_total": len(seules), "seules": seules[:5000]} if a.tout else {})},
+                       "\n".join(txt))
         vues = sorted(((i, j, d) for (i, j), d in paires.items()), key=lambda x: (-len(x[2]["conflits"]), -x[2]["identiques"], x[0], x[1]))
         noms = noms_ressources(set(relations), provs, jeu, data, oodle)   # tout d'un coup : le détail suit sans attente
         rows = [{"gagnant": i, "perdant": j, "conflits": len(d["conflits"]), "identiques": d["identiques"],

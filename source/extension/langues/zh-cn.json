@@ -1805,5 +1805,12 @@
  "Glisser pour régler la largeur du volet. Double-clic : largeur d'origine.": "拖动以调整面板宽度。双击:恢复原始宽度。",
  "{n} encore servie au jeu": {
   "other": "仍有 {n} 个提供给游戏"
+ },
+ "Lister aussi les ressources hors conflit : celles que ce mod est seul à livrer, donc servies au jeu": "同时列出没有冲突的资源:只有此模组提供,因此会交给游戏",
+ "Cacher les ressources hors conflit": "隐藏无冲突的资源",
+ "Toutes ses ressources…": "它的全部资源…",
+ "{0} montrées, par ordre de chemin": "显示 {0} 个,按路径排序",
+ "{n} ressource hors conflit, servie au jeu": {
+  "other": "无冲突的资源 {n} 个,已提供给游戏"
  }
 }

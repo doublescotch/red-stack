@@ -731,6 +731,8 @@ async function recoit(m) {
     case 'montreMod':                               // depuis la fenêtre d'analyse : le détail s'ouvre dans la page
       ouvrir();
       return envoie({ t: 'detail', data: await moteur.run(['detail', ...P, '--mod', m.cle]) });
+    case 'conflitsToutes':                          // toutes les ressources d'un mod ou d'une archive, celles sans conflit comprises
+      return envoie({ t: 'conflitsToutes', id: m.id, data: await moteur.run(['conflits', ...P, m.mod ? '--mod=' + m.mod : '--nom=' + m.nom, '--tout']) });
     case 'conflitsDetail':
       return envoie({ t: 'conflitsDetail', nom: m.nom, data: await moteur.run(['conflits', ...P, '--nom=' + m.nom]) });
     case 'ordrePasse': {                            // « Passer devant / derrière » : par le nom dans le jeu, ou par modlist.txt

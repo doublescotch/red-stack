@@ -1977,5 +1977,13 @@
  "{n} encore servie au jeu": {
   "one": "{n} ainda servido ao jogo",
   "other": "{n} ainda servidos ao jogo"
+ },
+ "Lister aussi les ressources hors conflit : celles que ce mod est seul à livrer, donc servies au jeu": "Listar também os recursos sem conflito: os que só este mod entrega e que, portanto, chegam ao jogo",
+ "Cacher les ressources hors conflit": "Ocultar os recursos sem conflito",
+ "Toutes ses ressources…": "Todos os seus recursos…",
+ "{0} montrées, par ordre de chemin": "{0} mostrados, por ordem de caminho",
+ "{n} ressource hors conflit, servie au jeu": {
+  "one": "{n} recurso sem conflito, servido ao jogo",
+  "other": "{n} recursos sem conflito, servidos ao jogo"
  }
 }
