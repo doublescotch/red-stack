@@ -1869,5 +1869,23 @@
   "other": "{n} 个已启用的模组缺少前置："
  },
  "Aucun mod actif ne manque d'un prérequis connu.": "没有已启用的模组缺少已知的前置。",
- "  ! prérequis : {0} exige {1}": "  ! 前置：{0} 需要 {1}"
+ "  ! prérequis : {0} exige {1}": "  ! 前置：{0} 需要 {1}",
+ "Aucune archive à convertir : {0}": "没有要转换的压缩包：{0}",
+ "Convertir {n} archive en .zip ?": {
+  "other": "将 {n} 个压缩包转换为 .zip？"
+ },
+ "Convertir {n} archive": {
+  "other": "转换 {n} 个压缩包"
+ },
+ "{n} archive convertie en .zip.": {
+  "other": "已将 {n} 个压缩包转换为 .zip。"
+ },
+ "Compter de nouveau ce prérequis pour ce mod": "重新为此模组计入这项前置",
+ "Ne plus compter ce prérequis pour ce mod : vous n'en avez pas besoin, ou vous l'avez sous un autre zip. Réversible.": "不再为此模组计入这项前置：你不需要它，或者它在另一个 zip 中。可恢复。",
+ "Convertir en .zip les archives .7z / .rar cochées, en une confirmation": "将勾选的 .7z / .rar 压缩包转换为 .zip，只需确认一次",
+ "Convertir {0}…": "转换 {0}…",
+ "prerequis --ignore : on (ne plus compter) ou off (compter de nouveau), --cle <clé du zip>, --requis <identifiant du prérequis>": "prerequis --ignore：on（不再计入）或 off（重新计入），--cle <zip 的键>，--requis <前置的标识>",
+ "prerequis --ignore : ce mod n'a pas de prérequis « {0} »": "prerequis --ignore：此模组没有前置“{0}”",
+ "{0} : prérequis « {1} » ignoré.": "{0}：已忽略前置“{1}”。",
+ "{0} : prérequis « {1} » compté de nouveau.": "{0}：已重新计入前置“{1}”。"
 }

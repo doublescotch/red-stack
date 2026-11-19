@@ -148,7 +148,10 @@ TOOLS = [
                                 "will not load; `a_voir` = declared mods not active). With `mod`: its full list and who requires it. `nexus` "
                                 "true reads Nexus first for what is not cached yet (public API, no key).",
          {**P_PROFIL, "mod": {"type": "string", "description": "Text that designates ONE active zip, or its exact key (stack/[folder/]name.zip)"},
-          "nexus": {"type": "boolean", "description": "Read the declared requirements on Nexus first (only what is not cached)"}}),
+          "nexus": {"type": "boolean", "description": "Read the declared requirements on Nexus first (only what is not cached)"},
+          "requis": {"type": "string", "description": "With `mod` and `ignore`: the `ident` of ONE requirement of that mod (as returned in its list)"},
+          "ignore": {"type": "boolean", "description": "With `mod` and `requis`: true = stop counting this requirement for this mod (not needed, or held "
+                                                       "under another zip), false = count it again. Noted in the settings, reversible; the game is not touched."}}),
     tool("red_stack_sauvegardes", "Backups of the mods' settings (files never linked, delivered or written in game). Without an argument: the "
                                   "list. `cree`: makes one now (dated copy, the game is not touched). `compare` (name of a backup, or “derniere” "
                                   "for the latest): what a restore would change in the game; restoring is done in VS Code.",
@@ -438,6 +441,11 @@ class Serveur:
         return d
 
     def red_stack_prerequis(self, p):
+        if p.get("requis") and "ignore" in p:       # ne plus compter, ou compter de nouveau, UN prérequis de ce mod
+            if not p.get("mod"):
+                raise ValueError("`requis` and `ignore` need `mod`")
+            cle = self.rs("prerequis", "--profil", p.get("profil") or "actuel", "--mod", p["mod"])["mods"][0]["cle"]
+            self.rs("prerequis", "on" if p["ignore"] else "off", "--profil", p.get("profil") or "actuel", "--cle", cle, "--ignore", "--requis", p["requis"])
         d = self.rs("prerequis", "--profil", p.get("profil") or "actuel", *(["--mod", p["mod"]] if p.get("mod") else []),
                     *(["--nexus"] if p.get("nexus") else []))
         if p.get("mod"):                             # un mod : sa liste entière, et qui l'exige (soixante noms, le reste compté)
@@ -445,7 +453,7 @@ class Serveur:
             r["requis_par_total"], r["requis_par"] = len(r["requis_par"]), r["requis_par"][:60]
             return {"mod": r, "erreur": d["erreur"]}
         absents = lambda r: [{k: e[k] for k in ("nom", "cadre", "mod", "etat", "notes", "par")}
-                             for e in r["requis"] if e["etat"] in ("coupé", "rangé", "absent") and not e["optionnel"]]
+                             for e in r["requis"] if e["etat"] in ("coupé", "rangé", "absent") and not e["optionnel"] and not e["ignore"]]
         vus = [{"cle": r["cle"], "manque": r["manque"], "a_voir": r["a_voir"], "absents": absents(r)} for r in d["mods"] if r["manque"] or r["a_voir"]]
         for c in d["cadres"]:
             c["par"] = c["par"][:5]

@@ -1588,6 +1588,15 @@ check("exigé par : le zip fourni nomme qui l'exige, aucun actif ne l'a tant qu'
 pl = {x["zip"]: [e["nom"] for e in x["requis"]] for x in rs("plan", "--profil", "q")["prerequis"]}
 check("aperçu du plan : cadre manquant et mod requis coupé sont dits, l'optionnel et l'externe non",
       pl.get(BESOIN) == ["Cyber Engine Tweaks", "Fourni"] and pl.get(LUA) == ["Cyber Engine Tweaks"] and pl.get(SANS) == ["TweakXL"], str(pl))
+tu = un(b, "Fourni")["ident"]
+refus = rs("prerequis", "on", "--profil", "q", "--cle", BESOIN, "--ignore", "--requis", "m:424242", ok=False)
+rs("prerequis", "on", "--profil", "q", "--cle", BESOIN, "--ignore", "--requis", tu)
+R2 = lit()
+pl2 = {x["zip"]: [e["nom"] for e in x["requis"]] for x in rs("plan", "--profil", "q")["prerequis"]}
+rs("prerequis", "off", "--profil", "q", "--cle", BESOIN, "--ignore", "--requis", tu)
+check("prérequis ignoré pour ce mod : toujours listé, marqué, plus compté ni dit au plan ; inconnu = refus ; repris, il compte de nouveau",
+      un(R2[BESOIN], "Fourni")["ignore"] is True and R2[BESOIN]["a_voir"] == 0 and pl2.get(BESOIN) == ["Cyber Engine Tweaks"] and "m:424242" in str(refus)
+      and lit()[BESOIN]["a_voir"] == 1 and "requis_ignores" in json.load(open(os.path.join(DONNEES, "config.json"), encoding="utf-8")), str(R2[BESOIN]) + str(refus))
 for z in (CADRE, FOURNI):
     rs("bascule", "on", "--profil", "q", "--mod", z[:-4])
 R = lit()

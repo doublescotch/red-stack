@@ -1869,5 +1869,23 @@
   "other": "필수 항목이 없는 활성 mod {n}개:"
  },
  "Aucun mod actif ne manque d'un prérequis connu.": "알려진 필수 항목이 없는 활성 mod는 없습니다.",
- "  ! prérequis : {0} exige {1}": "  ! 필수 항목: {0}에 {1} 필요"
+ "  ! prérequis : {0} exige {1}": "  ! 필수 항목: {0}에 {1} 필요",
+ "Aucune archive à convertir : {0}": "변환할 압축 파일이 없습니다: {0}",
+ "Convertir {n} archive en .zip ?": {
+  "other": "압축 파일 {n}개를 .zip으로 변환할까요?"
+ },
+ "Convertir {n} archive": {
+  "other": "압축 파일 {n}개 변환"
+ },
+ "{n} archive convertie en .zip.": {
+  "other": "압축 파일 {n}개를 .zip으로 변환했습니다."
+ },
+ "Compter de nouveau ce prérequis pour ce mod": "이 mod에서 이 필수 항목을 다시 집계",
+ "Ne plus compter ce prérequis pour ce mod : vous n'en avez pas besoin, ou vous l'avez sous un autre zip. Réversible.": "이 mod에서 이 필수 항목을 더 이상 집계하지 않습니다. 필요하지 않거나 다른 zip에 들어 있는 경우입니다. 되돌릴 수 있습니다.",
+ "Convertir en .zip les archives .7z / .rar cochées, en une confirmation": "선택한 .7z / .rar 압축 파일을 한 번의 확인으로 .zip으로 변환",
+ "Convertir {0}…": "{0} 변환…",
+ "prerequis --ignore : on (ne plus compter) ou off (compter de nouveau), --cle <clé du zip>, --requis <identifiant du prérequis>": "prerequis --ignore: on(집계 안 함) 또는 off(다시 집계), --cle <zip 키>, --requis <필수 항목 식별자>",
+ "prerequis --ignore : ce mod n'a pas de prérequis « {0} »": "prerequis --ignore: 이 mod에는 필수 항목 “{0}”이(가) 없습니다",
+ "{0} : prérequis « {1} » ignoré.": "{0}: 필수 항목 “{1}” 무시됨.",
+ "{0} : prérequis « {1} » compté de nouveau.": "{0}: 필수 항목 “{1}” 다시 집계됨."
 }

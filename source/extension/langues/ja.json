@@ -1869,5 +1869,23 @@
   "other": "前提が不足している有効な MOD {n} 個:"
  },
  "Aucun mod actif ne manque d'un prérequis connu.": "既知の前提が不足している有効な MOD はありません。",
- "  ! prérequis : {0} exige {1}": "  ! 前提: {0} には {1} が必要"
+ "  ! prérequis : {0} exige {1}": "  ! 前提: {0} には {1} が必要",
+ "Aucune archive à convertir : {0}": "変換するアーカイブがありません: {0}",
+ "Convertir {n} archive en .zip ?": {
+  "other": "アーカイブ {n} 個を .zip に変換しますか?"
+ },
+ "Convertir {n} archive": {
+  "other": "アーカイブ {n} 個を変換"
+ },
+ "{n} archive convertie en .zip.": {
+  "other": "アーカイブ {n} 個を .zip に変換しました。"
+ },
+ "Compter de nouveau ce prérequis pour ce mod": "この MOD でこの前提を再び数える",
+ "Ne plus compter ce prérequis pour ce mod : vous n'en avez pas besoin, ou vous l'avez sous un autre zip. Réversible.": "この MOD でこの前提を数えないようにします。不要な場合、または別の zip で持っている場合です。元に戻せます。",
+ "Convertir en .zip les archives .7z / .rar cochées, en une confirmation": "チェックした .7z / .rar アーカイブを .zip に変換します (確認は 1 回)",
+ "Convertir {0}…": "{0} を変換…",
+ "prerequis --ignore : on (ne plus compter) ou off (compter de nouveau), --cle <clé du zip>, --requis <identifiant du prérequis>": "prerequis --ignore: on (数えない) または off (再び数える)、--cle <zip のキー>、--requis <前提の識別子>",
+ "prerequis --ignore : ce mod n'a pas de prérequis « {0} »": "prerequis --ignore: この MOD に前提「{0}」はありません",
+ "{0} : prérequis « {1} » ignoré.": "{0}: 前提「{1}」を無視します。",
+ "{0} : prérequis « {1} » compté de nouveau.": "{0}: 前提「{1}」を再び数えます。"
 }

@@ -188,7 +188,7 @@ a { color: var(--bleu); }
 <tr><th>absent</th><td>Aucun zip du dépôt ne le fournit. Son nom ouvre sa page Nexus.</td></tr>
 <tr><th>hors Nexus</th><td>Prérequis extérieur à Nexus (ReShade…) ou d'un autre jeu : Red Stack ne peut pas le contrôler.</td></tr>
 </table>
-<p>« Exigé par » liste, à l'inverse, les mods du dépôt qui ont besoin de celui-ci ; un mod coupé que des mods actifs exigent le dit en rouge. Un prérequis que vous avez sous un autre zip (un pack, une version retouchée sans numéro Nexus) reste dit « absent » : Red Stack ne reconnaît un mod de Nexus qu'au numéro porté par le nom du zip.</p>
+<p>« Exigé par » liste, à l'inverse, les mods du dépôt qui ont besoin de celui-ci ; un mod coupé que des mods actifs exigent le dit en rouge. Un prérequis que vous avez sous un autre zip (un pack, une version retouchée sans numéro Nexus) reste dit « absent » : Red Stack ne reconnaît un mod de Nexus qu'au numéro porté par le nom du zip. Dans ce cas, ou si vous n'en voulez pas, <b class="b">Ignorer</b> sur sa ligne le fait taire pour ce mod : il reste listé, marqué « ignoré », ne lève plus de puce ni d'alerte au plan, et le choix suit le mod d'une version à l'autre ; <b class="b">Ne plus ignorer</b> le rend.</p>
 <h3>Les boutons du détail</h3>
 <ul>
 <li><b class="b">Installateur…</b> : les pages de choix d'un <a href="#fomod">FOMOD</a>.</li>
@@ -237,7 +237,7 @@ a { color: var(--bleu); }
 </ul>
 <h3>Convertir, remonter, parquer</h3>
 <ul>
-<li><b class="b">Convertir en .zip…</b> : un <code>.7z</code> ou un <code>.rar</code> est récrit en <code>.zip</code> (par 7-Zip, UnRAR ou le <code>tar</code> de Windows), relu, puis l'original est supprimé.</li>
+<li><b class="b">Convertir en .zip…</b> : un <code>.7z</code> ou un <code>.rar</code> est récrit en <code>.zip</code> (par 7-Zip, UnRAR ou le <code>tar</code> de Windows), relu, puis l'original est supprimé. Plusieurs archives se convertissent d'un coup : cochez-les, puis « Convertir les cochées… » en tête de la vue ; une seule confirmation, et une archive illisible ne retient pas les autres.</li>
 <li><b class="b">Remonter dans la pile…</b> : le zip quitte le dossier d'arrivée et devient un mod « nouveau dans le dépôt », à cocher dans la liste.</li>
 <li><b class="b">Parquer…</b> : le zip va dans le dossier des parqués de sa pile.</li>
 <li>« Remonter les cochées » et « Parquer les cochées » traitent un lot en une seule confirmation.</li>

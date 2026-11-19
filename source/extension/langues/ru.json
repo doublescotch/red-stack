@@ -2415,5 +2415,32 @@
   "other": "{n} активного мода, которым не хватает требования:"
  },
  "Aucun mod actif ne manque d'un prérequis connu.": "Нет активных модов, которым не хватает известного требования.",
- "  ! prérequis : {0} exige {1}": "  ! требование: {0} требует {1}"
+ "  ! prérequis : {0} exige {1}": "  ! требование: {0} требует {1}",
+ "Aucune archive à convertir : {0}": "Нет архивов для преобразования: {0}",
+ "Convertir {n} archive en .zip ?": {
+  "one": "Преобразовать {n} архив в .zip?",
+  "few": "Преобразовать {n} архива в .zip?",
+  "many": "Преобразовать {n} архивов в .zip?",
+  "other": "Преобразовать {n} архива в .zip?"
+ },
+ "Convertir {n} archive": {
+  "one": "Преобразовать {n} архив",
+  "few": "Преобразовать {n} архива",
+  "many": "Преобразовать {n} архивов",
+  "other": "Преобразовать {n} архива"
+ },
+ "{n} archive convertie en .zip.": {
+  "one": "{n} архив преобразован в .zip.",
+  "few": "{n} архива преобразовано в .zip.",
+  "many": "{n} архивов преобразовано в .zip.",
+  "other": "{n} архива преобразовано в .zip."
+ },
+ "Compter de nouveau ce prérequis pour ce mod": "Снова учитывать это требование для этого мода",
+ "Ne plus compter ce prérequis pour ce mod : vous n'en avez pas besoin, ou vous l'avez sous un autre zip. Réversible.": "Больше не учитывать это требование для этого мода: оно вам не нужно или есть в другом zip. Обратимо.",
+ "Convertir en .zip les archives .7z / .rar cochées, en une confirmation": "Преобразовать отмеченные архивы .7z / .rar в .zip с одним подтверждением",
+ "Convertir {0}…": "Преобразовать {0}…",
+ "prerequis --ignore : on (ne plus compter) ou off (compter de nouveau), --cle <clé du zip>, --requis <identifiant du prérequis>": "prerequis --ignore: on (не учитывать) или off (снова учитывать), --cle <ключ zip>, --requis <идентификатор требования>",
+ "prerequis --ignore : ce mod n'a pas de prérequis « {0} »": "prerequis --ignore: у этого мода нет требования «{0}»",
+ "{0} : prérequis « {1} » ignoré.": "{0}: требование «{1}» игнорируется.",
+ "{0} : prérequis « {1} » compté de nouveau.": "{0}: требование «{1}» снова учитывается."
 }

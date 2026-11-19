@@ -2051,5 +2051,26 @@
   "other": "{n} aktive Mods, denen eine Voraussetzung fehlt:"
  },
  "Aucun mod actif ne manque d'un prérequis connu.": "Keinem aktiven Mod fehlt eine bekannte Voraussetzung.",
- "  ! prérequis : {0} exige {1}": "  ! Voraussetzung: {0} setzt {1} voraus"
+ "  ! prérequis : {0} exige {1}": "  ! Voraussetzung: {0} setzt {1} voraus",
+ "Aucune archive à convertir : {0}": "Kein Archiv zu konvertieren: {0}",
+ "Convertir {n} archive en .zip ?": {
+  "one": "{n} Archiv in .zip konvertieren?",
+  "other": "{n} Archive in .zip konvertieren?"
+ },
+ "Convertir {n} archive": {
+  "one": "{n} Archiv konvertieren",
+  "other": "{n} Archive konvertieren"
+ },
+ "{n} archive convertie en .zip.": {
+  "one": "{n} Archiv in .zip konvertiert.",
+  "other": "{n} Archive in .zip konvertiert."
+ },
+ "Compter de nouveau ce prérequis pour ce mod": "Diese Voraussetzung für diesen Mod wieder zählen",
+ "Ne plus compter ce prérequis pour ce mod : vous n'en avez pas besoin, ou vous l'avez sous un autre zip. Réversible.": "Diese Voraussetzung für diesen Mod nicht mehr zählen: Sie brauchen sie nicht, oder Sie haben sie unter einem anderen Zip. Umkehrbar.",
+ "Convertir en .zip les archives .7z / .rar cochées, en une confirmation": "Die markierten .7z- / .rar-Archive in .zip konvertieren, mit einer einzigen Bestätigung",
+ "Convertir {0}…": "{0} konvertieren…",
+ "prerequis --ignore : on (ne plus compter) ou off (compter de nouveau), --cle <clé du zip>, --requis <identifiant du prérequis>": "prerequis --ignore: on (nicht mehr zählen) oder off (wieder zählen), --cle <Schlüssel des Zips>, --requis <Kennung der Voraussetzung>",
+ "prerequis --ignore : ce mod n'a pas de prérequis « {0} »": "prerequis --ignore: Dieser Mod hat keine Voraussetzung „{0}“",
+ "{0} : prérequis « {1} » ignoré.": "{0}: Voraussetzung „{1}“ wird ignoriert.",
+ "{0} : prérequis « {1} » compté de nouveau.": "{0}: Voraussetzung „{1}“ wird wieder gezählt."
 }

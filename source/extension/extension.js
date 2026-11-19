@@ -439,7 +439,7 @@ function rafraichit(delai = 0, auto = false) {
 
 // Gestes qui écrivent le dépôt, le magasin ou le jeu : de leur confirmation à leur fin, la page est verrouillée (message
 // `verrou`), et tout autre geste qui écrit ou qui change le profil est refusé, d'où qu'il vienne (page, onglets d'analyse).
-const GESTES_ECRIT = new Set(['adopte', 'deplace', 'deplaceLot', 'supprime', 'conventionRange', 'conventionRenomme', 'conventionConvertit', 'contenuRenomme',
+const GESTES_ECRIT = new Set(['adopte', 'deplace', 'deplaceLot', 'supprime', 'conventionRange', 'conventionRenomme', 'conventionConvertit', 'conventionConvertitLot', 'contenuRenomme',
   'purge', 'retoucheAnnule', 'applique']);
 const CHANGE = new Set(['profilNouveau', 'profilSupprime', 'bascule', 'basculeLot', 'option', 'priorite', 'fomodFixe', 'nomsFixe', 'ordrePasse', 'ordreRenomme',
   'ordreAnnule', 'ordreModlistStop', 'planRemplace', 'reglagesEcrit', 'reference', 'sauvegarde', 'majTelecharge']);
@@ -535,6 +535,10 @@ async function recoit(m) {
       return rafraichit(250);
     case 'detail':
       return envoie({ t: 'detail', data: await moteur.run(['detail', ...P, '--mod', m.cle]) });
+    case 'prerequisIgnore':                         // « ce prérequis ne compte pas pour ce mod » : noté aux réglages, réversible
+      await moteur.run(['prerequis', m.valeur ? 'on' : 'off', ...P, '--cle', m.cle, '--ignore', '--requis', m.requis]);
+      envoie({ t: 'detail', data: await moteur.run(['detail', ...P, '--mod', m.cle]) });
+      return rafraichit(250);
     case 'prerequisLit': {                          // prérequis déclarés sur Nexus, pour ce mod seul : un appel, sans clé d'API
       const r = await moteur.run(['prerequis', ...P, '--mod', m.cle, '--nexus']);
       if (r.erreur) vscode.window.showWarningMessage(r.erreur);
@@ -638,6 +642,29 @@ async function recoit(m) {
       const r = await vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: T('Red Stack : conversion en .zip…') },
         () => moteur.run(['convention', '--convertit', '--cle', m.cle, '--go']));
       envoie({ t: 'convention', data: await moteur.run(['convention']), dit: T`Converti : ${path.basename(r.vers)} (${r.fichiers} fichiers).` });
+      return rafraichit();
+    }
+    case 'conventionConvertitLot': {                // les .7z / .rar cochés -> .zip, une seule confirmation
+      const prets = [], refus = [];
+      for (const cle of m.cles || []) {               // sans --go : chaque archive dit son outil, ou son refus
+        try { prets.push({ cle, vu: await moteur.run(['convention', '--convertit', '--cle', cle]) }); }
+        catch (e) { refus.push(`${cle.split('/').pop()} : ${String((e && e.message) || e).split('\n')[0]}`); }
+      }
+      if (!prets.length) throw new Error(T`Aucune archive à convertir : ${refus.join(' ; ') || T('rien de coché')}`);
+      const n = prets.length;
+      const ok = await confirme(N(n, 'Convertir {n} archive en .zip ?', 'Convertir {n} archives en .zip ?'), N(n, 'Convertir {n} archive', 'Convertir {n} archives'),
+        prets.slice(0, 3).map((x) => path.basename(x.vu.de)).join(' · ') + (n > 3 ? ` · ${N(n - 3, '… et {n} autre', '… et {n} autres')}` : ''),
+        T('Entrée = ne rien écrire. Le zip est écrit à côté, relu, puis l\'archive d\'origine est supprimée.') + (refus.length ? ` ${T`Laissés de côté : ${refus.length}.`}` : ''));
+      if (!ok) return;
+      let faits = 0;
+      await vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: T('Red Stack : conversion en .zip…') }, async (avance) => {
+        for (const x of prets) {                      // une archive qui échoue ne retient pas les suivantes
+          avance.report({ message: `${faits + refus.length + 1} / ${m.cles.length} · ${path.basename(x.vu.de)}`, increment: 100 / prets.length });
+          try { await moteur.run(['convention', '--convertit', '--cle', x.cle, '--go']); faits += 1; }
+          catch (e) { refus.push(`${x.cle.split('/').pop()} : ${String((e && e.message) || e).split('\n')[0]}`); }
+        }
+      });
+      envoie({ t: 'convention', data: await moteur.run(['convention']), dit: N(faits, '{n} archive convertie en .zip.', '{n} archives converties en .zip.') + (refus.length ? ` ${T`Laissés : ${refus.join(' ; ')}`}` : '') });
       return rafraichit();
     }
     case 'contenu':                                 // contenu d'un zip : plan de renommage, lecture seule (index des références)

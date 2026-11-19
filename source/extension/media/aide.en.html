@@ -126,7 +126,7 @@
 <tr><th>missing</th><td>No zip of the repository provides it. Its name opens its Nexus page.</td></tr>
 <tr><th>outside Nexus</th><td>A requirement from outside Nexus (ReShade…) or from another game: Red Stack cannot check it.</td></tr>
 </table>
-<p>“Required by” lists, the other way round, the mods of the repository that need this one; a disabled mod that active mods require says so in red. A requirement you hold under another zip (a pack, an edited version with no Nexus number) is still shown as “missing”: Red Stack recognises a Nexus mod only by the number carried in the zip name.</p>
+<p>“Required by” lists, the other way round, the mods of the repository that need this one; a disabled mod that active mods require says so in red. A requirement you hold under another zip (a pack, an edited version with no Nexus number) is still shown as “missing”: Red Stack recognises a Nexus mod only by the number carried in the zip name. In that case, or if you do not want it, <b class="b">Ignore</b> on its line silences it for this mod: it stays listed, marked “ignored”, raises no chip and no warning in the plan any more, and the choice follows the mod from one version to the next; <b class="b">Stop ignoring</b> brings it back.</p>
 <h3>The buttons of the detail</h3>
 <ul>
 <li><b class="b">Installer…</b>: the choice pages of a <a href="#fomod">FOMOD</a>.</li>
@@ -175,7 +175,7 @@
 </ul>
 <h3>Convert, move into the stack, park</h3>
 <ul>
-<li><b class="b">Convert to .zip…</b>: a <code>.7z</code> or a <code>.rar</code> is rewritten as a <code>.zip</code> (by 7-Zip, UnRAR or the Windows <code>tar</code>), read back, then the original is deleted.</li>
+<li><b class="b">Convert to .zip…</b>: a <code>.7z</code> or a <code>.rar</code> is rewritten as a <code>.zip</code> (by 7-Zip, UnRAR or the Windows <code>tar</code>), read back, then the original is deleted. Several archives convert at once: tick them, then “Convert the ticked ones…” at the top of the view; one confirmation, and an unreadable archive does not hold back the others.</li>
 <li><b class="b">Move into the stack…</b>: the zip leaves the arrival folder and becomes a mod “new in the repository”, to tick in the list.</li>
 <li><b class="b">Park…</b>: the zip goes to the parked folder of its stack.</li>
 <li>“Move the ticked ones into the stack…” and “Park the ticked ones…” handle a lot in a single confirmation.</li>

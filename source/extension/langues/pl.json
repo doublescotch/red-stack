@@ -2415,5 +2415,32 @@
   "other": "{n} aktywnego moda, którym brakuje wymagania:"
  },
  "Aucun mod actif ne manque d'un prérequis connu.": "Żadnemu aktywnemu modowi nie brakuje znanego wymagania.",
- "  ! prérequis : {0} exige {1}": "  ! wymaganie: {0} wymaga {1}"
+ "  ! prérequis : {0} exige {1}": "  ! wymaganie: {0} wymaga {1}",
+ "Aucune archive à convertir : {0}": "Brak archiwów do konwersji: {0}",
+ "Convertir {n} archive en .zip ?": {
+  "one": "Przekonwertować {n} archiwum na .zip?",
+  "few": "Przekonwertować {n} archiwa na .zip?",
+  "many": "Przekonwertować {n} archiwów na .zip?",
+  "other": "Przekonwertować {n} archiwum na .zip?"
+ },
+ "Convertir {n} archive": {
+  "one": "Konwertuj {n} archiwum",
+  "few": "Konwertuj {n} archiwa",
+  "many": "Konwertuj {n} archiwów",
+  "other": "Konwertuj {n} archiwum"
+ },
+ "{n} archive convertie en .zip.": {
+  "one": "Przekonwertowano {n} archiwum na .zip.",
+  "few": "Przekonwertowano {n} archiwa na .zip.",
+  "many": "Przekonwertowano {n} archiwów na .zip.",
+  "other": "Przekonwertowano {n} archiwum na .zip."
+ },
+ "Compter de nouveau ce prérequis pour ce mod": "Ponownie uwzględniaj to wymaganie dla tego moda",
+ "Ne plus compter ce prérequis pour ce mod : vous n'en avez pas besoin, ou vous l'avez sous un autre zip. Réversible.": "Nie uwzględniaj już tego wymagania dla tego moda: nie potrzebujesz go albo masz je w innym zipie. Odwracalne.",
+ "Convertir en .zip les archives .7z / .rar cochées, en une confirmation": "Przekonwertuj zaznaczone archiwa .7z / .rar na .zip, jednym potwierdzeniem",
+ "Convertir {0}…": "Konwertuj {0}…",
+ "prerequis --ignore : on (ne plus compter) ou off (compter de nouveau), --cle <clé du zip>, --requis <identifiant du prérequis>": "prerequis --ignore: on (nie uwzględniaj) lub off (uwzględniaj ponownie), --cle <klucz zipa>, --requis <identyfikator wymagania>",
+ "prerequis --ignore : ce mod n'a pas de prérequis « {0} »": "prerequis --ignore: ten mod nie ma wymagania „{0}”",
+ "{0} : prérequis « {1} » ignoré.": "{0}: wymaganie „{1}” zignorowane.",
+ "{0} : prérequis « {1} » compté de nouveau.": "{0}: wymaganie „{1}” ponownie uwzględniane."
 }

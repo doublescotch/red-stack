@@ -600,13 +600,16 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     const q = d.prerequis;
     if (!q) return '';
     const absent = (e) => ['coupé', 'rangé', 'absent'].includes(e.etat);
-    const ton = (e) => (!absent(e) ? (e.etat === 'externe' ? 'gris' : 'vert') : e.cadre ? 'rouge' : e.optionnel ? 'gris' : 'ambre');
+    const ton = (e) => (!absent(e) ? (e.etat === 'externe' ? 'gris' : 'vert') : e.ignore ? 'gris' : e.cadre ? 'rouge' : e.optionnel ? 'gris' : 'ambre');
+    // un prérequis qui n'est pas là se tait d'un clic (inutile chez vous, ou tenu sous un autre zip) ; réversible
+    const geste = (e) => (!absent(e) ? '' : e.ignore ? ` <button class="mini" data-reqreprend="${h(e.ident)}" title="${T`Compter de nouveau ce prérequis pour ce mod`}">${T`Ne plus ignorer`}</button>`
+      : ` <button class="mini" data-reqignore="${h(e.ident)}" title="${T`Ne plus compter ce prérequis pour ce mod : vous n'en avez pas besoin, ou vous l'avez sous un autre zip. Réversible.`}">${T`Ignorer`}</button>`);
     const source = (e) => (e.sources.length > 1 ? T('déclaré sur Nexus, et déduit de ses fichiers') : e.sources[0] === 'nexus' ? T('déclaré sur Nexus') : T('déduit de ses fichiers'));
     const nom = (e) => (e.par.length ? `<button class="lien" data-va="${h(e.par[0])}" title="${T`Ouvrir le détail du zip qui le fournit`}">${h(e.nom)}</button>`
       : e.mod ? `<button class="lien" data-nexus="${e.mod}" title="${T`Ouvrir sa page Nexus`}">${h(e.nom)}</button>` : `<b>${h(e.nom)}</b>`);
     let c = `<h3>${T`Prérequis`}</h3>`;
     if (!d.actif && q.requis_par_actifs) c += `<p class="avis"><span class="pastille rouge"></span>${N(q.requis_par_actifs, '{n} mod actif exige ce mod, qui n\'est pas actif.', '{n} mods actifs exigent ce mod, qui n\'est pas actif.')}</p>`;
-    if (q.requis.length) c += '<ul class="req">' + q.requis.map((e) => `<li><span class="etatf"><span class="pastille ${ton(e)}"></span><b class="mot ${ton(e)}">${h(dit(e.etat))}</b>${e.optionnel ? ` · ${T('optionnel')}` : ''}</span>`
+    if (q.requis.length) c += '<ul class="req">' + q.requis.map((e) => `<li><span class="etatf"><span class="pastille ${ton(e)}"></span><b class="mot ${ton(e)}">${h(dit(e.etat))}</b>${e.optionnel ? ` · ${T('optionnel')}` : ''}${e.ignore ? ` · ${T('ignoré')}` : ''}${geste(e)}</span>`
       + `${nom(e)} <small>· ${source(e)}</small>${e.notes ? `<div class="faits">${T`Note de l'auteur : ${h(e.notes)}`}</div>` : ''}</li>`).join('') + '</ul>';
     else if (q.nexus === 'lu') c += `<p class="vide">${T`Aucun prérequis connu : rien de déclaré sur Nexus, et ses fichiers ne demandent aucun cadre.`}</p>`;
     if (q.nexus === 'jamais lu') c += `<p class="aide">${T`Les prérequis déclarés sur Nexus n'ont pas encore été lus pour ce mod.`} <button class="mini" data-reqlit="${h(d.cle)}">${T`Lire sur Nexus`}</button></p>`;
@@ -1256,11 +1259,12 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     const A = E.arr;
     if (!A) return;
     if (!A.data) { $('arrivages').innerHTML = `<p class="vide">${T`Lecture des arrivages et des fichiers Nexus…`}</p>`; return; }
-    const d = A.data, coches = aRenommer().length, haut_ = aDeplacer('pile').length, bas_ = aDeplacer('parques').length;
+    const d = A.data, coches = aRenommer().length, haut_ = aDeplacer('pile').length, bas_ = aDeplacer('parques').length, conv_ = aConvertir().length;
     const html = ['<div class="intro"><div class="rang">'
       + `<button class="plein" id="arrRenomme"${coches ? '' : ' disabled'}>${(coches ? N(coches, 'Renommer {n} archive cochée…', 'Renommer {n} archives cochées…') : T('Renommer les archives cochées…'))}</button>`
       + `<button id="arrRemonte"${haut_ ? '' : ' disabled'} title="${T`Déplacer les zips cochés à la racine de leur pile, en une confirmation`}">${T`Remonter ${haut_ ? N(haut_, '{n} cochée', '{n} cochées') : T('les cochées')}…`}</button>`
       + `<button id="arrParque"${bas_ ? '' : ' disabled'} title="${T`Déplacer les zips cochés dans le dossier des parqués de leur pile, en une confirmation`}">${T`Parquer ${bas_ ? N(bas_, '{n} cochée', '{n} cochées') : T('les cochées')}…`}</button>`
+      + `<button id="arrConvertit"${conv_ && d.extracteur ? '' : ' disabled'} title="${T`Convertir en .zip les archives .7z / .rar cochées, en une confirmation`}">${T`Convertir ${conv_ ? N(conv_, '{n} cochée', '{n} cochées') : T('les cochées')}…`}</button>`
       + `<button id="arrRelit" title="${T`Relire les arrivages et redemander à Nexus les fichiers de ces mods`}">${T`Relire Nexus`}</button>`
       + Object.entries(d.compte).map(([s, n]) => `<span class="puce ${(STATUT[s] || ['', ''])[1]}">${n} ${(STATUT[s] || [s])[0]}</span>`).join('')
       + (A.dit ? `<span class="dit" role="status">${h(A.dit)}</span>` : '') + '</div>'
@@ -1501,6 +1505,8 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
   }
   /** Lignes cochées qu'on peut remonter (hors de la racine de leur pile) ou parquer (pas déjà parquées) ; jamais une archive à convertir. */
   const aDeplacer = (vers) => E.arr.data.lignes.filter((r) => E.arr.coches.has(r.cle) && !r.convertir && (vers === 'pile' ? !!r.lieu : r.genre !== 'parqué'));
+  /** Archives .7z / .rar cochées : à convertir en .zip d'un seul geste. */
+  const aConvertir = () => E.arr.data.lignes.filter((r) => E.arr.coches.has(r.cle) && r.convertir);
   function recoitArrivages(m) {
     if (!E.arr) return;
     const A = E.arr, cles = new Set(m.data.lignes.map((r) => r.cle)), neuf = !A.data;
@@ -1550,6 +1556,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       const vers = e.target.id === 'arrRemonte' ? 'pile' : 'parques';
       vscode.postMessage({ t: 'deplaceLot', vers, cles: aDeplacer(vers).map((r) => r.cle) });
     }
+    else if (e.target.id === 'arrConvertit') vscode.postMessage({ t: 'conventionConvertitLot', cles: aConvertir().map((r) => r.cle) });
     else if (e.target.id === 'arrTout') { for (const r of A.data.lignes) if (e.target.checked) A.coches.add(r.cle); else A.coches.delete(r.cle); dessineArrivages(); }
     else if (d.contenu) {
       if (A.contenu && A.contenu.cle === d.contenu) A.contenu = null;
@@ -2180,6 +2187,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     else if (d.retouche) vscode.postMessage({ t: 'retoucheAnnule', cle: d.retouche });
     else if (d.montre) vscode.postMessage({ t: 'montre', chemin: d.montre });
     else if (d.nexus) vscode.postMessage({ t: 'nexus', id: d.nexus });
+    else if (d.reqignore || d.reqreprend) { e.target.disabled = true; vscode.postMessage({ t: 'prerequisIgnore', cle: $('volet').dataset.cle, requis: d.reqignore || d.reqreprend, valeur: !!d.reqignore }); }
     else if (d.reqlit) { e.target.disabled = true; e.target.textContent = T('Lecture de Nexus…'); vscode.postMessage({ t: 'prerequisLit', cle: d.reqlit }); }
     else if (d.va) { E.choisi = d.va; vscode.postMessage({ t: 'detail', cle: d.va }); }
     else if (d.gagne) {

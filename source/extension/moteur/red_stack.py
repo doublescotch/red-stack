@@ -3065,11 +3065,19 @@ def requis_de_nexus(n):
                     for x in r.get("dlcRequirements") or []]}
 
 
-def prerequis(index, prof, jeu, data):
+def qui_requiert(nom):
+    """identité d'un mod pour ses prérequis ignorés : son modId, sinon le radical de son nom ; elle tient d'une version à l'autre"""
+    radical, mid = ident(nom)
+    return mid or radical
+
+
+def prerequis(index, prof, jeu, data, ignores=None):
     """({clé: {nexus, requis: [...], requis_par: [clés], manque}}, [cadres]) pour tout zip qui n'est pas retiré. Lecture
     seule, sans réseau : Nexus est lu dans son cache. Un prérequis : {cadre, mod, nom, notes, url, sources, par, etat} ;
     `par` = les zips du dépôt qui le fournissent ; `etat` = actif, dans le jeu (posé hors Red Stack), coupé, rangé (parqué
-    ou arrivage seulement), absent, externe (hors Nexus, ou d'un autre jeu : pas contrôlable)."""
+    ou arrivage seulement), absent, externe (hors Nexus, ou d'un autre jeu : pas contrôlable). `ignores` (config.json
+    `requis_ignores`) : {identité du mod: [identifiants de prérequis]} que l'utilisateur a dit ne pas compter pour ce mod
+    (inutile chez lui, ou tenu sous un autre zip) ; ils restent listés, marqués `ignore`, et ne lèvent plus d'alerte."""
     try:
         cache = json.load(open(os.path.join(data, "nexus.json"), encoding="utf-8"))
     except (OSError, ValueError):
@@ -3136,10 +3144,12 @@ def prerequis(index, prof, jeu, data):
                 e["par"], e["etat"] = [], "externe"
             for p in e["par"]:
                 requis_par[p].add(k)
-        for e in req.values():                       # Nexus ne dit pas « optionnel » : seule la note de l'auteur le dit
+        tus = set((ignores or {}).get(qui_requiert(m["nom"]), ()))
+        for i, e in req.items():                     # Nexus ne dit pas « optionnel » : seule la note de l'auteur le dit
             e["optionnel"] = not e["cadre"] and bool(RX_OPTIONNEL.search(e["notes"]))
-        rq = sorted(req.values(), key=lambda e: (e["etat"] not in MANQUES, e["optionnel"], not e["cadre"], e["nom"].lower()))
-        absents = [e for e in rq if e["etat"] in MANQUES] if actif(k) else []
+            e["ident"], e["ignore"] = i, i in tus
+        rq = sorted(req.values(), key=lambda e: (e["etat"] not in MANQUES, e["ignore"], e["optionnel"], not e["cadre"], e["nom"].lower()))
+        absents = [e for e in rq if e["etat"] in MANQUES and not e["ignore"]] if actif(k) else []
         lignes[k] = {"nexus": "sans modId" if not mid else "jamais lu" if not c or ("requis" not in c) else "inconnu" if c["requis"] is None else "lu",
                      "requis": rq, "manque": sum(1 for e in absents if e["cadre"]),
                      "a_voir": sum(1 for e in absents if not e["cadre"] and not e["optionnel"]),
@@ -4178,6 +4188,8 @@ def main():
                                        "reglage", "retouche", "purge", "config", "profils", "detail", "fichier", "hors", "reference",
                                        "conflits", "deplace", "convention", "contenu", "ordre", "noms", "scripts", "journal",
                                        "magasin", "sauvegarde", "nexus", "fomod", "prerequis"])
+    ap.add_argument("--requis", help="prerequis on|off --cle CLE --ignore --requis IDENT : ne plus compter (on) ou compter de nouveau (off) "
+                    "ce prérequis pour ce mod ; IDENT est l'`ident` rendu par `prerequis --mod`")
     ap.add_argument("--nexus", action="store_true", help="prerequis : lit d'abord sur Nexus les prérequis des mods qui ne sont pas "
                     "au cache (--mod : de ce mod seul ; --force : de tous, même lus il y a peu)")
     ap.add_argument("--convertit", action="store_true", help="convention : change le .7z / .rar de --cle en .zip")
@@ -4850,13 +4862,28 @@ def main():
     charge_miens(prof)
 
     if a.action == "prerequis":                      # ce que chaque mod exige, qui le fournit, dans quel état : lecture seule
+        if a.ignore:                                 # « ce prérequis ne compte pas pour ce mod » : noté dans config.json, réversible
+            if a.valeur not in ("on", "off") or a.cle not in index or not a.requis:
+                sys.exit(T("prerequis --ignore : on (ne plus compter) ou off (compter de nouveau), --cle <clé du zip>, --requis <identifiant du prérequis>"))
+            qui, tous = qui_requiert(index[a.cle]["nom"]), dict(conf.get("requis_ignores") or {})
+            connus = {e["ident"] for e in prerequis(index, prof, jeu, data)[0].get(a.cle, {}).get("requis", [])}
+            if a.valeur == "on" and a.requis not in connus:
+                sys.exit(T("prerequis --ignore : ce mod n'a pas de prérequis « {0} »", a.requis))
+            tus = sorted(set(tous.get(qui, [])) | {a.requis} if a.valeur == "on" else set(tous.get(qui, [])) - {a.requis})
+            tous.pop(qui, None)
+            if tus:
+                tous[qui] = tus
+            conf["requis_ignores"] = tous
+            save_conf()
+            return out({"cle": a.cle, "requis": a.requis, "ignore": a.valeur == "on"},
+                       T("{0} : prérequis « {1} » ignoré.", a.cle, a.requis) if a.valeur == "on" else T("{0} : prérequis « {1} » compté de nouveau.", a.cle, a.requis))
         key = find_mod(index, prof, a.mod, partout=True) if a.mod else None
         err = None
         if a.nexus:
             mods = sorted({int(w["mod"]) for k, m in index.items() if m["genre"] != "retiré" and (not key or k == key)
                            and (w := RX_ZIP_NEXUS.match(m["nom"]))})
             err = nexus_fichiers(mods, data, a.force, True, True)[1] if mods else None
-        lignes, cadres = prerequis(index, prof, jeu, data)
+        lignes, cadres = prerequis(index, prof, jeu, data, conf.get("requis_ignores"))
         jeu.save()
         rows = [dict(r, cle=k, actif=bool((prof["mods"].get(k) or {}).get("actif")) and not index[k]["lieu"], lieu=index[k]["lieu"])
                 for k, r in lignes.items() if not key or k == key]
@@ -4872,7 +4899,7 @@ def main():
             txt += [f"{key}"] + ["  " + dit(e) for e in r["requis"]] + [N(len(r["requis_par"]), "  exigé par {n} zip, dont {0} actifs", "  exigé par {n} zips, dont {0} actifs", r["requis_par_actifs"])]
         else:
             txt += [N(len(manques), "{n} mod actif à qui il manque un prérequis :", "{n} mods actifs à qui il manque un prérequis :")] if manques else [T("Aucun mod actif ne manque d'un prérequis connu.")]
-            txt += [f"  {r['cle']} : " + T(", ").join(dit(e) for e in r["requis"] if e["etat"] in MANQUES and not e["optionnel"]) for r in manques]
+            txt += [f"  {r['cle']} : " + T(", ").join(dit(e) for e in r["requis"] if e["etat"] in MANQUES and not e["optionnel"] and not e["ignore"]) for r in manques]
             txt += [T("Prérequis optionnels (d'après la note de l'auteur) absents, non comptés : {0}", sum(r["optionnels"] for r in rows))]
         return out({"mods": rows, "cadres": cadres, "compte": dict(c), "manques": sum(1 for r in rows if r["manque"]),
                     "a_voir": sum(1 for r in rows if r["a_voir"]), "optionnels": sum(r["optionnels"] for r in rows), "erreur": err}, "\n".join(txt))
@@ -4915,7 +4942,7 @@ def main():
                          "reglage": bool(d and store and store.est_reglage(d))})
         jeu.save()
         return out({"cle": key, "nom": mod["nom"], "section": mod["section"], "version": version_de(mod),
-                    "redmod": mod.get("redmod") or [], "fomod": fomod_bref(mod, mp), "prerequis": prerequis(index, prof, jeu, data)[0].get(key),
+                    "redmod": mod.get("redmod") or [], "fomod": fomod_bref(mod, mp), "prerequis": prerequis(index, prof, jeu, data, conf.get("requis_ignores"))[0].get(key),
                     "actif": bool(mp and mp.get("actif")), "options": options_of(mod), "sel": (mp or {}).get("sel"),
                     "arbre": store.dir_of(mod) if store and os.path.isdir(store.dir_of(mod)) else None, "zip": mod["zip"], "entrees": rows,
                     "priorites": [p for p in prof["priorites"] if key in p]},
@@ -5525,7 +5552,7 @@ def main():
         except (OSError, ValueError):
             cache_refs = {}
         cites = cites_du_depot(index, cache_refs)
-        requis = prerequis(index, prof, jeu, data)[0]    # Nexus lu dans son cache : jamais d'appel ici
+        requis = prerequis(index, prof, jeu, data, conf.get("requis_ignores"))[0]    # Nexus lu dans son cache : jamais d'appel ici
         for k, m in index.items():
             mp = prof["mods"].get(k)
             c = per.get(k, {})
@@ -5603,8 +5630,8 @@ def main():
         # prérequis : ce que l'aperçu doit dire avant d'écrire. Un cadre qui manque à un mod actif, ou un mod déclaré
         # requis sans réserve que ce profil coupe. Un prérequis absent du dépôt se lit dans la liste, pas ici.
         alertes = []
-        for k, r in prerequis(index, prof, jeu, data)[0].items():
-            es = [e for e in r["requis"] if e["etat"] in MANQUES and (e["cadre"] or (e["etat"] == "coupé" and not e["optionnel"]))]
+        for k, r in prerequis(index, prof, jeu, data, conf.get("requis_ignores"))[0].items():
+            es = [e for e in r["requis"] if e["etat"] in MANQUES and not e["ignore"] and (e["cadre"] or (e["etat"] == "coupé" and not e["optionnel"]))]
             if es and (r["manque"] or r["a_voir"]):
                 alertes.append({"zip": k, "requis": [{x: e[x] for x in ("cadre", "mod", "nom", "etat", "notes", "par")} for e in es]})
                 txt.append(T("  ! prérequis : {0} exige {1}", k, T(", ").join(f"{e['nom']} [{dit_etat(e['etat'])}]" for e in es)))

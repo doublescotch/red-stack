@@ -2051,5 +2051,26 @@
   "other": "{n} mods activos a los que les falta un requisito:"
  },
  "Aucun mod actif ne manque d'un prérequis connu.": "A ningún mod activo le falta un requisito conocido.",
- "  ! prérequis : {0} exige {1}": "  ! requisito: {0} requiere {1}"
+ "  ! prérequis : {0} exige {1}": "  ! requisito: {0} requiere {1}",
+ "Aucune archive à convertir : {0}": "Ningún archivo por convertir: {0}",
+ "Convertir {n} archive en .zip ?": {
+  "one": "¿Convertir {n} archivo a .zip?",
+  "other": "¿Convertir {n} archivos a .zip?"
+ },
+ "Convertir {n} archive": {
+  "one": "Convertir {n} archivo",
+  "other": "Convertir {n} archivos"
+ },
+ "{n} archive convertie en .zip.": {
+  "one": "{n} archivo convertido a .zip.",
+  "other": "{n} archivos convertidos a .zip."
+ },
+ "Compter de nouveau ce prérequis pour ce mod": "Volver a contar este requisito para este mod",
+ "Ne plus compter ce prérequis pour ce mod : vous n'en avez pas besoin, ou vous l'avez sous un autre zip. Réversible.": "Dejar de contar este requisito para este mod: no lo necesita, o lo tiene en otro zip. Reversible.",
+ "Convertir en .zip les archives .7z / .rar cochées, en une confirmation": "Convertir a .zip los archivos .7z / .rar marcados, con una sola confirmación",
+ "Convertir {0}…": "Convertir {0}…",
+ "prerequis --ignore : on (ne plus compter) ou off (compter de nouveau), --cle <clé du zip>, --requis <identifiant du prérequis>": "prerequis --ignore: on (dejar de contar) u off (volver a contar), --cle <clave del zip>, --requis <identificador del requisito>",
+ "prerequis --ignore : ce mod n'a pas de prérequis « {0} »": "prerequis --ignore: este mod no tiene el requisito «{0}»",
+ "{0} : prérequis « {1} » ignoré.": "{0}: requisito «{1}» ignorado.",
+ "{0} : prérequis « {1} » compté de nouveau.": "{0}: requisito «{1}» contado de nuevo."
 }
