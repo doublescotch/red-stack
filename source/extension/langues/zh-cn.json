@@ -1812,5 +1812,62 @@
  "{0} montrées, par ordre de chemin": "显示 {0} 个,按路径排序",
  "{n} ressource hors conflit, servie au jeu": {
   "other": "无冲突的资源 {n} 个,已提供给游戏"
- }
+ },
+ "Prérequis à voir": "待查看的前置",
+ "Ce mod a besoin de {n} cadre qui n'est pas actif : il ne se chargera pas. Sa fiche dit lequel.": {
+  "other": "此模组需要 {n} 个未启用的框架：它将无法加载。详情中会说明是哪些。"
+ },
+ "⚠ prérequis": "⚠ 前置",
+ "{n} mod que l'auteur déclare requis sur Nexus n'est pas actif. Sa fiche dit lequel, avec la note de l'auteur.": {
+  "other": "作者在 Nexus 上声明为必需的 {n} 个模组未启用。详情中会说明是哪些，并附作者的备注。"
+ },
+ "prérequis ?": "前置？",
+ "déclaré sur Nexus, et déduit de ses fichiers": "在 Nexus 上声明，并由其文件推断",
+ "déclaré sur Nexus": "在 Nexus 上声明",
+ "déduit de ses fichiers": "由其文件推断",
+ "Ouvrir le détail du zip qui le fournit": "打开提供它的 zip 的详情",
+ "Ouvrir sa page Nexus": "打开它的 Nexus 页面",
+ "Prérequis": "前置",
+ "{n} mod actif exige ce mod, qui n'est pas actif.": {
+  "other": "有 {n} 个已启用的模组需要此模组，而它未启用。"
+ },
+ "optionnel": "可选",
+ "Note de l'auteur : {0}": "作者备注：{0}",
+ "Aucun prérequis connu : rien de déclaré sur Nexus, et ses fichiers ne demandent aucun cadre.": "没有已知的前置：Nexus 上未声明任何内容，其文件也不需要任何框架。",
+ "Les prérequis déclarés sur Nexus n'ont pas encore été lus pour ce mod.": "尚未读取此模组在 Nexus 上声明的前置。",
+ "Lire sur Nexus": "从 Nexus 读取",
+ "Ce zip ne porte pas de numéro Nexus : seuls les cadres déduits de ses fichiers sont connus.": "此 zip 没有 Nexus 编号：仅知道由其文件推断出的框架。",
+ "Nexus ne rend plus ce mod (retiré ou caché) : seuls les cadres déduits de ses fichiers sont connus.": "Nexus 已不再返回此模组（已移除或已隐藏）：仅知道由其文件推断出的框架。",
+ "Nexus ne donne aucune version minimale, et range sous le même mot ce qui est exigé et ce qui est conseillé : seule la note de l'auteur le dit.": "Nexus 不提供最低版本，并且把必需项和仅推荐项归在同一名目下：只有作者的备注能说明。",
+ "Exigé par {n} mod du dépôt, dont {0} actifs": {
+  "other": "仓库中有 {n} 个模组需要它，其中已启用：{0}"
+ },
+ "dans le jeu, hors Red Stack": "在游戏中，Red Stack 之外",
+ "rangé, pas dans une pile": "已收起，不在栈中",
+ "hors Nexus, non contrôlé": "Nexus 之外，未检查",
+ "{n} mod actif sans un de ses prérequis": {
+  "other": "{n} 个已启用的模组缺少某项前置"
+ },
+ "exige {0} ({1})": "需要 {0}（{1}）",
+ "Lecture de Nexus…": "正在读取 Nexus…",
+ "  cadre {0} : {1}": "  框架 {0}：{1}",
+ "Prérequis optionnels (d'après la note de l'auteur) absents, non comptés : {0}": "缺失的可选前置（依据作者备注），未计入：{0}",
+ "{n} zip": {
+  "other": "{n} 个 zip"
+ },
+ "prérequis lus sur Nexus pour {0}": "已从 Nexus 读取前置：{0}",
+ "jamais lus : {0}": "从未读取：{0}",
+ "sans modId : {0}": "无 modId：{0}",
+ "inconnus de Nexus : {0}": "Nexus 未知：{0}",
+ "exigé par {n} mod actif": {
+  "other": "{n} 个已启用的模组需要它"
+ },
+ "  exigé par {n} zip, dont {0} actifs": {
+  "other": "  有 {n} 个 zip 需要它，其中已启用：{0}"
+ },
+ "{n} mod actif à qui il manque un prérequis :": {
+  "other": "{n} 个已启用的模组缺少前置："
+ },
+ "Aucun mod actif ne manque d'un prérequis connu.": "没有已启用的模组缺少已知的前置。",
+ "  ! prérequis : {0} exige {1}": "  ! 前置：{0} 需要 {1}"
 }

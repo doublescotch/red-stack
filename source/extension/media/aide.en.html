@@ -71,6 +71,7 @@
 <ul>
 <li><b>▼ ▲</b> on a row: this mod loses or wins resources against other archives. <b>⇄</b>: its own archives overlap each other. Hovering gives the detail, a click opens <a href="#conflits">the conflict analysis</a> on this mod.</li>
 <li>The <b>FOMOD</b> chip marks a zip installed by <a href="#fomod">its installer</a>.</li>
+<li>The <b>⚠ requirement</b> chip (red) marks an active mod that lacks a framework (Cyber Engine Tweaks, RED4ext, redscript…): it will not load. The <b>requirement?</b> chip (amber) marks that a mod the author lists as required on Nexus is not active. The <b>Requirements to check</b> filter shows only these mods; <a href="#prerequis">the detail of the mod</a> says what is missing.</li>
 <li>The chips under the header filter by state; the line of figures sums up the profile. <b>New</b> shows the zips of the arrival folders and those of the stack that the profile does not know yet; <b>Parked</b> and <b>Retired</b> show the content of the parked and retired folders.</li>
 <li>A click on a column header sorts; the third click restores the order of the repository.</li>
 <li><b class="b">⇕ Fold / unfold all</b>, on the line of figures, folds every stack at once; if everything is already folded, it unfolds everything. In “Updates” and “Arrivals”, it folds the stack bands. The same button folds the rows of the “Conflicts” and “Scripts and tweaks” tabs, and a <b class="b">⇕</b> at the top of a panel does the same for its rows (history, plan, folders in the detail of a mod).</li>
@@ -111,6 +112,21 @@
 <li><b>“This file belongs to this mod”</b>: on an “outside Red Stack” file, ticking the box says that this file belongs to the mod. Red Stack records it in its registry without modifying it, and it will leave with the mod when you disable it. Unticking hands it back to the third-party installer and leaves it in the game.</li>
 <li><b>Priority between two mods</b>: when two enabled mods want the same file with a different content, the plan stops on a conflict to settle. You say which one wins, file by file or for the whole mod; the profile remembers.</li>
 </ul>
+<h3 id="prerequis">Requirements</h3>
+<p>The detail says what the mod needs to work, which zip of your repository provides it, and in what state. Two sources:</p>
+<ul>
+<li><b>Listed on Nexus</b>: the list the author gives on the mod page. It is read along with the updates (“Updates” view), or for a single mod with <b class="b">Read on Nexus</b>; no API key is asked for. Nexus gives no minimum version, and authors also file there what they merely recommend: only their note tells. Red Stack marks as “optional” a requirement whose note suggests so, and never counts it as a fault.</li>
+<li><b>Deduced from its files</b>: a framework is recognised by where the zip puts its files (a Lua script in the mods folder of Cyber Engine Tweaks, a <code>.reds</code> under <code>r6/scripts</code>, a tweak under <code>r6/tweaks</code>, an <code>.xl</code>, a plugin under <code>red4ext/plugins</code>, an entry under <code>r6/input</code>, a sound under <code>r6/audioware</code>, a REDmod). This reading does without Nexus: it also holds for a mod with no number.</li>
+</ul>
+<table>
+<tr><th>active</th><td>An active zip of the profile provides it.</td></tr>
+<tr><th>in the game, outside Red Stack</th><td>The framework is in the game without Red Stack having installed it (by hand, or by another manager): it is taken as present.</td></tr>
+<tr><th>disabled</th><td>The zip that provides it is in a stack, but disabled in this profile.</td></tr>
+<tr><th>put away</th><td>The zip that provides it is only parked, or in an arrivals folder.</td></tr>
+<tr><th>missing</th><td>No zip of the repository provides it. Its name opens its Nexus page.</td></tr>
+<tr><th>outside Nexus</th><td>A requirement from outside Nexus (ReShade…) or from another game: Red Stack cannot check it.</td></tr>
+</table>
+<p>“Required by” lists, the other way round, the mods of the repository that need this one; a disabled mod that active mods require says so in red. A requirement you hold under another zip (a pack, an edited version with no Nexus number) is still shown as “missing”: Red Stack recognises a Nexus mod only by the number carried in the zip name.</p>
 <h3>The buttons of the detail</h3>
 <ul>
 <li><b class="b">Installer…</b>: the choice pages of a <a href="#fomod">FOMOD</a>.</li>
@@ -133,6 +149,7 @@
 <tr><th>modlist.txt</th><td>The load order file to write or to remove, if the profile holds it.</td></tr>
 <tr><th>conflicts</th><td>Two enabled mods want the same file, different content, with no priority given. To settle before applying.</td></tr>
 <tr><th>disabled mods</th><td>One line per disabled mod: what leaves the game, what another mod takes over as it is, what another already holds.</td></tr>
+<tr><th>requirements</th><td>The active mods that lack a framework, and those for which a mod listed as required is disabled in this profile. Nothing is blocked: it is a warning before writing.</td></tr>
 </table>
 <h3>Apply</h3>
 <ul>
@@ -412,7 +429,7 @@
 <p>The extension carries an MCP server. Once declared (the command can be copied from “Settings”, “This machine”), a Claude Code session can read the state, the conflicts, the history, change a profile and prepare a plan.</p>
 <h3>What a session can do</h3>
 <ul>
-<li><b>Read</b>: the state of the mods (by stack, by state, by kind), the detail of a mod, which mod owns a game file, the plan, the archive conflicts (per pair, per mod, per archive, per resource), the script and tweak conflicts, the load order, the history, the store, the game reference, the settings backups, the updates proposed by Nexus, the arrivals and the name each would take, the content of a zip against the convention.</li>
+<li><b>Read</b>: the state of the mods (by stack, by state, by kind), the detail of a mod, which mod owns a game file, the plan, the archive conflicts (per pair, per mod, per archive, per resource), the script and tweak conflicts, the load order, the history, the store, the game reference, the settings backups, the updates proposed by Nexus, the requirements of each mod (listed on Nexus or deduced from its files), the arrivals and the name each would take, the content of a zip against the convention.</li>
 <li><b>Change a profile</b>: enable or disable a mod or a stack, take or leave an option or a file, say “this file belongs to this mod”, set a priority between two mods or for a single file, rename in the game, change the load order, answer a FOMOD installer.</li>
 <li><b>Set</b>: the settings patterns and the “outside Red Stack” patterns, ignore or propose again the updates of a mod, make a settings backup.</li>
 </ul>

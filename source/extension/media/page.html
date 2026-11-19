@@ -137,7 +137,8 @@ button.puce:hover, button.puce.on { background: var(--trait); }
 .puce.attente { border-color: var(--ambre); color: var(--ambre); }
 .puce.neuf { border-color: var(--bleu); color: var(--bleu); }
 .puce.alerte { border-color: var(--rouge); color: var(--rouge); }
-.puce.pack { margin-left: 6px; color: var(--pale); }
+.puce.pack, .puce.req { margin-left: 6px; } .puce.pack { color: var(--pale); }
+#volet ul.req li { margin: 3px 0; } #volet ul.req small { color: var(--pale); } .mot.gris { color: var(--pale); }
 .vide { padding: 28px 12px; color: var(--pale); text-align: center; }
 
 #volet .tete { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px 6px; position: sticky; top: 0; background: var(--bande); z-index: 1; }
@@ -409,7 +410,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     retire: '<path d="M3 4.5h10M6.3 4.5V2.8h3.4v1.7M4.3 4.5l.6 8.7h6.2l.6-8.7M6.7 6.8v4.2M9.3 6.8v4.2"/>',
     supprime: '<path d="M3 4.5h10M6.3 4.5V2.8h3.4v1.7M4.3 4.5l.6 8.7h6.2l.6-8.7M6.4 7l3.2 3.6M9.6 7l-3.2 3.6"/>',
   };
-  const FILTRES = [['tous', T('Tous')], ['actifs', T('Actifs')], ['coupes', T('Coupés')], ['jamais', T('Jamais posés')], ['attente', T('À appliquer')], ['neufs', T('Nouveaux')], ['modifies', T('Modifiés en jeu')], ['parques', T('Parqués')], ['retires', T('Retirés')]];
+  const FILTRES = [['tous', T('Tous')], ['actifs', T('Actifs')], ['coupes', T('Coupés')], ['jamais', T('Jamais posés')], ['attente', T('À appliquer')], ['neufs', T('Nouveaux')], ['modifies', T('Modifiés en jeu')], ['prerequis', T('Prérequis à voir')], ['parques', T('Parqués')], ['retires', T('Retirés')]];
   // nature d'un mod : ce que son zip pose (fait lu dans le zip) ; « socle » = chargeur, ou mod que d'autres mods du dépôt appellent
   const NATURE = { socle: [T('socle'), T("Socle : un chargeur (CET, RED4ext, Redscript, ArchiveXL, TweakXL, Codeware), ou un mod que d'autres mods du dépôt appellent par leur code.")],
     archive: [T('archive'), T('Pose des archives dans archive/pc/mod.')], xl: ['xl', T('Pose des fichiers .xl lus par ArchiveXL.')],
@@ -472,7 +473,16 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     if (f === 'jamais') return r.etat === 'jamais posé';
     if (f === 'attente') return aEcrire(r) > 0 || r.etat.startsWith('à ');
     if (f === 'modifies') return r.etat.includes('modifié');
+    if (f === 'prerequis') return !!pucePrerequis(r);
     return true;
+  }
+  // Prérequis d'un mod actif qui ne sont pas là. Rouge : un cadre (CET, RED4ext…) manque, le mod ne se chargera pas.
+  // Ambre : un mod que l'auteur déclare requis sur Nexus n'est pas actif ; sa fiche dit lequel, et la note de l'auteur.
+  function pucePrerequis(r) {
+    const p = r.actif && !r.lieu && r.prerequis;
+    if (!p || !(p.manque || p.a_voir)) return '';
+    return p.manque ? `<span class="puce alerte req" title="${N(p.manque, 'Ce mod a besoin de {n} cadre qui n\'est pas actif : il ne se chargera pas. Sa fiche dit lequel.', 'Ce mod a besoin de {n} cadres qui ne sont pas actifs : il ne se chargera pas. Sa fiche dit lesquels.')}">${T`⚠ prérequis`}</span>`
+      : `<span class="puce attente req" title="${N(p.a_voir, '{n} mod que l\'auteur déclare requis sur Nexus n\'est pas actif. Sa fiche dit lequel, avec la note de l\'auteur.', '{n} mods que l\'auteur déclare requis sur Nexus ne sont pas actifs. Sa fiche dit lesquels, avec la note de l\'auteur.')}">${T`prérequis ?`}</span>`;
   }
 
   function dessine() {
@@ -529,7 +539,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
         const fo = r.fomod && r.fomod.actif, l = lit(r.nom), pack = !fo && Object.keys(r.options).some((o) => o !== '');
         html.push(`<tr data-cle="${h(r.cle)}" class="${r.lieu ? 'hors' : r.actif ? '' : 'coupe'}${r.cle === E.choisi ? ' choisi' : ''}">`
           + `<td class="case">${r.lieu ? `<input type="checkbox" data-lot="${h(r.cle)}"${E.lot.has(r.cle) ? ' checked' : ''} title="${T`Cocher ce zip rangé pour le remonter, le parquer ou le retirer avec d'autres`}" aria-label="${h(l.titre)}">` : `<input type="checkbox" data-case="${h(r.cle)}"${r.actif ? ' checked' : ''} aria-label="${h(l.titre)}">`}</td>`
-          + `<td class="mod" title="${h(r.nom)}">${E.complets ? h(r.nom.replace(/\.zip$/i, '')) : h(l.titre) + (l.variante ? `<small>${h(l.variante)}</small>` : '')}${pack ? '<span class="puce pack">pack</span>' : ''}${fo ? `<span class="puce pack" title="${r.fomod.regle ? T`Posé par son installateur FOMOD. Ses choix : détail du mod, « Installateur… ».` : T`Posé par son installateur FOMOD : choix par défaut, jamais réglés. Ses choix : détail du mod, « Installateur… ».`}">FOMOD</span>` : ''}${pastilleConflits(r.cle)}</td>`
+          + `<td class="mod" title="${h(r.nom)}">${E.complets ? h(r.nom.replace(/\.zip$/i, '')) : h(l.titre) + (l.variante ? `<small>${h(l.variante)}</small>` : '')}${pack ? '<span class="puce pack">pack</span>' : ''}${fo ? `<span class="puce pack" title="${r.fomod.regle ? T`Posé par son installateur FOMOD. Ses choix : détail du mod, « Installateur… ».` : T`Posé par son installateur FOMOD : choix par défaut, jamais réglés. Ses choix : détail du mod, « Installateur… ».`}">FOMOD</span>` : ''}${pucePrerequis(r)}${pastilleConflits(r.cle)}</td>`
           + `<td class="version">${h(r.version)}</td>`
           + `<td class="etat"><span class="puce ${classe(r)}" title="${h(motEtat(r))}">${h(motEtat(r))}</span></td>`
           + `<td class="nature">${(r.natures || []).map((x) => `<button class="nat ${x}${E.nature === x ? ' on' : ''}" data-nature="${x}" title="${T`${h(NATURE[x][1])} Clic : ne montrer que ces mods ; second clic : tous.`}">${NATURE[x][0]}</button>`).join('')}</td>`
@@ -584,8 +594,32 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     return `<span class="pastille ${ton}"></span><b class="mot ${ton}">${h(mot)}</b>`;
   }
 
+  /** Prérequis d'un mod, dans sa fiche : ce qu'il exige (déclaré sur Nexus, ou déduit de la place de ses fichiers), qui le
+   *  fournit dans le dépôt et dans quel état, puis les mods qui l'exigent, lui. */
+  function prerequisHtml(d) {
+    const q = d.prerequis;
+    if (!q) return '';
+    const absent = (e) => ['coupé', 'rangé', 'absent'].includes(e.etat);
+    const ton = (e) => (!absent(e) ? (e.etat === 'externe' ? 'gris' : 'vert') : e.cadre ? 'rouge' : e.optionnel ? 'gris' : 'ambre');
+    const source = (e) => (e.sources.length > 1 ? T('déclaré sur Nexus, et déduit de ses fichiers') : e.sources[0] === 'nexus' ? T('déclaré sur Nexus') : T('déduit de ses fichiers'));
+    const nom = (e) => (e.par.length ? `<button class="lien" data-va="${h(e.par[0])}" title="${T`Ouvrir le détail du zip qui le fournit`}">${h(e.nom)}</button>`
+      : e.mod ? `<button class="lien" data-nexus="${e.mod}" title="${T`Ouvrir sa page Nexus`}">${h(e.nom)}</button>` : `<b>${h(e.nom)}</b>`);
+    let c = `<h3>${T`Prérequis`}</h3>`;
+    if (!d.actif && q.requis_par_actifs) c += `<p class="avis"><span class="pastille rouge"></span>${N(q.requis_par_actifs, '{n} mod actif exige ce mod, qui n\'est pas actif.', '{n} mods actifs exigent ce mod, qui n\'est pas actif.')}</p>`;
+    if (q.requis.length) c += '<ul class="req">' + q.requis.map((e) => `<li><span class="etatf"><span class="pastille ${ton(e)}"></span><b class="mot ${ton(e)}">${h(dit(e.etat))}</b>${e.optionnel ? ` · ${T('optionnel')}` : ''}</span>`
+      + `${nom(e)} <small>· ${source(e)}</small>${e.notes ? `<div class="faits">${T`Note de l'auteur : ${h(e.notes)}`}</div>` : ''}</li>`).join('') + '</ul>';
+    else if (q.nexus === 'lu') c += `<p class="vide">${T`Aucun prérequis connu : rien de déclaré sur Nexus, et ses fichiers ne demandent aucun cadre.`}</p>`;
+    if (q.nexus === 'jamais lu') c += `<p class="aide">${T`Les prérequis déclarés sur Nexus n'ont pas encore été lus pour ce mod.`} <button class="mini" data-reqlit="${h(d.cle)}">${T`Lire sur Nexus`}</button></p>`;
+    else if (q.nexus === 'sans modId') c += `<p class="aide">${T`Ce zip ne porte pas de numéro Nexus : seuls les cadres déduits de ses fichiers sont connus.`}</p>`;
+    else if (q.nexus === 'inconnu') c += `<p class="aide">${T`Nexus ne rend plus ce mod (retiré ou caché) : seuls les cadres déduits de ses fichiers sont connus.`}</p>`;
+    if (q.requis.some((e) => e.sources.includes('nexus'))) c += `<p class="faits">${T`Nexus ne donne aucune version minimale, et range sous le même mot ce qui est exigé et ce qui est conseillé : seule la note de l'auteur le dit.`}</p>`;
+    if (q.requis_par.length) c += `<details class="plis"><summary>${N(q.requis_par.length, 'Exigé par {n} mod du dépôt, dont {0} actifs', 'Exigé par {n} mods du dépôt, dont {0} actifs', q.requis_par_actifs)}</summary><ul>`
+      + q.requis_par.map((z) => `<li><button class="lien" data-va="${h(z)}">${h(titreZip(z))}</button> <small>${h(z.split('/')[0])}</small></li>`).join('') + '</ul></details>';
+    return c;
+  }
+
   function voletDetail(d) {
-    const haut = E.volet && E.volet.t === 'detail' && E.volet.d.cle === d.cle ? $('volet').scrollTop : 0;   // même mod redessiné : on reste où on était
+    const haut =E.volet && E.volet.t === 'detail' && E.volet.d.cle === d.cle ? $('volet').scrollTop : 0;   // même mod redessiné : on reste où on était
     E.volet = { t: 'detail', d };
     const l = lit(d.nom), opts = Object.keys(d.options), fo = d.fomod, parFo = !!(fo && fo.actif);
     const pack = !parFo && opts.some((o) => o !== '');
@@ -600,6 +634,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       + `<button data-nomsmod="${h(d.cle)}" title="${T`Poser ce mod sous d'autres noms DANS LE JEU (archives, .xl, scripts, tweaks, dossier CET ou REDmod) : le profil le note, le zip ne change pas. Dit qui cite chaque nom.`}">${T`Noms dans le jeu…`}</button>`
       + (d.arbre ? `<button data-montre="${h(d.arbre)}" title="${h(d.arbre)}">${T`Ouvrir son arbre`}</button>` : '')
       + (l.nexus ? `<button data-nexus="${h(l.nexus)}">${T`Page Nexus`}</button>` : '') + '</div>';
+    c += prerequisHtml(d);
     if (fo) c += `<h3>${T`Installateur FOMOD`}</h3><p class="aide">` + (fo.erreur ? T`Illisible (${h(fo.erreur)}) : ce zip reste un pack à piocher.`
       : parFo ? T`Ce mod est posé par son installateur « ${h(fo.module)} » : ${N(fo.fichiers, '{n} fichier', '{n} fichiers')}, ${fo.choix ? N(fo.choix, '{n} groupe de choix', '{n} groupes de choix') : T('aucun choix à faire')}${fo.regle ? '' : ` ${T('(choix par défaut, jamais réglés)')}`}. Les cases des fichiers suivent ses choix.`
         : T('Ce zip porte un installateur, qui n\'est pas suivi : la sélection ci-dessous est faite à la main.')) + '</p>';
@@ -705,7 +740,8 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     'lié': T('lié'), 'copié': T('copié'), 'absent': T('absent'), 'modifié en jeu': T('modifié en jeu'), 'autre contenu': T('autre contenu'),
     'hors Red Stack': T('hors Red Stack'), 'partagé avec': T('partagé avec'), 'écrasé par': T('écrasé par'),
     'renommé': T('renommé'), 'mise à jour': T('mise à jour'), 'remplacé': T('remplacé'), 'zip disparu': T('zip disparu'),
-    'nouveau, coché d\'office': T('nouveau, coché d\'office'), 'non posable': T('non posable') };
+    'nouveau, coché d\'office': T('nouveau, coché d\'office'), 'non posable': T('non posable'),
+    'actif': T('actif'), 'dans le jeu': T('dans le jeu, hors Red Stack'), 'rangé': T('rangé, pas dans une pile'), 'externe': T('hors Nexus, non contrôlé') };
   const dit = (c) => CODES[c] || c;
   // la pile des zips posés à la racine même du dépôt : son nom est un code du moteur, dit ici dans la langue
   const nomPile = (s) => (s === '(racine)' ? T('(racine du dépôt)') : s);
@@ -823,6 +859,11 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
         return `<li><button class="lien" data-va="${h(k.zip)}">${nomMod(k.zip)}</button><div class="faits">${faits.join(' · ')}</div></li>`;
       }).join('') + '</ul>';
     }
+    // prérequis : un cadre qui manque à un mod actif, ou un mod déclaré requis que ce profil coupe
+    const sansRequis = p.prerequis || [];
+    if (sansRequis.length) b += `<h3>${N(sansRequis.length, '{n} mod actif sans un de ses prérequis', '{n} mods actifs sans un de leurs prérequis')}</h3><ul>`
+      + sansRequis.map((k) => `<li><button class="lien" data-va="${h(k.zip)}">${nomMod(k.zip)}</button><div class="faits">`
+        + k.requis.map((e) => `<span class="pastille ${e.cadre ? 'rouge' : 'ambre'}"></span>${T`exige ${h(e.nom)} (${h(dit(e.etat))})`}`).join(' · ') + '</div></li>').join('') + '</ul>';
     const zips = Object.entries(parZip);
     if (zips.length) {
       // un « à lier » qui vient d'un autre mod dit lequel : le fichier commun passe à l'arbre de celui qui le tient désormais
@@ -2139,6 +2180,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     else if (d.retouche) vscode.postMessage({ t: 'retoucheAnnule', cle: d.retouche });
     else if (d.montre) vscode.postMessage({ t: 'montre', chemin: d.montre });
     else if (d.nexus) vscode.postMessage({ t: 'nexus', id: d.nexus });
+    else if (d.reqlit) { e.target.disabled = true; e.target.textContent = T('Lecture de Nexus…'); vscode.postMessage({ t: 'prerequisLit', cle: d.reqlit }); }
     else if (d.va) { E.choisi = d.va; vscode.postMessage({ t: 'detail', cle: d.va }); }
     else if (d.gagne) {
       const bloc = e.target.closest('.conflit');     // retour immédiat : le choix se voit, le bloc se fige le temps du moteur

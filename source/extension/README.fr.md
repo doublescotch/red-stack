@@ -63,6 +63,10 @@ bibliothèque : Red Stack lit les zips là où vous les rangez, ne les copie pas
   (détail du mod) montre ses pages, ses groupes de choix, descriptions et images ; un clic note le
   choix au profil, les pages et les fichiers qui en dépendent suivent. Les fichiers qu'il copie hors
   des dossiers du jeu se laissent d'une case ; l'installateur s'ignore pour piocher à la main.
+- Prérequis : le détail d'un mod liste ce qu'il exige, d'après la liste que son auteur donne sur Nexus et
+  d'après les cadres déduits de la place de ses fichiers (CET, RED4ext, redscript, TweakXL, ArchiveXL…),
+  avec le zip qui fournit chacun et son état. Un mod actif à qui il manque un cadre est signalé dans la
+  liste et dans l'aperçu du plan.
 - La version d'un REDmod est lue dans son `info.json` quand le nom du zip n'en porte pas.
 - « Mises à jour » : chaque zip nommé à la forme du site Nexus est comparé aux fichiers publiés
   de son mod. La nouvelle version se télécharge à la place de l'ancienne, rangée dans le dossier
@@ -160,7 +164,7 @@ que nous recommandons avec ces thèmes.
 
 ## Pilotage par une session Claude Code
 
-Le paquet porte un serveur MCP (26 outils) : une session lit l'état, les conflits, l'historique,
+Le paquet porte un serveur MCP (27 outils) : une session lit l'état, les conflits, l'historique,
 les arrivages et les mises à jour proposées, change un profil et prépare un plan. Elle n'écrit ni
 le jeu ni le dépôt de zips : parquer, renommer, télécharger restent vos gestes, dans la page.
 Pour le jeu, elle dépose une demande, que cette extension vous montre (plan

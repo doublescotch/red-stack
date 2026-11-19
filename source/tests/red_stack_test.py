@@ -1532,5 +1532,78 @@ if MAGASIN:
     check("mode texte, magasin : la place libre suit le séparateur de la langue",
           " ; libre sur le disque du jeu : " in fr["magasin"][1] and "; free on the game disk: " in en["magasin"][1] and " / " in sorties["ja"]["magasin"][1], en["magasin"][1][:300])
 
+# ---------------------------------------------------------------- 28. prérequis : déclarés sur Nexus, déduits des fichiers, qui les fournit
+print("28. prérequis (faux serveur local) : cadres déduits des fichiers, liste de Nexus, optionnels, alertes du plan")
+REQUIS = {7002: ("Besoin", [(107, "Cyber Engine Tweaks", "", False), (7003, "Fourni", "", False), (7004, "Extras", "Optional, for the extra colours", False),
+                            (0, "ReShade", "Download and install it", True)]),
+          7003: ("Fourni", []), 107: ("Cyber Engine Tweaks", [])}
+
+
+class FauxRequis(FauxNexus):
+    def do_POST(self):
+        q = json.loads(self.rfile.read(int(self.headers["Content-Length"])))["query"]
+        ids = [int(m) for m in re.findall(r"modId: (\d+)\}", q)]
+        noeud = lambda m: {"modId": str(m), "name": REQUIS[m][0], "modRequirements": {"dlcRequirements": [], "nexusRequirements": {"nodes": [
+            {"modId": str(i), "modName": n, "notes": note, "externalRequirement": ext, "url": "https://reshade.me/" if ext else "", "gameId": "3333"}
+            for i, n, note, ext in REQUIS[m][1]]}}}
+        self.rend(200, {"data": {**{f"m{m}": [] for m in re.findall(r"m(\d+): modFiles", q)},
+                                 "req": {"nodes": [noeud(m) for m in ids if m in REQUIS]}}})
+
+
+srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), FauxRequis)
+threading.Thread(target=srv.serve_forever, daemon=True).start()
+os.environ["RED_STACK_NEXUS_URL"] = f"http://127.0.0.1:{srv.server_address[1]}"
+Q = "7_Req/"
+CADRE, LUA, BESOIN, FOURNI, SANS = (Q + "Cadre CET-107-1-0-1700000701.zip", Q + "Lua Mod-7001-1-0-1700000702.zip", Q + "Besoin-7002-1-0-1700000703.zip",
+                                    Q + "Fourni-7003-1-0-1700000704.zip", Q + "Sans Id.zip")
+mkzip(CADRE, {"bin/x64/plugins/cyber_engine_tweaks.asi": "cet"})
+mkzip(LUA, {"bin/x64/plugins/cyber_engine_tweaks/mods/lua_mod/init.lua": "-- lua"})
+mkzip(BESOIN, {A + "besoin.archive": "b"})
+mkzip(FOURNI, {A + "fourni.archive": "f"})
+mkzip(SANS, {"r6/tweaks/sans_id.yaml": "a: 1"})
+rs("profils", "--profil", "q", "--copie", "t")
+for z in (LUA, BESOIN, SANS):
+    rs("bascule", "on", "--profil", "q", "--mod", z[:-4])
+lit = lambda *a: {r["cle"]: r for r in rs("prerequis", "--profil", "q", *a)["mods"]}
+R = lit()
+un = lambda r, nom: next((e for e in r["requis"] if e["nom"] == nom), {})
+check("cadre déduit des fichiers sans Nexus : un mod Lua exige CET, fourni par un zip du dépôt qui n'est pas actif",
+      un(R[LUA], "Cyber Engine Tweaks").get("etat") == "coupé" and un(R[LUA], "Cyber Engine Tweaks")["sources"] == ["fichiers"]
+      and un(R[LUA], "Cyber Engine Tweaks")["par"] == [CADRE] and R[LUA]["manque"] == 1 and R[LUA]["nexus"] == "jamais lu", str(R[LUA]))
+check("zip sans modId : son cadre se déduit quand même, absent du dépôt et du jeu ; le zip du cadre ne s'exige pas lui-même",
+      un(R[SANS], "TweakXL").get("etat") == "absent" and R[SANS]["manque"] == 1 and R[SANS]["nexus"] == "sans modId" and not R[CADRE]["requis"], str(R[SANS]))
+put("red4ext/plugins/TweakXL/TweakXL.dll", "posé à la main")
+R = lit()
+check("cadre posé à la main dans le jeu, hors Red Stack : tenu pour présent", un(R[SANS], "TweakXL").get("etat") == "dans le jeu" and R[SANS]["manque"] == 0, str(R[SANS]))
+os.remove(os.path.join(JEU, "red4ext", "plugins", "TweakXL", "TweakXL.dll"))
+R = lit("--nexus")
+b = R[BESOIN]
+check("Nexus lu : mod déclaré requis et coupé = à voir ; note « Optional » = optionnel, non compté ; prérequis hors Nexus = externe",
+      un(b, "Fourni").get("etat") == "coupé" and b["a_voir"] == 1 and un(b, "Extras").get("optionnel") is True and un(b, "Extras")["etat"] == "absent"
+      and b["optionnels"] == 1 and un(b, "ReShade").get("etat") == "externe" and b["nexus"] == "lu", str(b))
+check("cadre déclaré sur Nexus : compté comme cadre, par son zip ; mod que Nexus ne rend pas : dit inconnu, ses cadres restent",
+      un(b, "Cyber Engine Tweaks").get("cadre") == "cet" and b["manque"] == 1 and R[LUA]["nexus"] == "inconnu" and R[LUA]["manque"] == 1, str(R[LUA]))
+check("exigé par : le zip fourni nomme qui l'exige, aucun actif ne l'a tant qu'il est coupé de son côté",
+      R[FOURNI]["requis_par"] == [BESOIN] and R[FOURNI]["requis_par_actifs"] == 1 and sorted(R[CADRE]["requis_par"]) == sorted([LUA, BESOIN]), str(R[FOURNI]))
+pl = {x["zip"]: [e["nom"] for e in x["requis"]] for x in rs("plan", "--profil", "q")["prerequis"]}
+check("aperçu du plan : cadre manquant et mod requis coupé sont dits, l'optionnel et l'externe non",
+      pl.get(BESOIN) == ["Cyber Engine Tweaks", "Fourni"] and pl.get(LUA) == ["Cyber Engine Tweaks"] and pl.get(SANS) == ["TweakXL"], str(pl))
+for z in (CADRE, FOURNI):
+    rs("bascule", "on", "--profil", "q", "--mod", z[:-4])
+R = lit()
+et = {r["cle"]: r["prerequis"] for r in rs("etat", "--profil", "q")["mods"]}
+check("cadre et mod requis activés : plus rien ne manque, l'état de la liste le porte, le plan ne dit plus que le cadre absent",
+      R[BESOIN]["manque"] == R[BESOIN]["a_voir"] == 0 and R[LUA]["manque"] == 0 and et[BESOIN] == {"manque": 0, "a_voir": 0, "optionnels": 1, "requis_par_actifs": 0}
+      and et[SANS]["manque"] == 1 and [x["zip"] for x in rs("plan", "--profil", "q")["prerequis"] if x["zip"].startswith(Q)] == [SANS], str(et.get(BESOIN)))
+d = rs("detail", "--profil", "q", "--mod", FOURNI)
+check("fiche d'un mod : ses prérequis et qui l'exige", d["prerequis"]["requis_par"] == [BESOIN] and d["prerequis"]["requis"] == [], str(d.get("prerequis")))
+srv.shutdown()
+os.environ.pop("RED_STACK_NEXUS_URL")
+shutil.rmtree(os.path.join(DEPOT, "7_Req"))
+os.remove(os.path.join(DONNEES, "nexus.json"))
+rs("profils", "--profil", "q", "--supprime")
+c = plan_counts()
+check("profil « t » intact après l'essai (28)", c["pose"] == c["remplace"] == c["retire"] == c["conflit"] == 0, str(c))
+
 print(f"\n{'TOUT VERT' if not fails else str(len(fails)) + ' KO : ' + ', '.join(fails)}")
 sys.exit(1 if fails else 0)

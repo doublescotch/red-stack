@@ -25,6 +25,8 @@ etat, profils, plan, conf, conflits = rs("etat"), rs("profils")["profils"], rs("
 convention = rs("convention")
 maj = rs("nexus")                           # mises à jour : la vraie comparaison à Nexus (gardée six heures), compte d'exemple
 maj_compte = {"cle": True, "nom": "vous", "premium": False, "reste_jour": 19990, "reste_heure": 500}
+for _i in range(len(maj["lignes"]), 4 if maj["lignes"] else 0):   # dépôt presque à jour : lignes d'exemple, la vue verrouillée en veut trois
+    maj["lignes"].append(dict(maj["lignes"][0], cle=maj["lignes"][0]["cle"].replace(".zip", f" exemple {_i}.zip")))
 if maj["lignes"]:                           # une ligne ignorée d'exemple, pour voir son rang et son bouton
     maj["lignes"][-1] = dict(maj["lignes"][-1], ignore=True)
 cfr = rs("conflits", "--ressources")
@@ -39,6 +41,19 @@ plan = dict(plan, coupes=plan.get("coupes", []) + [{"zip": _z[0], "au_registre":
             pris=plan.get("pris", []) + [{"dest": "bin/x64/reshade-shaders/Shaders/Exemple.fx", "zip": _z[1], "entree": "x", "crc": 0, "taille": 1}])
 plan["modlist"] = [{"dest": "archive/pc/mod/modlist.txt", "zip": "", "crc": 0, "action": "ecrire", "lignes": ["exemple.archive"]}]
 plan["compte"] = dict(plan["compte"], lie=len(plan["lie"]), pris=len(plan["pris"]), modlist=1)
+# prérequis : un cadre absent d'exemple dans le plan et sur une ligne de la liste ; la fiche d'un vrai mod à qui un mod déclaré
+# sur Nexus manque (sinon le premier mod actif), complétée d'un cadre absent, d'un prérequis hors Nexus et d'un « exigé par »
+_cadre = {"cadre": "tweakxl", "mod": 4197, "nom": "TweakXL", "notes": "", "url": "", "sources": ["fichiers"], "par": [], "etat": "absent", "optionnel": False}
+plan["prerequis"] = plan.get("prerequis", []) + [{"zip": _z[0], "requis": [_cadre]}]
+for _m in etat["mods"]:
+    if _m["cle"] == _z[0]:
+        _m["prerequis"] = dict(_m["prerequis"] or {"a_voir": 0, "optionnels": 0, "requis_par_actifs": 0}, manque=1)
+_req = next((m["cle"] for m in etat["mods"] if m["actif"] and (m.get("prerequis") or {}).get("a_voir")), _z[1])
+detail_req = rs("detail", "--mod", _req)
+detail_req["actif"] = False
+detail_req["prerequis"] = dict(detail_req["prerequis"], nexus="jamais lu", requis_par=[_z[0]], requis_par_actifs=1,
+                               requis=detail_req["prerequis"]["requis"] + [_cadre, {"cadre": None, "mod": 0, "nom": "ReShade", "notes": "Download and install it", "url": "https://reshade.me/",
+                                                                                     "sources": ["nexus"], "par": [], "etat": "externe", "optionnel": False}])
 # dépôt sans arrivage (dossiers d'arrivée vides) : une ligne d'exemple, tirée d'un zip rangé du dépôt, pour voir la vue
 if not any(not r["convertir"] for r in convention["lignes"]):
     _x = next((m for m in etat["mods"] if m["lieu"]), etat["mods"][0])
@@ -118,6 +133,7 @@ AILLEURS = {"en": {"liste": ["active mods out of", "Plan preview", "Fold / unfol
                    "code": ["to look at", "to review", "Code conflict", "Filter: mod, method"], "detail": ["Pack options", "Show the zip", "Rename the content…"],
                    "plan": ["already in place", "Apply to the game…", "Plan of the profile", "mod disabled"], "arrivages": ["Wanted name", "Re-read Nexus", "File the update…"],
                    "maj": ["Zip of the repository", "New version", "free account", "Stop ignoring"], "fomod": ["Installer of “", "What the installer installs"],
+                   "prerequis": ["<h3>Requirements</h3>", "deduced from its files", "Read on Nexus", "⚠ requirement", "outside Nexus, not checked", "Required by 1 mod of the repository, 1 of them active"],
                    "noms": ["In-game names of", "Author's name"], "ressource": ["per resource", "taken from", "lost by"],
                    "reglages": ["<legend>Language</legend>", "Automatic (VS Code: en)", "Settings backups", "Back up now", "Save", "<legend>Theme</legend>", "Current theme: <b>Red Stack Jaune</b>"]}}
 fails = []
@@ -165,7 +181,10 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
                             ("noms", "recoit({t:'detail', data: D.detail}); document.querySelector('[data-nomsmod]').click();"
                                      "E_noms();",
                              ["Noms dans le jeu de", "Nom de l'auteur", "Dans le jeu", 'id="nmNote"', "data-nomde=", "Cité par son nom"]),
-                            ("plan", "recoit({t:'plan', data: D.plan});", ["Voir les fichiers", "déjà en place", "Appliquer au jeu", "Plan du profil", "mod coupé", "repris à l'identique", "déjà tenus avec un autre contenu", "fichiers communs repris de", "pris au registre pour un mod", "modlist.txt à écrire (1 ligne)"]),
+                            ("prerequis", "recoit({t:'detail', data: D.detailReq}); document.querySelector('button[data-filtre=prerequis]').click();",
+                             ["<h3>Prérequis</h3>", "déduit de ses fichiers", "Lire sur Nexus", 'data-reqlit="', "Exigé par 1 mod du dépôt, dont 1 actifs", "hors Nexus, non contrôlé", "Note de l'auteur : Download and install it",
+                              "⚠ prérequis", 'data-filtre="prerequis" class="on"', "1 mod actif exige ce mod, qui n'est pas actif.", 'class="pastille rouge"']),
+                            ("plan", "recoit({t:'plan', data: D.plan});", ["mod actif sans un de ses prérequis", "exige TweakXL (absent)", "Voir les fichiers", "déjà en place", "Appliquer au jeu", "Plan du profil", "mod coupé", "repris à l'identique", "déjà tenus avec un autre contenu", "fichiers communs repris de", "pris au registre pour un mod", "modlist.txt à écrire (1 ligne)"]),
                             ("tri", "for (const i of [1, 2]) document.querySelector('th[data-tri=taille]').click();"
                                     "document.querySelector('button[data-filtre=actifs]').click();",
                              ["Taille ▼", 'data-filtre="actifs" class="on"', 'data-act="nexus"']),
@@ -256,7 +275,7 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
                              ["Sauvegardes des réglages", "Sauvegarder maintenant", "Comparer au jeu", "Restaurer…", "du jeu diffèrent d'elle", "(jeu lancé)", "Convention du dépôt", "Hors Red Stack", "Créer la référence", "Enregistrer", "Convention du contenu des zips", 'id="k_prefixes"', 'id="c_depot"', 'id="c_nouveaux"', "claude mcp add", 'id="c_wolvenkit"', 'id="c_atelier"', 'id="copieMcpWk"', "claude mcp add red-stack-wolvenkit", "avant d'extraire",
                               "vont aujourd'hui à <b>Vortex.exe</b>", 'id="nxmInscrit"', "Recevoir les liens nxm:// dans Red Stack…",
                               "<legend>Thème</legend>", "<legend>Langue</legend>", 'id="p_langue"', "Automatique (VS Code : en)", "Thème en cours : <b>Red Stack Jaune</b>", 'data-theme="Red Stack Rouge">Activer Red Stack Rouge', "✓ Red Stack Jaune", 'id="p_barre"', "Autre thème…"])):
-    stub = ("<script nonce=\"banc\">const D = " + json.dumps({"etat": etat, "profils": profils, "plan": plan, "detail": detail, "conf": conf, "poste": poste, "conflits": conflits, "cfr": cfr, "code": code, "convention": convention, "maj": maj, "majCompte": maj_compte, "contenu": contenu, "contenuCle": contenu_cle, "noms": noms, "journal": journal, "magasin": magasin, "sauve": sauve, "sauveCompare": sauve_compare, "fomod": fomod, "detailFo": detail_fo, "png": PNG, "majOccupe": maj_occupe, "nxm": nxm_etat}).replace("</", "<\\/")
+    stub = ("<script nonce=\"banc\">const D = " + json.dumps({"etat": etat, "profils": profils, "plan": plan, "detail": detail, "detailReq": detail_req, "conf": conf, "poste": poste, "conflits": conflits, "cfr": cfr, "code": code, "convention": convention, "maj": maj, "majCompte": maj_compte, "contenu": contenu, "contenuCle": contenu_cle, "noms": noms, "journal": journal, "magasin": magasin, "sauve": sauve, "sauveCompare": sauve_compare, "fomod": fomod, "detailFo": detail_fo, "png": PNG, "majOccupe": maj_occupe, "nxm": nxm_etat}).replace("</", "<\\/")
             + ";\nconst recoit = (m) => window.dispatchEvent(new MessageEvent('message', {data: m}));\n"
             + "window.onerror = (m) => { document.title = 'ERREUR ' + m; };\n"
             + "const E_noms = () => recoit({t:'noms', cle: D.detail.cle, data: Object.assign({}, D.noms, {cle: D.detail.cle})});\n"
@@ -282,7 +301,7 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
     bad = [a for a in attendu if a not in text]
     title = re.search(r"<title>(.*?)</title>", text).group(1)
     # « fichier » : le champ de filtre vide aussi la liste, cachée dans cet onglet
-    ok = (rows > 100 or vue in ("fichier", "filtre_neufs", "filtre_parques") or (vue == "verrou" and rows > 50)) and not errs and not bad and not title.startswith("ERREUR")
+    ok = (rows > 100 or vue in ("fichier", "filtre_neufs", "filtre_parques") or (vue == "verrou" and rows > 50) or (vue == "prerequis" and rows > 0)) and not errs and not bad and not title.startswith("ERREUR")
     print(("  ok   " if ok else "  KO   ") + f"{vue} : {rows} lignes de mods, {len(errs)} erreur(s) de console, manquants {bad}, titre « {title} »")
     for l in errs[:5]:
         print("       " + l[:300])

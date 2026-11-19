@@ -1812,5 +1812,62 @@
  "{0} montrées, par ordre de chemin": "{0}개 표시, 경로순",
  "{n} ressource hors conflit, servie au jeu": {
   "other": "충돌 없는 리소스 {n}개, 게임에 제공"
- }
+ },
+ "Prérequis à voir": "확인할 필수 항목",
+ "Ce mod a besoin de {n} cadre qui n'est pas actif : il ne se chargera pas. Sa fiche dit lequel.": {
+  "other": "이 mod에는 활성화되지 않은 프레임워크 {n}개가 필요합니다. 로드되지 않습니다. 세부 정보에서 확인할 수 있습니다."
+ },
+ "⚠ prérequis": "⚠ 필수 항목",
+ "{n} mod que l'auteur déclare requis sur Nexus n'est pas actif. Sa fiche dit lequel, avec la note de l'auteur.": {
+  "other": "제작자가 Nexus에서 필수로 지정한 mod {n}개가 활성화되지 않았습니다. 세부 정보에서 제작자 메모와 함께 확인할 수 있습니다."
+ },
+ "prérequis ?": "필수 항목?",
+ "déclaré sur Nexus, et déduit de ses fichiers": "Nexus에 명시되고 파일에서도 추론됨",
+ "déclaré sur Nexus": "Nexus에 명시됨",
+ "déduit de ses fichiers": "파일에서 추론됨",
+ "Ouvrir le détail du zip qui le fournit": "이를 제공하는 zip의 세부 정보 열기",
+ "Ouvrir sa page Nexus": "해당 Nexus 페이지 열기",
+ "Prérequis": "필수 항목",
+ "{n} mod actif exige ce mod, qui n'est pas actif.": {
+  "other": "활성 mod {n}개가 이 mod를 필요로 하지만, 이 mod는 활성화되지 않았습니다."
+ },
+ "optionnel": "선택 사항",
+ "Note de l'auteur : {0}": "제작자 메모: {0}",
+ "Aucun prérequis connu : rien de déclaré sur Nexus, et ses fichiers ne demandent aucun cadre.": "알려진 필수 항목 없음: Nexus에 명시된 것이 없고, 파일도 프레임워크를 요구하지 않습니다.",
+ "Les prérequis déclarés sur Nexus n'ont pas encore été lus pour ce mod.": "이 mod에 대해 Nexus에 명시된 필수 항목을 아직 읽지 않았습니다.",
+ "Lire sur Nexus": "Nexus에서 읽기",
+ "Ce zip ne porte pas de numéro Nexus : seuls les cadres déduits de ses fichiers sont connus.": "이 zip에는 Nexus 번호가 없습니다. 파일에서 추론한 프레임워크만 알 수 있습니다.",
+ "Nexus ne rend plus ce mod (retiré ou caché) : seuls les cadres déduits de ses fichiers sont connus.": "Nexus가 더 이상 이 mod를 반환하지 않습니다(삭제되었거나 숨겨짐). 파일에서 추론한 프레임워크만 알 수 있습니다.",
+ "Nexus ne donne aucune version minimale, et range sous le même mot ce qui est exigé et ce qui est conseillé : seule la note de l'auteur le dit.": "Nexus는 최소 버전을 알려주지 않으며, 필수 항목과 단순 권장 항목을 같은 말로 묶습니다. 제작자 메모만이 이를 구분해 줍니다.",
+ "Exigé par {n} mod du dépôt, dont {0} actifs": {
+  "other": "저장소의 mod {n}개가 필요로 함(그중 활성: {0})"
+ },
+ "dans le jeu, hors Red Stack": "게임에 있음, Red Stack 외부",
+ "rangé, pas dans une pile": "보관됨, 스택에 없음",
+ "hors Nexus, non contrôlé": "Nexus 외부, 확인하지 않음",
+ "{n} mod actif sans un de ses prérequis": {
+  "other": "필수 항목 중 하나가 없는 활성 mod {n}개"
+ },
+ "exige {0} ({1})": "{0} 필요({1})",
+ "Lecture de Nexus…": "Nexus를 읽는 중…",
+ "  cadre {0} : {1}": "  프레임워크 {0}: {1}",
+ "Prérequis optionnels (d'après la note de l'auteur) absents, non comptés : {0}": "없는 선택 필수 항목(제작자 메모 기준), 집계 제외: {0}",
+ "{n} zip": {
+  "other": "zip {n}개"
+ },
+ "prérequis lus sur Nexus pour {0}": "Nexus에서 필수 항목을 읽음: {0}",
+ "jamais lus : {0}": "읽은 적 없음: {0}",
+ "sans modId : {0}": "modId 없음: {0}",
+ "inconnus de Nexus : {0}": "Nexus에 없음: {0}",
+ "exigé par {n} mod actif": {
+  "other": "활성 mod {n}개가 필요로 함"
+ },
+ "  exigé par {n} zip, dont {0} actifs": {
+  "other": "  zip {n}개가 필요로 함(그중 활성: {0})"
+ },
+ "{n} mod actif à qui il manque un prérequis :": {
+  "other": "필수 항목이 없는 활성 mod {n}개:"
+ },
+ "Aucun mod actif ne manque d'un prérequis connu.": "알려진 필수 항목이 없는 활성 mod는 없습니다.",
+ "  ! prérequis : {0} exige {1}": "  ! 필수 항목: {0}에 {1} 필요"
 }

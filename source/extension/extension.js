@@ -535,6 +535,12 @@ async function recoit(m) {
       return rafraichit(250);
     case 'detail':
       return envoie({ t: 'detail', data: await moteur.run(['detail', ...P, '--mod', m.cle]) });
+    case 'prerequisLit': {                          // prérequis déclarés sur Nexus, pour ce mod seul : un appel, sans clé d'API
+      const r = await moteur.run(['prerequis', ...P, '--mod', m.cle, '--nexus']);
+      if (r.erreur) vscode.window.showWarningMessage(r.erreur);
+      envoie({ t: 'detail', data: await moteur.run(['detail', ...P, '--mod', m.cle]) });
+      return rafraichit(250);
+    }
     case 'fichier':
       return envoie({ t: 'fichier', nom: m.nom, data: await moteur.run(['fichier', '--nom', m.nom]) });
     case 'plan':

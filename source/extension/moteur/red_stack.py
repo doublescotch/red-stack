@@ -2951,9 +2951,11 @@ AUTRES_ARCHIVES = (".7z", ".rar")
 INTERDITS = re.compile(r'[\\/:*?"<>|\x00-\x1f]')
 
 
-def nexus_fichiers(mods, data, frais=False, complet=False):
+def nexus_fichiers(mods, data, frais=False, complet=False, requis=False):
     """({modId: [fichier Nexus]}, erreur ou None) ; cache `nexus.json` du dossier des données.
-    `complet` (mises à jour) : un mod mis en cache avant la 0.12.0, sans catégorie de fichier, est relu."""
+    `complet` (mises à jour) : un mod mis en cache avant la 0.12.0, sans catégorie de fichier, est relu.
+    `requis` (mises à jour, prérequis) : un mod mis en cache avant la 1.1.0, sans ses prérequis, est relu aussi. La même requête rend les prérequis déclarés par l'auteur
+    (`requis` de chaque mod du cache, `None` si Nexus ne connaît plus ce mod) : aucun appel de plus."""
     import urllib.request
     path = os.path.join(data, "nexus.json")
     try:
@@ -2962,12 +2964,17 @@ def nexus_fichiers(mods, data, frais=False, complet=False):
         cache = {}
     now = datetime.datetime.now().timestamp()
     api, tetes = f"{NEXUS_BASE}/v2/graphql", ["Application-Name: Red Stack", "Application-Version: " + str(version_outil())]
-    perime = lambda c: now - c.get("lu", 0) > NEXUS_FRAIS or (complet and any("category" not in f for f in c.get("fichiers") or []))
+    perime = lambda c: (now - c.get("lu", 0) > NEXUS_FRAIS or (complet and any("category" not in f for f in c.get("fichiers") or []))
+                        or (requis and "requis" not in c and now - c.get("requis_lu", 0) > NEXUS_FRAIS))
     todo = sorted(m for m in mods if frais or perime(cache.get(str(m), {})))
     err = None
     for i in range(0, len(todo), 20):
         lot = todo[i:i + 20]
         q = " ".join(f"m{m}: modFiles(modId: {m}, gameId: {NEXUS_JEU}) {{ fileId name version category date uri sizeInBytes }}" for m in lot)
+        # prérequis : par la liste `legacyMods`, qui passe sous silence un mod retiré du site (`mod(…)` ferait échouer le lot)
+        q += (f" req: legacyMods(count: {len(lot)}, ids: [" + ", ".join(f"{{gameId: {NEXUS_JEU}, modId: {m}}}" for m in lot) + "]) { nodes { modId name"
+              " modRequirements { nexusRequirements { nodes { modId modName notes externalRequirement url gameId } }"
+              " dlcRequirements { gameExpansion { name } notes } } } }")
         corps = json.dumps({"query": "{ " + q + " }"}).encode()
         try:
             curl = shutil.which("curl")              # curl d'abord : il lit le magasin de certificats du système
@@ -2988,14 +2995,159 @@ def nexus_fichiers(mods, data, frais=False, complet=False):
             break
         if d.get("errors"):
             err = "Nexus : " + "; ".join(str(x.get("message", x)) for x in d["errors"][:3])
+        req = (d.get("data") or {}).get("req")
+        lus = {int(n["modId"]): n for n in (req or {}).get("nodes") or []}
         for m in lot:
             fl = (d.get("data") or {}).get(f"m{m}")
             if fl is not None:
                 cache[str(m)] = {"lu": now, "fichiers": fl}
+                if req is None:                      # prérequis pas rendus (panne, serveur d'essai) : redemandés plus tard
+                    cache[str(m)]["requis_lu"] = now
+                else:
+                    cache[str(m)].update(requis_de_nexus(lus.get(m)))
     if todo:
         os.makedirs(data, exist_ok=True)
         json.dump(cache, open(path, "w", encoding="utf-8"), ensure_ascii=False)
     return {m: cache.get(str(m), {}).get("fichiers") for m in mods}, err
+
+
+# ---------------------------------------------------------------- prérequis
+
+# Ce qu'un mod exige pour marcher, lu à deux sources. (1) Nexus : la liste que l'auteur déclare sur la page du mod (cache
+# `nexus.json`, remplie par la lecture des mises à jour ou par `prerequis --nexus`) ; elle peut être incomplète ou périmée,
+# et ne porte aucune version minimale, seulement une note libre. (2) Les fichiers du zip : un cadre (« framework ») se
+# déduit de la place de ce que le mod pose, sans Nexus, donc aussi pour un mod sans modId. Un cadre est tenu pour présent
+# si un zip actif du profil le livre, ou si son fichier témoin est dans le jeu sans que Red Stack l'ait posé.
+# (code, nom, modId Nexus, fichier témoin dans le jeu, (début, fins) des destinations qui en ont besoin)
+_CETM = _CET + "mods/"
+CADRES = (
+    ("cet", "Cyber Engine Tweaks", 107, "bin/x64/plugins/cyber_engine_tweaks.asi", ((_CETM, (".lua",)),)),
+    ("red4ext", "RED4ext", 2380, "red4ext/red4ext.dll", (("red4ext/plugins/", (".dll",)),)),
+    ("redscript", "redscript", 1511, "engine/tools/scc_lib.dll", (("r6/scripts/", (".reds",)),)),
+    ("tweakxl", "TweakXL", 4197, "red4ext/plugins/tweakxl/tweakxl.dll", (("r6/tweaks/", (".yaml", ".yml", ".tweak")),)),
+    ("archivexl", "ArchiveXL", 4198, "red4ext/plugins/archivexl/archivexl.dll", (("archive/pc/mod/", (".xl",)), ("red4ext/plugins/", (".xl",)))),
+    ("codeware", "Codeware", 7780, "red4ext/plugins/codeware/codeware.dll", ()),
+    ("input_loader", "Input Loader", 4575, "red4ext/plugins/input_loader/input_loader.dll", (("r6/input/", (".xml",)),)),
+    ("audioware", "Audioware", 12001, "red4ext/plugins/audioware/audioware.dll", (("r6/audioware/", ("",)),)),
+    ("mod_settings", "Mod Settings", 4885, "red4ext/plugins/mod_settings/mod_settings.dll", ()),
+    ("native_settings", "Native Settings UI", 3518, _CETM + "nativesettings/init.lua", ()),
+    ("redmod", "REDmod", 0, "tools/redmod/bin/redmod.exe", (("mods/", ("/info.json",)),)),
+)
+CADRE_DU_MOD = {c[2]: c[0] for c in CADRES if c[2]}
+EXTENSION_JEU = "archive/pc/ep1"                     # dossier de Phantom Liberty : le seul contenu payant qu'un mod peut exiger
+MANQUES = ("coupé", "rangé", "absent")               # états d'un prérequis qui laissent un mod actif sans ce qu'il exige
+# Sur Nexus un auteur range sous « requirements » aussi ce qu'il conseille : la note libre est seule à le dire. Trois
+# niveaux pour un prérequis qui n'est pas là : un cadre (ferme, le mod ne se charge pas), un mod déclaré sans réserve
+# (« à voir »), un mod dont la note dit le caractère facultatif (« optionnel », jamais compté comme un défaut).
+RX_OPTIONNEL = re.compile(r"option|recommend|suggest|soft|not\s+(strictly\s+|really\s+)?(required|necessary|needed|mandatory)|n[o']t\s+need"
+                          r"|\bif\s+(you|using|used|installed|needed|desired)|\bonly\s+(if|for|required|needed|when)|\bwhen\s+using|compatib"
+                          r"|add-?on|this\s+or\b|\bor\s+(this|the|any|another)\b|use\s+one|either|nice\s+to|for\s+the\s+\S+(\s+\S+)?\s+(option|version|variant|refit)"
+                          r"|facultati|optionnel|conseill|empfohlen|opcional|recomend", re.I)
+
+
+def dit_etat(code):
+    """état d'un prérequis dit en mode texte : trois codes ont une phrase à eux, les autres sont ceux de la liste des mods"""
+    return {"dans le jeu": T("dans le jeu, hors Red Stack"), "rangé": T("rangé, pas dans une pile"),
+            "externe": T("hors Nexus, non contrôlé")}.get(code) or C(code)
+
+
+def requis_de_nexus(n):
+    """ce que le cache garde des prérequis d'un mod lu sur Nexus (`n` : son nœud `legacyMods`, None si Nexus ne le rend pas)"""
+    if not n:
+        return {"requis": None}
+    r = n.get("modRequirements") or {}
+    ici = lambda x: str(x.get("gameId")) == str(NEXUS_JEU) and not x.get("externalRequirement")
+    return {"titre": n.get("name") or "",
+            "requis": [{"mod": int(x.get("modId") or 0) if ici(x) else 0, "nom": x.get("modName") or "",
+                        "notes": (x.get("notes") or "").strip()[:300], "url": x.get("url") or ""}
+                       for x in (r.get("nexusRequirements") or {}).get("nodes") or []],
+            "dlc": [{"nom": (x.get("gameExpansion") or {}).get("name") or "", "notes": (x.get("notes") or "").strip()[:300]}
+                    for x in r.get("dlcRequirements") or []]}
+
+
+def prerequis(index, prof, jeu, data):
+    """({clé: {nexus, requis: [...], requis_par: [clés], manque}}, [cadres]) pour tout zip qui n'est pas retiré. Lecture
+    seule, sans réseau : Nexus est lu dans son cache. Un prérequis : {cadre, mod, nom, notes, url, sources, par, etat} ;
+    `par` = les zips du dépôt qui le fournissent ; `etat` = actif, dans le jeu (posé hors Red Stack), coupé, rangé (parqué
+    ou arrivage seulement), absent, externe (hors Nexus, ou d'un autre jeu : pas contrôlable)."""
+    try:
+        cache = json.load(open(os.path.join(data, "nexus.json"), encoding="utf-8"))
+    except (OSError, ValueError):
+        cache = {}
+    pose = jeu.load_pose()
+    actif = lambda k: not index[k]["lieu"] and bool((prof["mods"].get(k) or {}).get("actif"))
+    vivants = {k: m for k, m in index.items() if m["genre"] != "retiré"}
+    du_mod, du_cadre, dests, ids = collections.defaultdict(list), collections.defaultdict(list), {}, {}
+    temoins = {c[3]: c[0] for c in CADRES}
+    for k, m in vivants.items():
+        w = RX_ZIP_NEXUS.match(m["nom"])
+        ids[k] = int(w["mod"]) if w else 0
+        if ids[k]:
+            du_mod[ids[k]].append(k)
+        dests[k] = [e["d"].lower() for e in m["entrees"] if e["d"]]
+        for d in dests[k]:
+            if d in temoins:
+                du_cadre[temoins[d]].append(k)
+
+    def etat_de(cles, temoin=None):
+        if any(actif(k) for k in cles):
+            return "actif"
+        if temoin and jeu.size(temoin) is not None and (pose.get(temoin) or {}).get("zip") not in vivants:
+            return "dans le jeu"                     # posé à la main ou par un autre gestionnaire : rien ne le retirera
+        return "coupé" if any(not index[k]["lieu"] for k in cles) else "rangé" if cles else "absent"
+
+    cadres = {}
+    for code, nom, mid, temoin, _ in CADRES:
+        par = sorted(set(du_cadre[code]) | set(du_mod.get(mid, []) if mid else []))
+        cadres[code] = {"cadre": code, "mod": mid, "nom": nom, "par": par, "etat": etat_de(par, temoin), "exige_par": 0}
+    ep1 = os.path.isdir(jeu.path(EXTENSION_JEU))
+    lignes, requis_par = {}, collections.defaultdict(set)
+    for k, m in vivants.items():
+        mid, req = ids[k], {}
+        c = cache.get(str(mid)) if mid else None
+        for code, nom, cmid, temoin, usages in CADRES:   # par les fichiers : ce que le zip pose dit le cadre qu'il lui faut
+            if usages and k not in cadres[code]["par"] and any(d.startswith(deb) and d.endswith(fins) for d in dests[k] for deb, fins in usages):
+                req["c:" + code] = {"cadre": code, "mod": cmid, "nom": nom, "notes": "", "url": "", "sources": ["fichiers"]}
+        for x in (c or {}).get("requis") or []:      # par Nexus : ce que l'auteur déclare
+            if x["mod"] and x["mod"] == mid:
+                continue
+            code = CADRE_DU_MOD.get(x["mod"])
+            if code and k in cadres[code]["par"]:
+                continue
+            ident = "c:" + code if code else f"m:{x['mod']}" if x["mod"] else "x:" + x["nom"].lower()
+            e = req.setdefault(ident, {"cadre": code, "mod": x["mod"], "nom": next(n[1] for n in CADRES if n[0] == code) if code else x["nom"],
+                                       "notes": "", "url": "", "sources": []})
+            e["sources"].append("nexus")
+            e["notes"], e["url"] = x.get("notes") or e["notes"], x.get("url") or e["url"]
+        for x in (c or {}).get("dlc") or []:
+            pl = "phantom" in x["nom"].lower()
+            req["d:" + x["nom"].lower()] = {"cadre": None, "mod": 0, "nom": x["nom"], "notes": x.get("notes") or "", "url": "", "sources": ["nexus"],
+                                            "par": [], "etat": ("dans le jeu" if ep1 else "absent") if pl else "externe", "extension": True}
+        for ident, e in req.items():
+            if "etat" in e:
+                continue
+            if e["cadre"]:
+                e["par"], e["etat"] = cadres[e["cadre"]]["par"], cadres[e["cadre"]]["etat"]
+                cadres[e["cadre"]]["exige_par"] += actif(k)
+            elif e["mod"]:
+                e["par"] = sorted(x for x in du_mod.get(e["mod"], []) if x != k)
+                e["etat"] = etat_de(e["par"])
+            else:
+                e["par"], e["etat"] = [], "externe"
+            for p in e["par"]:
+                requis_par[p].add(k)
+        for e in req.values():                       # Nexus ne dit pas « optionnel » : seule la note de l'auteur le dit
+            e["optionnel"] = not e["cadre"] and bool(RX_OPTIONNEL.search(e["notes"]))
+        rq = sorted(req.values(), key=lambda e: (e["etat"] not in MANQUES, e["optionnel"], not e["cadre"], e["nom"].lower()))
+        absents = [e for e in rq if e["etat"] in MANQUES] if actif(k) else []
+        lignes[k] = {"nexus": "sans modId" if not mid else "jamais lu" if not c or ("requis" not in c) else "inconnu" if c["requis"] is None else "lu",
+                     "requis": rq, "manque": sum(1 for e in absents if e["cadre"]),
+                     "a_voir": sum(1 for e in absents if not e["cadre"] and not e["optionnel"]),
+                     "optionnels": sum(1 for e in absents if e["optionnel"])}
+    for k, r in lignes.items():
+        qui = sorted(requis_par.get(k, ()), key=str.lower)
+        r["requis_par"], r["requis_par_actifs"] = qui, sum(1 for x in qui if actif(x))
+    return lignes, list(cadres.values())
 
 
 def mots(s):
@@ -4025,7 +4177,9 @@ def main():
     ap.add_argument("action", choices=["index", "adopte", "etat", "bascule", "option", "priorite", "plan", "applique",
                                        "reglage", "retouche", "purge", "config", "profils", "detail", "fichier", "hors", "reference",
                                        "conflits", "deplace", "convention", "contenu", "ordre", "noms", "scripts", "journal",
-                                       "magasin", "sauvegarde", "nexus", "fomod"])
+                                       "magasin", "sauvegarde", "nexus", "fomod", "prerequis"])
+    ap.add_argument("--nexus", action="store_true", help="prerequis : lit d'abord sur Nexus les prérequis des mods qui ne sont pas "
+                    "au cache (--mod : de ce mod seul ; --force : de tous, même lus il y a peu)")
     ap.add_argument("--convertit", action="store_true", help="convention : change le .7z / .rar de --cle en .zip")
     ap.add_argument("valeur", nargs="?", choices=["on", "off"])
     ap.add_argument("--profil", default="actuel")
@@ -4556,7 +4710,7 @@ def main():
         if a.cle and not lus.get(a.cle):
             sys.exit(T("nexus --cle : zip inconnu des piles, ou sans modId dans son nom : {0}", a.cle))
         mods = sorted({int(w["mod"]) for k, w in lus.items() if w and (not a.cle or k == a.cle)})
-        fichiers, err = nexus_fichiers(mods, data, a.force, True) if mods else ({}, None)
+        fichiers, err = nexus_fichiers(mods, data, a.force, True, True) if mods else ({}, None)
         lignes, hors = nexus_maj(index, fichiers, ignores)
         if a.cle:
             r = next(r for r in lignes if r["cle"] == a.cle)
@@ -4695,6 +4849,34 @@ def main():
     prof, notes = load_profil(data, a.profil, index, jeu.load_pose(), bool(conf.get("nouveaux_actifs")))
     charge_miens(prof)
 
+    if a.action == "prerequis":                      # ce que chaque mod exige, qui le fournit, dans quel état : lecture seule
+        key = find_mod(index, prof, a.mod, partout=True) if a.mod else None
+        err = None
+        if a.nexus:
+            mods = sorted({int(w["mod"]) for k, m in index.items() if m["genre"] != "retiré" and (not key or k == key)
+                           and (w := RX_ZIP_NEXUS.match(m["nom"]))})
+            err = nexus_fichiers(mods, data, a.force, True, True)[1] if mods else None
+        lignes, cadres = prerequis(index, prof, jeu, data)
+        jeu.save()
+        rows = [dict(r, cle=k, actif=bool((prof["mods"].get(k) or {}).get("actif")) and not index[k]["lieu"], lieu=index[k]["lieu"])
+                for k, r in lignes.items() if not key or k == key]
+        c = collections.Counter(r["nexus"] for r in rows)
+        manques = [r for r in rows if r["manque"] or r["a_voir"]]
+        dit = lambda e: f"{e['nom']} [{dit_etat(e['etat'])}]" + (f" ({e['notes']})" if e["notes"] else "")
+        txt = [suite(N(len(rows), "{n} zip", "{n} zips"), T("prérequis lus sur Nexus pour {0}", c["lu"]), T("jamais lus : {0}", c["jamais lu"]),
+                     T("sans modId : {0}", c["sans modId"]), T("inconnus de Nexus : {0}", c["inconnu"]))] + ([f"  ! {err}"] if err else [])
+        txt += [suite(T("  cadre {0} : {1}", x["nom"], dit_etat(x["etat"])), N(x["exige_par"], "exigé par {n} mod actif", "exigé par {n} mods actifs") if x["exige_par"] else "", sep=T(", "))
+                for x in cadres if x["exige_par"] or x["etat"] in ("actif", "dans le jeu")]
+        if key:
+            r = rows[0]
+            txt += [f"{key}"] + ["  " + dit(e) for e in r["requis"]] + [N(len(r["requis_par"]), "  exigé par {n} zip, dont {0} actifs", "  exigé par {n} zips, dont {0} actifs", r["requis_par_actifs"])]
+        else:
+            txt += [N(len(manques), "{n} mod actif à qui il manque un prérequis :", "{n} mods actifs à qui il manque un prérequis :")] if manques else [T("Aucun mod actif ne manque d'un prérequis connu.")]
+            txt += [f"  {r['cle']} : " + T(", ").join(dit(e) for e in r["requis"] if e["etat"] in MANQUES and not e["optionnel"]) for r in manques]
+            txt += [T("Prérequis optionnels (d'après la note de l'auteur) absents, non comptés : {0}", sum(r["optionnels"] for r in rows))]
+        return out({"mods": rows, "cadres": cadres, "compte": dict(c), "manques": sum(1 for r in rows if r["manque"]),
+                    "a_voir": sum(1 for r in rows if r["a_voir"]), "optionnels": sum(r["optionnels"] for r in rows), "erreur": err}, "\n".join(txt))
+
     if a.action == "detail":
         key = find_mod(index, prof, a.mod or "", partout=True)
         mod, mp, reg = index[key], prof["mods"].get(key), jeu.load_pose()
@@ -4733,7 +4915,7 @@ def main():
                          "reglage": bool(d and store and store.est_reglage(d))})
         jeu.save()
         return out({"cle": key, "nom": mod["nom"], "section": mod["section"], "version": version_de(mod),
-                    "redmod": mod.get("redmod") or [], "fomod": fomod_bref(mod, mp),
+                    "redmod": mod.get("redmod") or [], "fomod": fomod_bref(mod, mp), "prerequis": prerequis(index, prof, jeu, data)[0].get(key),
                     "actif": bool(mp and mp.get("actif")), "options": options_of(mod), "sel": (mp or {}).get("sel"),
                     "arbre": store.dir_of(mod) if store and os.path.isdir(store.dir_of(mod)) else None, "zip": mod["zip"], "entrees": rows,
                     "priorites": [p for p in prof["priorites"] if key in p]},
@@ -5343,6 +5525,7 @@ def main():
         except (OSError, ValueError):
             cache_refs = {}
         cites = cites_du_depot(index, cache_refs)
+        requis = prerequis(index, prof, jeu, data)[0]    # Nexus lu dans son cache : jamais d'appel ici
         for k, m in index.items():
             mp = prof["mods"].get(k)
             c = per.get(k, {})
@@ -5362,6 +5545,7 @@ def main():
             rows.append({"cle": k, "section": m["section"], "nom": m["nom"], "version": version_de(m),
                          "lieu": m["lieu"], "genre": m["genre"], "actif": bool(mp and mp.get("actif")) and not m["lieu"],
                          "fomod": fo, "natures": natures(m, k, cites, cache_refs),
+                         "prerequis": {x: requis[k][x] for x in ("manque", "a_voir", "optionnels", "requis_par_actifs")} if k in requis else None,
                          "posables": (fo["fichiers"] if fo and fo["actif"] else sum(1 for e in m["entrees"] if e["o"] is not None)) - ht,
                          "hors": ht,
                          "taille": m["taille"], "etat": etat, "fichiers_poses": posed.get(k, 0),
@@ -5416,7 +5600,15 @@ def main():
         txt.append(T("  - coupé : {0} : ", c['zip']) + " ; ".join(faits))
 
     if a.action == "plan":
-        return out({"compte": counts, "empreinte": mark, "reel": real, "jeu_lance": game_running() if real else False,
+        # prérequis : ce que l'aperçu doit dire avant d'écrire. Un cadre qui manque à un mod actif, ou un mod déclaré
+        # requis sans réserve que ce profil coupe. Un prérequis absent du dépôt se lit dans la liste, pas ici.
+        alertes = []
+        for k, r in prerequis(index, prof, jeu, data)[0].items():
+            es = [e for e in r["requis"] if e["etat"] in MANQUES and (e["cadre"] or (e["etat"] == "coupé" and not e["optionnel"]))]
+            if es and (r["manque"] or r["a_voir"]):
+                alertes.append({"zip": k, "requis": [{x: e[x] for x in ("cadre", "mod", "nom", "etat", "notes", "par")} for e in es]})
+                txt.append(T("  ! prérequis : {0} exige {1}", k, T(", ").join(f"{e['nom']} [{dit_etat(e['etat'])}]" for e in es)))
+        return out({"compte": counts, "empreinte": mark, "reel": real, "jeu_lance": game_running() if real else False, "prerequis": alertes,
                     "ok": plan["ok"], **{k: plan[k] for k in counts}, "tranche": plan["tranche"], "notes": notes,
                     "tiers": plan["tiers"], "coupes": plan["coupes"]},
                    "\n".join(txt + [T("Rien écrit.")]))

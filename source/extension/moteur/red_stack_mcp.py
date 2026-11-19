@@ -137,6 +137,18 @@ TOOLS = [
     tool("red_stack_magasin", "State of the store (one tree per mod, linked to the game) for this profile, read only: number of game files "
                               "linked or copied, size that Explorer adds up against real size on the disk, free room, trees without an active "
                               "mod (what a purge would free), local edits. The purge is done in VS Code.", P_PROFIL),
+    tool("red_stack_prerequis", "Requirements of the mods (read only): what each mod needs, from two sources. `nexus` = the list the author "
+                                "declares on the mod's Nexus page (no minimum version, and authors also list what they merely recommend: only "
+                                "the free-text note tells, `optionnel` is a guess from that note). `fichiers` = a framework deduced from where "
+                                "the zip puts its files (CET, RED4ext, redscript, TweakXL, ArchiveXL, Input Loader, Audioware, REDmod), known "
+                                "without Nexus. `par` = the zips of the repository that provide it; `etat` (codes): actif = an active zip "
+                                "provides it, dans le jeu = present in the game but not installed by Red Stack, coupé = its zip is disabled, "
+                                "rangé = its zip is only parked or in an arrivals folder, absent = nowhere, externe = outside Nexus, not "
+                                "checkable. Without `mod`: the frameworks, and the ACTIVE mods missing something (`manque` = frameworks, the mod "
+                                "will not load; `a_voir` = declared mods not active). With `mod`: its full list and who requires it. `nexus` "
+                                "true reads Nexus first for what is not cached yet (public API, no key).",
+         {**P_PROFIL, "mod": {"type": "string", "description": "Text that designates ONE active zip, or its exact key (stack/[folder/]name.zip)"},
+          "nexus": {"type": "boolean", "description": "Read the declared requirements on Nexus first (only what is not cached)"}}),
     tool("red_stack_sauvegardes", "Backups of the mods' settings (files never linked, delivered or written in game). Without an argument: the "
                                   "list. `cree`: makes one now (dated copy, the game is not touched). `compare` (name of a backup, or “derniere” "
                                   "for the latest): what a restore would change in the game; restoring is done in VS Code.",
@@ -371,7 +383,7 @@ class Serveur:
                    "jeu_lance": d["jeu_lance"], "deja_en_place": d["ok"], "par_zip": par_zip, "conflits": d["conflit"],
                    "gardes_modifies_en_jeu": [f"{r['dest']} ({r.get('raison', '')})" for r in d["garde_modifie"][:60]],
                    "presents_non_poses_par_l_outil": [r["dest"] for r in d["inconnu"][:60]], "notes": d["notes"],
-                   "mods_coupes": d.get("coupes", []),
+                   "mods_coupes": d.get("coupes", []), "actifs_sans_un_prerequis": d.get("prerequis", []),
                    "lies_repris_d_un_autre_mod": [f"{r['dest']} ({r['ancien']} -> {r['zip']})" for r in d["lie"] if r.get("ancien")][:60]}
 
     def red_stack_plan(self, p):
@@ -424,6 +436,21 @@ class Serveur:
         d["sans_mod_total"], d["sans_mod"] = len(d["sans_mod"]), d["sans_mod"][:60]
         d["retouches_total"], d["retouches"] = len(d["retouches"]), d["retouches"][:60]
         return d
+
+    def red_stack_prerequis(self, p):
+        d = self.rs("prerequis", "--profil", p.get("profil") or "actuel", *(["--mod", p["mod"]] if p.get("mod") else []),
+                    *(["--nexus"] if p.get("nexus") else []))
+        if p.get("mod"):                             # un mod : sa liste entière, et qui l'exige (soixante noms, le reste compté)
+            r = d["mods"][0]
+            r["requis_par_total"], r["requis_par"] = len(r["requis_par"]), r["requis_par"][:60]
+            return {"mod": r, "erreur": d["erreur"]}
+        absents = lambda r: [{k: e[k] for k in ("nom", "cadre", "mod", "etat", "notes", "par")}
+                             for e in r["requis"] if e["etat"] in ("coupé", "rangé", "absent") and not e["optionnel"]]
+        vus = [{"cle": r["cle"], "manque": r["manque"], "a_voir": r["a_voir"], "absents": absents(r)} for r in d["mods"] if r["manque"] or r["a_voir"]]
+        for c in d["cadres"]:
+            c["par"] = c["par"][:5]
+        return {"cadres": d["cadres"], "lus_sur_nexus": d["compte"], "mods_sans_un_cadre": d["manques"], "mods_a_voir": d["a_voir"],
+                "optionnels_absents": d["optionnels"], "mods": vus[:80], "mods_total": len(vus), "erreur": d["erreur"]}
 
     def red_stack_sauvegardes(self, p):
         if p.get("cree"):

@@ -1812,5 +1812,62 @@
  "{0} montrées, par ordre de chemin": "{0} 件を表示(パス順)",
  "{n} ressource hors conflit, servie au jeu": {
   "other": "競合のないリソース {n} 個、ゲームに提供"
- }
+ },
+ "Prérequis à voir": "要確認の前提",
+ "Ce mod a besoin de {n} cadre qui n'est pas actif : il ne se chargera pas. Sa fiche dit lequel.": {
+  "other": "この MOD には有効になっていないフレームワークが {n} 個必要です。読み込まれません。詳細に内訳があります。"
+ },
+ "⚠ prérequis": "⚠ 前提",
+ "{n} mod que l'auteur déclare requis sur Nexus n'est pas actif. Sa fiche dit lequel, avec la note de l'auteur.": {
+  "other": "作者が Nexus で必須とした MOD {n} 個が有効になっていません。詳細に内訳と作者のメモがあります。"
+ },
+ "prérequis ?": "前提?",
+ "déclaré sur Nexus, et déduit de ses fichiers": "Nexus に記載、かつファイルから推定",
+ "déclaré sur Nexus": "Nexus に記載",
+ "déduit de ses fichiers": "ファイルから推定",
+ "Ouvrir le détail du zip qui le fournit": "これを提供する zip の詳細を開く",
+ "Ouvrir sa page Nexus": "その Nexus ページを開く",
+ "Prérequis": "前提",
+ "{n} mod actif exige ce mod, qui n'est pas actif.": {
+  "other": "有効な MOD {n} 個がこの MOD を必要としていますが、有効になっていません。"
+ },
+ "optionnel": "任意",
+ "Note de l'auteur : {0}": "作者のメモ: {0}",
+ "Aucun prérequis connu : rien de déclaré sur Nexus, et ses fichiers ne demandent aucun cadre.": "既知の前提はありません。Nexus に記載がなく、ファイルもフレームワークを必要としません。",
+ "Les prérequis déclarés sur Nexus n'ont pas encore été lus pour ce mod.": "この MOD について、Nexus に記載された前提はまだ読み込まれていません。",
+ "Lire sur Nexus": "Nexus から読み込む",
+ "Ce zip ne porte pas de numéro Nexus : seuls les cadres déduits de ses fichiers sont connus.": "この zip には Nexus 番号がありません。ファイルから推定したフレームワークだけが分かります。",
+ "Nexus ne rend plus ce mod (retiré ou caché) : seuls les cadres déduits de ses fichiers sont connus.": "Nexus はこの MOD を返さなくなりました (削除または非表示)。ファイルから推定したフレームワークだけが分かります。",
+ "Nexus ne donne aucune version minimale, et range sous le même mot ce qui est exigé et ce qui est conseillé : seule la note de l'auteur le dit.": "Nexus は最低バージョンを示さず、必須のものと推奨にすぎないものを同じ言葉でまとめています。区別できるのは作者のメモだけです。",
+ "Exigé par {n} mod du dépôt, dont {0} actifs": {
+  "other": "リポジトリの MOD {n} 個が必要としています (うち有効: {0})"
+ },
+ "dans le jeu, hors Red Stack": "ゲーム内にあり、Red Stack 外",
+ "rangé, pas dans une pile": "保管中、スタック外",
+ "hors Nexus, non contrôlé": "Nexus 外、未確認",
+ "{n} mod actif sans un de ses prérequis": {
+  "other": "前提のどれかを欠いた有効な MOD {n} 個"
+ },
+ "exige {0} ({1})": "{0} が必要 ({1})",
+ "Lecture de Nexus…": "Nexus を読み込んでいます…",
+ "  cadre {0} : {1}": "  フレームワーク {0}: {1}",
+ "Prérequis optionnels (d'après la note de l'auteur) absents, non comptés : {0}": "不足している任意の前提 (作者のメモによる)、集計対象外: {0}",
+ "{n} zip": {
+  "other": "zip {n} 個"
+ },
+ "prérequis lus sur Nexus pour {0}": "Nexus から前提を読み込み済み: {0}",
+ "jamais lus : {0}": "未読み込み: {0}",
+ "sans modId : {0}": "modId なし: {0}",
+ "inconnus de Nexus : {0}": "Nexus に存在しない: {0}",
+ "exigé par {n} mod actif": {
+  "other": "有効な MOD {n} 個が必要としています"
+ },
+ "  exigé par {n} zip, dont {0} actifs": {
+  "other": "  zip {n} 個が必要としています (うち有効: {0})"
+ },
+ "{n} mod actif à qui il manque un prérequis :": {
+  "other": "前提が不足している有効な MOD {n} 個:"
+ },
+ "Aucun mod actif ne manque d'un prérequis connu.": "既知の前提が不足している有効な MOD はありません。",
+ "  ! prérequis : {0} exige {1}": "  ! 前提: {0} には {1} が必要"
 }

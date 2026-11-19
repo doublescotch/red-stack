@@ -66,6 +66,10 @@ Red Stack reads the zips where you file them, does not copy them and does not mo
   records the choice in the profile, and the pages and files that depend on it follow. The files
   it copies outside the game folders can be left out with a checkbox; the installer can be ignored
   to pick by hand.
+- Requirements: the detail of a mod lists what it needs, from the list its author gives on Nexus and from
+  the frameworks deduced from where its files go (CET, RED4ext, redscript, TweakXL, ArchiveXL…), with the
+  zip that provides each one and its state. An active mod that lacks a framework is flagged in the list
+  and in the plan preview.
 - The version of a REDmod is read from its `info.json` when the name of the zip has none.
 - “Updates”: each zip named in the form of the Nexus site is compared with the published files of
   its mod. The new version is downloaded in place of the old one, which is filed in the retired
@@ -162,7 +166,7 @@ icon pack, which we recommend with these themes.
 
 ## Driving by a Claude Code session
 
-The package carries an MCP server (26 tools): a session reads the state, the conflicts, the history,
+The package carries an MCP server (27 tools): a session reads the state, the conflicts, the history,
 the arrivals and the proposed updates, changes a profile and prepares a plan. It writes neither
 the game nor the zip repository: parking, renaming, downloading stay your actions, in the page.
 For the game, it leaves a request, which this extension shows you (plan with its figures, Apply or

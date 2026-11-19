@@ -59,8 +59,8 @@ check("initialize rend la version demandée et le nom du serveur",
       r["result"]["protocolVersion"] == "2025-06-18" and r["result"]["serverInfo"]["name"] == "red-stack", r)
 rpc("notifications/initialized", notif=True)
 tools = rpc("tools/list")["result"]["tools"]
-check("tools/list : 26 outils, tous avec un schéma objet",
-      len(tools) == 26 and all(t["inputSchema"]["type"] == "object" for t in tools), len(tools))
+check("tools/list : 27 outils, tous avec un schéma objet",
+      len(tools) == 27 and all(t["inputSchema"]["type"] == "object" for t in tools), len(tools))
 check("ping répond", rpc("ping")["result"] == {})
 check("méthode inconnue = erreur -32601", rpc("nimporte")["error"]["code"] == -32601)
 r = rpc("tools/call", {"name": "red_stack_inexistant", "arguments": {}})
@@ -128,6 +128,11 @@ check("magasin : poids réel, liens et arbres sans mod rendus, rien d'écrit",
       not err and "reel" in g and "explorateur" in g and isinstance(g["sans_mod"], list) and "lies" in g["jeu"], g if err else str(g)[:300])
 sv, err = call("red_stack_sauvegardes")
 check("sauvegardes des réglages : la liste (lecture seule)", not err and isinstance(sv["sauvegardes"], list) and sv["dossier"], sv)
+pq, err = call("red_stack_prerequis", profil="mcp")
+check("prérequis : les cadres et les mods actifs sans un prérequis, lus sans appeler Nexus",
+      not err and any(c["cadre"] == "cet" for c in pq["cadres"]) and isinstance(pq["mods"], list) and pq["erreur"] is None and pq["mods_total"] >= len(pq["mods"]), pq)
+pq, err = call("red_stack_prerequis", profil="mcp", mod=world)
+check("prérequis d'un mod : sa liste et qui l'exige", not err and isinstance(pq["mod"]["requis"], list) and "requis_par_total" in pq["mod"], pq)
 mj, err = call("red_stack_mises_a_jour")
 check("mises à jour : Nexus injoignable (adresse du banc), dit sans planter ; aucune clé ni marque interne rendue",
       not err and "unreachable" in (mj["erreur"] or "") and mj["total"] > 3 and "cle_api" not in mj and all("qui" not in r for r in mj["lignes"]), mj)

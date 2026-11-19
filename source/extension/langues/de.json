@@ -1985,5 +1985,71 @@
  "{n} ressource hors conflit, servie au jeu": {
   "one": "{n} Ressource ohne Konflikt, ans Spiel geliefert",
   "other": "{n} Ressourcen ohne Konflikt, ans Spiel geliefert"
- }
+ },
+ "Prérequis à voir": "Voraussetzungen prüfen",
+ "Ce mod a besoin de {n} cadre qui n'est pas actif : il ne se chargera pas. Sa fiche dit lequel.": {
+  "one": "Dieser Mod braucht {n} Framework, das nicht aktiv ist: Er wird nicht geladen. Seine Details nennen es.",
+  "other": "Dieser Mod braucht {n} Frameworks, die nicht aktiv sind: Er wird nicht geladen. Seine Details nennen sie."
+ },
+ "⚠ prérequis": "⚠ Voraussetzung",
+ "{n} mod que l'auteur déclare requis sur Nexus n'est pas actif. Sa fiche dit lequel, avec la note de l'auteur.": {
+  "one": "{n} Mod, den der Autor auf Nexus als Voraussetzung nennt, ist nicht aktiv. Die Details nennen ihn, mit der Anmerkung des Autors.",
+  "other": "{n} Mods, die der Autor auf Nexus als Voraussetzung nennt, sind nicht aktiv. Die Details nennen sie, mit der Anmerkung des Autors."
+ },
+ "prérequis ?": "Voraussetzung?",
+ "déclaré sur Nexus, et déduit de ses fichiers": "auf Nexus genannt und aus seinen Dateien abgeleitet",
+ "déclaré sur Nexus": "auf Nexus genannt",
+ "déduit de ses fichiers": "aus seinen Dateien abgeleitet",
+ "Ouvrir le détail du zip qui le fournit": "Details des Zips öffnen, das es liefert",
+ "Ouvrir sa page Nexus": "Seine Nexus-Seite öffnen",
+ "Prérequis": "Voraussetzungen",
+ "{n} mod actif exige ce mod, qui n'est pas actif.": {
+  "one": "{n} aktiver Mod setzt diesen Mod voraus, der nicht aktiv ist.",
+  "other": "{n} aktive Mods setzen diesen Mod voraus, der nicht aktiv ist."
+ },
+ "optionnel": "optional",
+ "Note de l'auteur : {0}": "Anmerkung des Autors: {0}",
+ "Aucun prérequis connu : rien de déclaré sur Nexus, et ses fichiers ne demandent aucun cadre.": "Keine bekannte Voraussetzung: auf Nexus ist nichts genannt, und seine Dateien verlangen kein Framework.",
+ "Les prérequis déclarés sur Nexus n'ont pas encore été lus pour ce mod.": "Die auf Nexus genannten Voraussetzungen wurden für diesen Mod noch nicht gelesen.",
+ "Lire sur Nexus": "Auf Nexus lesen",
+ "Ce zip ne porte pas de numéro Nexus : seuls les cadres déduits de ses fichiers sont connus.": "Dieses Zip trägt keine Nexus-Nummer: Bekannt sind nur die aus seinen Dateien abgeleiteten Frameworks.",
+ "Nexus ne rend plus ce mod (retiré ou caché) : seuls les cadres déduits de ses fichiers sont connus.": "Nexus liefert diesen Mod nicht mehr (entfernt oder versteckt): Bekannt sind nur die aus seinen Dateien abgeleiteten Frameworks.",
+ "Nexus ne donne aucune version minimale, et range sous le même mot ce qui est exigé et ce qui est conseillé : seule la note de l'auteur le dit.": "Nexus nennt keine Mindestversion und führt Erforderliches und bloß Empfohlenes unter demselben Wort: Nur die Anmerkung des Autors verrät es.",
+ "Exigé par {n} mod du dépôt, dont {0} actifs": {
+  "one": "Vorausgesetzt von {n} Mod des Depots, davon aktiv: {0}",
+  "other": "Vorausgesetzt von {n} Mods des Depots, davon aktiv: {0}"
+ },
+ "dans le jeu, hors Red Stack": "im Spiel, außerhalb von Red Stack",
+ "rangé, pas dans une pile": "abgelegt, nicht in einem Stapel",
+ "hors Nexus, non contrôlé": "außerhalb von Nexus, nicht geprüft",
+ "{n} mod actif sans un de ses prérequis": {
+  "one": "{n} aktiver Mod ohne eine seiner Voraussetzungen",
+  "other": "{n} aktive Mods ohne eine ihrer Voraussetzungen"
+ },
+ "exige {0} ({1})": "setzt {0} voraus ({1})",
+ "Lecture de Nexus…": "Nexus wird gelesen…",
+ "  cadre {0} : {1}": "  Framework {0}: {1}",
+ "Prérequis optionnels (d'après la note de l'auteur) absents, non comptés : {0}": "Fehlende optionale Voraussetzungen (laut Anmerkung des Autors), nicht gezählt: {0}",
+ "{n} zip": {
+  "one": "{n} Zip",
+  "other": "{n} Zips"
+ },
+ "prérequis lus sur Nexus pour {0}": "Voraussetzungen auf Nexus gelesen für {0}",
+ "jamais lus : {0}": "nie gelesen: {0}",
+ "sans modId : {0}": "ohne modId: {0}",
+ "inconnus de Nexus : {0}": "Nexus unbekannt: {0}",
+ "exigé par {n} mod actif": {
+  "one": "vorausgesetzt von {n} aktivem Mod",
+  "other": "vorausgesetzt von {n} aktiven Mods"
+ },
+ "  exigé par {n} zip, dont {0} actifs": {
+  "one": "  vorausgesetzt von {n} Zip, davon aktiv: {0}",
+  "other": "  vorausgesetzt von {n} Zips, davon aktiv: {0}"
+ },
+ "{n} mod actif à qui il manque un prérequis :": {
+  "one": "{n} aktiver Mod, dem eine Voraussetzung fehlt:",
+  "other": "{n} aktive Mods, denen eine Voraussetzung fehlt:"
+ },
+ "Aucun mod actif ne manque d'un prérequis connu.": "Keinem aktiven Mod fehlt eine bekannte Voraussetzung.",
+ "  ! prérequis : {0} exige {1}": "  ! Voraussetzung: {0} setzt {1} voraus"
 }

@@ -133,6 +133,7 @@ a { color: var(--bleu); }
 <ul>
 <li><b>▼ ▲</b> sur une ligne : ce mod perd ou gagne des ressources contre d'autres archives. <b>⇄</b> : ses propres archives se recouvrent entre elles. Le survol détaille, le clic ouvre <a href="#conflits">l'analyse des conflits</a> sur ce mod.</li>
 <li>La puce <b>FOMOD</b> signale un zip posé par <a href="#fomod">son installateur</a>.</li>
+<li>La puce <b>⚠ prérequis</b> (rouge) signale un mod actif à qui il manque un cadre (Cyber Engine Tweaks, RED4ext, redscript…) : il ne se chargera pas. La puce <b>prérequis ?</b> (ambre) signale qu'un mod que l'auteur déclare requis sur Nexus n'est pas actif. Le filtre <b>Prérequis à voir</b> ne montre que ces mods ; <a href="#prerequis">le détail du mod</a> dit ce qui manque.</li>
 <li>Les puces sous l'en-tête filtrent par état ; la ligne de chiffres résume le profil. <b>Nouveaux</b> montre les zips des dossiers d'arrivée et ceux de la pile que le profil ne connaît pas encore ; <b>Parqués</b> et <b>Retirés</b> montrent le contenu des dossiers des parqués et des retirés.</li>
 <li>Un clic sur un en-tête de colonne trie ; le troisième clic rend l'ordre du dépôt.</li>
 <li><b class="b">⇕ Tout plier / déplier</b>, sur la ligne des chiffres, replie toutes les piles d'un coup ; si tout est déjà replié, il déplie tout. Dans « Mises à jour » et « Arrivages », il replie les bandes de pile. Le même bouton replie les lignes des onglets « Conflits » et « Scripts et tweaks », et un <b class="b">⇕</b> en tête d'un volet fait de même pour ses lignes (historique, plan, dossiers du détail d'un mod).</li>
@@ -173,6 +174,21 @@ a { color: var(--bleu); }
 <li><b>« Ce fichier est à ce mod »</b> : sur un fichier « hors Red Stack », cocher la case dit que ce fichier appartient au mod. Red Stack l'inscrit à son registre sans le modifier, et il partira avec le mod quand vous le couperez. Décocher le rend à l'installateur tiers et le laisse dans le jeu.</li>
 <li><b>Priorité entre deux mods</b> : quand deux mods actifs veulent le même fichier avec un contenu différent, le plan s'arrête sur un conflit à trancher. Vous dites lequel gagne, fichier par fichier ou pour tout le mod ; le profil s'en souvient.</li>
 </ul>
+<h3 id="prerequis">Prérequis</h3>
+<p>Le détail dit ce que le mod exige pour marcher, quel zip de votre dépôt le fournit, et dans quel état. Deux sources :</p>
+<ul>
+<li><b>Déclaré sur Nexus</b> : la liste que l'auteur donne sur la page du mod. Elle est lue en même temps que les mises à jour (vue « Mises à jour »), ou pour un mod seul par <b class="b">Lire sur Nexus</b> ; aucune clé d'API n'est demandée. Nexus ne donne aucune version minimale, et les auteurs y rangent aussi ce qu'ils conseillent : seule leur note le dit. Red Stack marque « optionnel » un prérequis dont la note le laisse entendre, et ne le compte jamais comme un défaut.</li>
+<li><b>Déduit de ses fichiers</b> : un cadre se reconnaît à la place de ce que le zip pose (un script Lua dans le dossier des mods de Cyber Engine Tweaks, un <code>.reds</code> sous <code>r6/scripts</code>, un tweak sous <code>r6/tweaks</code>, un <code>.xl</code>, un greffon sous <code>red4ext/plugins</code>, une entrée sous <code>r6/input</code>, un son sous <code>r6/audioware</code>, un REDmod). Cette lecture se passe de Nexus : elle vaut aussi pour un mod sans numéro.</li>
+</ul>
+<table>
+<tr><th>actif</th><td>Un zip actif du profil le fournit.</td></tr>
+<tr><th>dans le jeu, hors Red Stack</th><td>Le cadre est dans le jeu sans que Red Stack l'ait posé (installé à la main, ou par un autre gestionnaire) : il est tenu pour présent.</td></tr>
+<tr><th>coupé</th><td>Le zip qui le fournit est dans une pile, mais coupé dans ce profil.</td></tr>
+<tr><th>rangé</th><td>Le zip qui le fournit n'est que parqué, ou dans un dossier d'arrivée.</td></tr>
+<tr><th>absent</th><td>Aucun zip du dépôt ne le fournit. Son nom ouvre sa page Nexus.</td></tr>
+<tr><th>hors Nexus</th><td>Prérequis extérieur à Nexus (ReShade…) ou d'un autre jeu : Red Stack ne peut pas le contrôler.</td></tr>
+</table>
+<p>« Exigé par » liste, à l'inverse, les mods du dépôt qui ont besoin de celui-ci ; un mod coupé que des mods actifs exigent le dit en rouge. Un prérequis que vous avez sous un autre zip (un pack, une version retouchée sans numéro Nexus) reste dit « absent » : Red Stack ne reconnaît un mod de Nexus qu'au numéro porté par le nom du zip.</p>
 <h3>Les boutons du détail</h3>
 <ul>
 <li><b class="b">Installateur…</b> : les pages de choix d'un <a href="#fomod">FOMOD</a>.</li>
@@ -195,6 +211,7 @@ a { color: var(--bleu); }
 <tr><th>modlist.txt</th><td>Le fichier d'ordre de chargement à écrire ou à retirer, si le profil le tient.</td></tr>
 <tr><th>conflits</th><td>Deux mods actifs veulent le même fichier, contenu différent, sans priorité dite. À trancher avant d'appliquer.</td></tr>
 <tr><th>mods coupés</th><td>Une ligne par mod coupé : ce qui sort du jeu, ce qu'un autre mod reprend à l'identique, ce qu'un autre tient déjà.</td></tr>
+<tr><th>prérequis</th><td>Les mods actifs à qui il manque un cadre, et ceux dont un mod déclaré requis est coupé dans ce profil. Rien n'est bloqué : c'est un avertissement avant d'écrire.</td></tr>
 </table>
 <h3>Appliquer</h3>
 <ul>
@@ -474,7 +491,7 @@ a { color: var(--bleu); }
 <p>L'extension porte un serveur MCP. Une fois déclaré (la commande se copie depuis « Réglages », « Ce poste »), une session Claude Code peut lire l'état, les conflits, l'historique, changer un profil et préparer un plan.</p>
 <h3>Ce qu'une session peut faire</h3>
 <ul>
-<li><b>Lire</b> : l'état des mods (par pile, par état, par nature), le détail d'un mod, à qui est un fichier du jeu, le plan, les conflits d'archives (par paire, par mod, par archive, par ressource), les conflits de scripts et de tweaks, l'ordre de chargement, l'historique, le magasin, la référence du jeu, les sauvegardes de réglages, les mises à jour proposées par Nexus, les arrivages et le nom que chacun prendrait, le contenu d'un zip face à la convention.</li>
+<li><b>Lire</b> : l'état des mods (par pile, par état, par nature), le détail d'un mod, à qui est un fichier du jeu, le plan, les conflits d'archives (par paire, par mod, par archive, par ressource), les conflits de scripts et de tweaks, l'ordre de chargement, l'historique, le magasin, la référence du jeu, les sauvegardes de réglages, les mises à jour proposées par Nexus, les prérequis de chaque mod (déclarés sur Nexus ou déduits de ses fichiers), les arrivages et le nom que chacun prendrait, le contenu d'un zip face à la convention.</li>
 <li><b>Changer un profil</b> : activer ou couper un mod ou une pile, prendre ou laisser une option ou un fichier, dire « ce fichier est à ce mod », régler une priorité entre deux mods ou pour un seul fichier, renommer dans le jeu, changer l'ordre de chargement, répondre à un installateur FOMOD.</li>
 <li><b>Régler</b> : les motifs de réglages et les motifs « hors Red Stack », ignorer ou reproposer les mises à jour d'un mod, faire une sauvegarde des réglages.</li>
 </ul>
