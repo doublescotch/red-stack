@@ -2442,5 +2442,38 @@
  "prerequis --ignore : on (ne plus compter) ou off (compter de nouveau), --cle <clé du zip>, --requis <identifiant du prérequis>": "prerequis --ignore: on (nie uwzględniaj) lub off (uwzględniaj ponownie), --cle <klucz zipa>, --requis <identyfikator wymagania>",
  "prerequis --ignore : ce mod n'a pas de prérequis « {0} »": "prerequis --ignore: ten mod nie ma wymagania „{0}”",
  "{0} : prérequis « {1} » ignoré.": "{0}: wymaganie „{1}” zignorowane.",
- "{0} : prérequis « {1} » compté de nouveau.": "{0}: wymaganie „{1}” ponownie uwzględniane."
+ "{0} : prérequis « {1} » compté de nouveau.": "{0}: wymaganie „{1}” ponownie uwzględniane.",
+ "Renommer d'un coup ce que livrent les zips cochés (archives, dossiers de scripts et de tweaks), aux noms que Red Stack propose. Pour retoucher un nom : « Contenu… » sur la ligne du zip.": "Zmień za jednym razem nazwy tego, co dostarczają zaznaczone zipy (archiwa, foldery skryptów i tweaków), na nazwy proponowane przez Red Stack. Aby poprawić nazwę: „Zawartość…” w wierszu zipa.",
+ "Contenu de {0}…": "Zawartość: {0}…",
+ "Aucun contenu à renommer : {0}": "Brak zawartości do zmiany nazw: {0}",
+ "ces zips sont déjà à la convention": "te zipy są już zgodne z konwencją",
+ "Renommer le contenu de {n} zip ?": {
+  "one": "Zmienić nazwy w zawartości {n} zipa?",
+  "few": "Zmienić nazwy w zawartości {n} zipów?",
+  "many": "Zmienić nazwy w zawartości {n} zipów?",
+  "other": "Zmienić nazwy w zawartości {n} zipa?"
+ },
+ "Récrire {n} zip": {
+  "one": "Zapisz ponownie {n} zip",
+  "few": "Zapisz ponownie {n} zipy",
+  "many": "Zapisz ponownie {n} zipów",
+  "other": "Zapisz ponownie {n} zipa"
+ },
+ "{n} fichier à renommer en tout": {
+  "one": "łącznie {n} plik do zmiany nazwy",
+  "few": "łącznie {n} pliki do zmiany nazwy",
+  "many": "łącznie {n} plików do zmiany nazwy",
+  "other": "łącznie {n} pliku do zmiany nazwy"
+ },
+ "Entrée = ne rien écrire. Chaque zip est récrit aux noms que Red Stack propose, relu, puis remplace l'ancien ; le contenu des fichiers ne change pas.": "Enter = nic nie zapisuj. Każdy zip jest zapisywany ponownie z nazwami proponowanymi przez Red Stack, odczytywany, a potem zastępuje stary; zawartość plików się nie zmienia.",
+ "Contenu renommé dans {n} zip.": {
+  "one": "Zmieniono nazwy w {n} zipie.",
+  "few": "Zmieniono nazwy w {n} zipach.",
+  "many": "Zmieniono nazwy w {n} zipach.",
+  "other": "Zmieniono nazwy w {n} zipa."
+ },
+ "Changer le nom du fichier zip dans le dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "Zmień nazwę pliku zip w repozytorium. Profil, drzewo w magazynie i rejestr podążają za nią; gra pozostaje nietknięta.",
+ "Renommer le zip…": "Zmień nazwę zipa…",
+ "Red Stack : nom du zip": "Red Stack: nazwa zipa",
+ "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "Nowa nazwa pliku, z rozszerzeniem .zip. Zachowanie numeru Nexus w nazwie zachowuje aktualizacje i wymagania odczytane z Nexusa."
 }

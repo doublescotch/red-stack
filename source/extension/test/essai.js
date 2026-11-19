@@ -462,6 +462,19 @@ const instantane = () => {
   n = recus.length;
   await libre(); versPage({ t: 'contenuRenomme', cle: '5_World/Arrivages/Arrive.zip', ops: [{ de: 'archive/pc/mod/Arrive_Voulu.archive', vers: de }] });
   await attend('contenu', n);
+  m0 = modales.length; reponse = 'Entree';         // contenu en lot : une seule liste à choix, aux noms proposés par le moteur
+  await libre(); versPage({ t: 'contenuRenommeLot', cles: ['5_World/Arrivages/Arrive.zip', '5_World/absent.zip'] });
+  await jusqua(() => modales.length === m0 + 1);
+  await pause(300);
+  controle("contenu en lot : une seule confirmation, le zip inconnu laissé de côté, Entrée n'écrit rien",
+    modales.length === m0 + 1 && /Renommer le contenu de 1 zip/.test(modales[m0].texte) && lus() === de, [modales[m0], lus()]);
+  n = recus.length; reponse = 'Appliquer';
+  await libre(); versPage({ t: 'contenuRenommeLot', cles: ['5_World/Arrivages/Arrive.zip'] });
+  const cl = await attend('convention', n);
+  controle('contenu en lot confirmé : le zip porte le nom proposé, la vue est prévenue', lus() === 'archive/pc/mod/Arrive.archive' && /1 zip/.test(cl.dit), [lus(), cl.dit]);
+  n = recus.length;
+  await libre(); versPage({ t: 'contenuRenomme', cle: '5_World/Arrivages/Arrive.zip', ops: [{ de: 'archive/pc/mod/Arrive.archive', vers: de }] });
+  await attend('contenu', n);
   reponse = undefined;
   fs.rmSync(path.join(DONNEES, 'references.json'), { force: true });
   fs.writeFileSync(path.join(DONNEES, 'config.json'), confAvant, 'utf8');

@@ -179,7 +179,7 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
                             ("ressource", "document.querySelector('[data-grille=ressource]').click();"
                                           "recoit({t:'conflitsRessources', data: D.cfr});",
                              ["par ressource", "prise dans", "perdue par", "remplace le jeu de base", "Jeu de base seulement"]),
-                            ("detail", "recoit({t:'detail', data: D.detail});", ["Options du pack", "Montrer le zip", "Fichiers", "Renommer le contenu…", 'details class="dossier"', 'id="poignee"']),
+                            ("detail", "recoit({t:'detail', data: D.detail});", ["Options du pack", "Montrer le zip", 'data-zipnom="', "Renommer le zip…", "Fichiers", "Renommer le contenu…", 'details class="dossier"', 'id="poignee"']),
                             ("noms", "recoit({t:'detail', data: D.detail}); document.querySelector('[data-nomsmod]').click();"
                                      "E_noms();",
                              ["Noms dans le jeu de", "Nom de l'auteur", "Dans le jeu", 'id="nmNote"', "data-nomde=", "Cité par son nom"]),
@@ -239,7 +239,7 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
                              ["<title>verrou ok</title>", 'id="verrou"']),
                             ("arrivages", "document.getElementById('arriv').click(); recoit({t:'convention', data: D.convention});"
                                           "document.querySelector('[data-contenu]').click(); recoit({t:'contenu', cle: D.contenuCle, data: D.contenu});",
-                             ["Nom voulu", "Renommer ", 'id="arrConvertit"', "Relire Nexus", "← Liste des mods", 'data-nom="', "Remonter dans la pile", "Parquer…", 'id="arrTout"', 'id="arrRemonte"', "Nom du mod dans les fichiers", "dans le zip…", "data-vers=",
+                             ["Nom voulu", "Renommer ", 'id="arrConvertit"', 'id="arrContenu"', "Relire Nexus", "← Liste des mods", 'data-nom="', "Remonter dans la pile", "Parquer…", 'id="arrTout"', 'id="arrRemonte"', "Nom du mod dans les fichiers", "dans le zip…", "data-vers=",
                               "Mise à jour de «", "Ranger la mise à jour…", 'data-range="', "Ou à la place de…", "sans clé d'API", "peut aussi changer de dossier"]),
                             ("dossier", "document.getElementById('arriv').click(); recoit({t:'convention', data: D.convention});"
                                         "document.querySelector('[data-contenu]').click();"

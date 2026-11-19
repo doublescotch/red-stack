@@ -439,7 +439,7 @@ function rafraichit(delai = 0, auto = false) {
 
 // Gestes qui écrivent le dépôt, le magasin ou le jeu : de leur confirmation à leur fin, la page est verrouillée (message
 // `verrou`), et tout autre geste qui écrit ou qui change le profil est refusé, d'où qu'il vienne (page, onglets d'analyse).
-const GESTES_ECRIT = new Set(['adopte', 'deplace', 'deplaceLot', 'supprime', 'conventionRange', 'conventionRenomme', 'conventionConvertit', 'conventionConvertitLot', 'contenuRenomme',
+const GESTES_ECRIT = new Set(['adopte', 'deplace', 'deplaceLot', 'supprime', 'conventionRange', 'conventionRenomme', 'conventionConvertit', 'conventionConvertitLot', 'contenuRenomme', 'contenuRenommeLot', 'zipRenomme',
   'purge', 'retoucheAnnule', 'applique']);
 const CHANGE = new Set(['profilNouveau', 'profilSupprime', 'bascule', 'basculeLot', 'option', 'priorite', 'fomodFixe', 'nomsFixe', 'ordrePasse', 'ordreRenomme',
   'ordreAnnule', 'ordreModlistStop', 'planRemplace', 'reglagesEcrit', 'reference', 'sauvegarde', 'majTelecharge']);
@@ -659,7 +659,7 @@ async function recoit(m) {
       let faits = 0;
       await vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: T('Red Stack : conversion en .zip…') }, async (avance) => {
         for (const x of prets) {                      // une archive qui échoue ne retient pas les suivantes
-          avance.report({ message: `${faits + refus.length + 1} / ${m.cles.length} · ${path.basename(x.vu.de)}`, increment: 100 / prets.length });
+          if (avance) avance.report({ message: `${faits + refus.length + 1} / ${m.cles.length} · ${path.basename(x.vu.de)}`, increment: 100 / prets.length });
           try { await moteur.run(['convention', '--convertit', '--cle', x.cle, '--go']); faits += 1; }
           catch (e) { refus.push(`${x.cle.split('/').pop()} : ${String((e && e.message) || e).split('\n')[0]}`); }
         }
@@ -682,6 +682,55 @@ async function recoit(m) {
         () => moteur.run(['contenu', '--cle', m.cle, '--fixe', '-', '--go'], JSON.stringify(m.ops)));
       envoie({ t: 'contenu', cle: m.cle, data: await moteur.run(['contenu', '--cle', m.cle]), dit: N(vu.renommes, '{n} fichier renommé dans le zip.', '{n} fichiers renommés dans le zip.') });
       envoie({ t: 'convention', data: await moteur.run(['convention']) });
+      return rafraichit();
+    }
+    case 'zipRenomme': {                            // le nom du zip lui-même, depuis la fiche du mod : saisi dans VS Code, confirmé
+      gardeMaj(m.cle);
+      const actuel = m.cle.split('/').pop();
+      const saisi = await vscode.window.showInputBox({ title: T('Red Stack : nom du zip'), value: actuel, valueSelection: [0, actuel.length - 4], ignoreFocusOut: true,
+        prompt: T('Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.') });
+      const nom = (saisi || '').trim();
+      if (!nom || nom === actuel) return;
+      const noms = JSON.stringify([{ cle: m.cle, nom }]);
+      const vu = await moteur.run(['convention', '--fixe', '-'], noms);   // sans --go : contrôle, ou refuse
+      if (!vu.renommes.length) return;
+      const ok = await confirme(N(1, 'Renommer {n} archive du dépôt ?', 'Renommer {n} archives du dépôt ?'), N(1, 'Renommer {n} archive', 'Renommer {n} archives'), path.basename(vu.renommes[0].vers),
+        T('Entrée = ne rien écrire. Seul le nom du fichier change : le contenu et le jeu ne sont pas touchés.'));
+      if (!ok) return;
+      await moteur.run(['convention', '--fixe', '-', '--go'], noms);
+      await rafraichit();                           // l'état relu fait suivre le profil, l'arbre et le registre au nouveau nom
+      return envoie({ t: 'detail', data: await moteur.run(['detail', ...P, '--mod', m.cle.split('/').slice(0, -1).concat(nom).join('/')]) });
+    }
+    case 'contenuRenommeLot': {                     // le contenu des zips cochés, aux noms que le moteur propose : une confirmation
+      const prets = [], refus = [];
+      let deja = 0;
+      const propose = async (cle) => (await moteur.run(['contenu', '--cle', cle])).ops.filter((o) => o.vers !== o.de).map((o) => ({ de: o.de, vers: o.vers }));
+      for (const cle of m.cles || []) {               // sans --go : chaque zip dit ce qu'il renommerait, ou son refus
+        try {
+          gardeMaj(cle);
+          const ops = await propose(cle);
+          const vu = ops.length ? await moteur.run(['contenu', '--cle', cle, '--fixe', '-'], JSON.stringify(ops)) : { renommes: 0 };
+          if (vu.renommes) prets.push({ cle, n: vu.renommes, poses: vu.poses || 0 }); else deja += 1;
+        } catch (e) { refus.push(`${cle.split('/').pop()} : ${String((e && e.message) || e).split('\n')[0]}`); }
+      }
+      if (!prets.length) throw new Error(T`Aucun contenu à renommer : ${refus.join(' ; ') || (deja ? T('ces zips sont déjà à la convention') : T('rien de coché'))}`);
+      const n = prets.length, total = prets.reduce((a, x) => a + x.n, 0);
+      const ok = await confirme(N(n, 'Renommer le contenu de {n} zip ?', 'Renommer le contenu de {n} zips ?'), N(n, 'Récrire {n} zip', 'Récrire {n} zips'),
+        N(total, '{n} fichier à renommer en tout', '{n} fichiers à renommer en tout') + ' · ' + prets.slice(0, 3).map((x) => x.cle.split('/').pop().replace(/\.zip$/i, '')).join(' · ') + (n > 3 ? ` · ${N(n - 3, '… et {n} autre', '… et {n} autres')}` : ''),
+        T('Entrée = ne rien écrire. Chaque zip est récrit aux noms que Red Stack propose, relu, puis remplace l\'ancien ; le contenu des fichiers ne change pas.') + (refus.length ? ` ${T`Laissés de côté : ${refus.length}.`}` : ''));
+      if (!ok) return;
+      let faits = 0;
+      await vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: T('Red Stack : réécriture du zip…') }, async (avance) => {
+        for (const x of prets) {                      // proposition relue juste avant d'écrire : un zip récrit peut changer ce que les suivants citent
+          if (avance) avance.report({ message: `${faits + 1} / ${prets.length} · ${x.cle.split('/').pop()}`, increment: 100 / prets.length });
+          try {
+            const ops = await propose(x.cle);
+            if (ops.length) await moteur.run(['contenu', '--cle', x.cle, '--fixe', '-', '--go'], JSON.stringify(ops));
+            faits += 1;
+          } catch (e) { refus.push(`${x.cle.split('/').pop()} : ${String((e && e.message) || e).split('\n')[0]}`); }
+        }
+      });
+      envoie({ t: 'convention', data: await moteur.run(['convention']), dit: N(faits, 'Contenu renommé dans {n} zip.', 'Contenu renommé dans {n} zips.') + (refus.length ? ` ${T`Laissés : ${refus.join(' ; ')}`}` : '') });
       return rafraichit();
     }
     case 'fomod':                                   // installateur FOMOD d'un zip : ses pages et les choix du profil (lecture seule)

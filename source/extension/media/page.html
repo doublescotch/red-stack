@@ -252,6 +252,7 @@ body.majv main, body.majv #puces { display: none; }
 #arrivages td.actions button { margin: 0 4px 3px 0; }
 #arrivages input[type=text] { width: 100%; box-sizing: border-box; background: var(--champ); border: 1px solid var(--trait); border-radius: 3px; padding: 2px 6px; }
 #arrivages input[type=text].change { border-color: var(--ambre); }
+#volet input[type=text] { box-sizing: border-box; background: var(--champ); border: 1px solid var(--champ-trait); border-radius: 3px; padding: 2px 6px; }
 #arrivages select { max-width: 100%; margin-top: 3px; }
 #arrivages small { display: block; color: var(--pale); margin-top: 2px; }
 #arrivages tr.contenu > td { background: var(--bande); padding: 8px 12px 12px; }
@@ -633,6 +634,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       + (hors ? `<span title="${T`Fichiers d'un installateur tiers déjà dans le jeu : jamais liés, remplacés ni retirés`}">${T`${hors} hors Red Stack`}</span>` : '') + '</div>'
       + `<div class="actions"><button data-montre="${h(d.zip)}">${T`Montrer le zip`}</button>`
       + (fo && !fo.erreur ? `<button data-fomodmod="${h(d.cle)}"${parFo ? ' class="plein"' : ''} title="${T`Les pages de choix de l'installateur FOMOD de ce zip`}">${T`Installateur…`}</button>` : '')
+      + `<button data-zipnom="${h(d.cle)}" title="${T`Changer le nom du fichier zip dans le dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.`}">${T`Renommer le zip…`}</button>`
       + `<button data-ctmod="${h(d.cle)}" title="${T`Renommer ce que ce zip livre (archives, dossiers de scripts et de tweaks), après lecture des références du dépôt`}">${T`Renommer le contenu…`}</button>`
       + `<button data-nomsmod="${h(d.cle)}" title="${T`Poser ce mod sous d'autres noms DANS LE JEU (archives, .xl, scripts, tweaks, dossier CET ou REDmod) : le profil le note, le zip ne change pas. Dit qui cite chaque nom.`}">${T`Noms dans le jeu…`}</button>`
       + (d.arbre ? `<button data-montre="${h(d.arbre)}" title="${h(d.arbre)}">${T`Ouvrir son arbre`}</button>` : '')
@@ -1259,11 +1261,12 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     const A = E.arr;
     if (!A) return;
     if (!A.data) { $('arrivages').innerHTML = `<p class="vide">${T`Lecture des arrivages et des fichiers Nexus…`}</p>`; return; }
-    const d = A.data, coches = aRenommer().length, haut_ = aDeplacer('pile').length, bas_ = aDeplacer('parques').length, conv_ = aConvertir().length;
+    const d = A.data, coches = aRenommer().length, haut_ = aDeplacer('pile').length, bas_ = aDeplacer('parques').length, conv_ = aConvertir().length, cont_ = aContenu().length;
     const html = ['<div class="intro"><div class="rang">'
       + `<button class="plein" id="arrRenomme"${coches ? '' : ' disabled'}>${(coches ? N(coches, 'Renommer {n} archive cochée…', 'Renommer {n} archives cochées…') : T('Renommer les archives cochées…'))}</button>`
       + `<button id="arrRemonte"${haut_ ? '' : ' disabled'} title="${T`Déplacer les zips cochés à la racine de leur pile, en une confirmation`}">${T`Remonter ${haut_ ? N(haut_, '{n} cochée', '{n} cochées') : T('les cochées')}…`}</button>`
       + `<button id="arrParque"${bas_ ? '' : ' disabled'} title="${T`Déplacer les zips cochés dans le dossier des parqués de leur pile, en une confirmation`}">${T`Parquer ${bas_ ? N(bas_, '{n} cochée', '{n} cochées') : T('les cochées')}…`}</button>`
+      + `<button id="arrContenu"${cont_ ? '' : ' disabled'} title="${T`Renommer d'un coup ce que livrent les zips cochés (archives, dossiers de scripts et de tweaks), aux noms que Red Stack propose. Pour retoucher un nom : « Contenu… » sur la ligne du zip.`}">${T`Contenu de ${cont_ ? N(cont_, '{n} cochée', '{n} cochées') : T('les cochées')}…`}</button>`
       + `<button id="arrConvertit"${conv_ && d.extracteur ? '' : ' disabled'} title="${T`Convertir en .zip les archives .7z / .rar cochées, en une confirmation`}">${T`Convertir ${conv_ ? N(conv_, '{n} cochée', '{n} cochées') : T('les cochées')}…`}</button>`
       + `<button id="arrRelit" title="${T`Relire les arrivages et redemander à Nexus les fichiers de ces mods`}">${T`Relire Nexus`}</button>`
       + Object.entries(d.compte).map(([s, n]) => `<span class="puce ${(STATUT[s] || ['', ''])[1]}">${n} ${(STATUT[s] || [s])[0]}</span>`).join('')
@@ -1507,6 +1510,8 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
   const aDeplacer = (vers) => E.arr.data.lignes.filter((r) => E.arr.coches.has(r.cle) && !r.convertir && (vers === 'pile' ? !!r.lieu : r.genre !== 'parqué'));
   /** Archives .7z / .rar cochées : à convertir en .zip d'un seul geste. */
   const aConvertir = () => E.arr.data.lignes.filter((r) => E.arr.coches.has(r.cle) && r.convertir);
+  /** Zips cochés dont le contenu peut se renommer d'un seul geste (jamais une archive à convertir). */
+  const aContenu = () => E.arr.data.lignes.filter((r) => E.arr.coches.has(r.cle) && !r.convertir);
   function recoitArrivages(m) {
     if (!E.arr) return;
     const A = E.arr, cles = new Set(m.data.lignes.map((r) => r.cle)), neuf = !A.data;
@@ -1556,6 +1561,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       const vers = e.target.id === 'arrRemonte' ? 'pile' : 'parques';
       vscode.postMessage({ t: 'deplaceLot', vers, cles: aDeplacer(vers).map((r) => r.cle) });
     }
+    else if (e.target.id === 'arrContenu') vscode.postMessage({ t: 'contenuRenommeLot', cles: aContenu().map((r) => r.cle) });
     else if (e.target.id === 'arrConvertit') vscode.postMessage({ t: 'conventionConvertitLot', cles: aConvertir().map((r) => r.cle) });
     else if (e.target.id === 'arrTout') { for (const r of A.data.lignes) if (e.target.checked) A.coches.add(r.cle); else A.coches.delete(r.cle); dessineArrivages(); }
     else if (d.contenu) {
@@ -2188,6 +2194,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     else if (d.montre) vscode.postMessage({ t: 'montre', chemin: d.montre });
     else if (d.nexus) vscode.postMessage({ t: 'nexus', id: d.nexus });
     else if (d.reqignore || d.reqreprend) { e.target.disabled = true; vscode.postMessage({ t: 'prerequisIgnore', cle: $('volet').dataset.cle, requis: d.reqignore || d.reqreprend, valeur: !!d.reqignore }); }
+    else if (d.zipnom) vscode.postMessage({ t: 'zipRenomme', cle: d.zipnom });
     else if (d.reqlit) { e.target.disabled = true; e.target.textContent = T('Lecture de Nexus…'); vscode.postMessage({ t: 'prerequisLit', cle: d.reqlit }); }
     else if (d.va) { E.choisi = d.va; vscode.postMessage({ t: 'detail', cle: d.va }); }
     else if (d.gagne) {

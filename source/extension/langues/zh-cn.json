@@ -1887,5 +1887,26 @@
  "prerequis --ignore : on (ne plus compter) ou off (compter de nouveau), --cle <clé du zip>, --requis <identifiant du prérequis>": "prerequis --ignore：on（不再计入）或 off（重新计入），--cle <zip 的键>，--requis <前置的标识>",
  "prerequis --ignore : ce mod n'a pas de prérequis « {0} »": "prerequis --ignore：此模组没有前置“{0}”",
  "{0} : prérequis « {1} » ignoré.": "{0}：已忽略前置“{1}”。",
- "{0} : prérequis « {1} » compté de nouveau.": "{0}：已重新计入前置“{1}”。"
+ "{0} : prérequis « {1} » compté de nouveau.": "{0}：已重新计入前置“{1}”。",
+ "Renommer d'un coup ce que livrent les zips cochés (archives, dossiers de scripts et de tweaks), aux noms que Red Stack propose. Pour retoucher un nom : « Contenu… » sur la ligne du zip.": "一次性重命名勾选的 zip 所提供的内容（压缩档、脚本和 tweak 文件夹），使用 Red Stack 建议的名称。要修改某个名称：在该 zip 的行上点“内容…”。",
+ "Contenu de {0}…": "{0} 的内容…",
+ "Aucun contenu à renommer : {0}": "没有要重命名的内容：{0}",
+ "ces zips sont déjà à la convention": "这些 zip 已符合约定",
+ "Renommer le contenu de {n} zip ?": {
+  "other": "重命名 {n} 个 zip 的内容？"
+ },
+ "Récrire {n} zip": {
+  "other": "重写 {n} 个 zip"
+ },
+ "{n} fichier à renommer en tout": {
+  "other": "共 {n} 个文件待重命名"
+ },
+ "Entrée = ne rien écrire. Chaque zip est récrit aux noms que Red Stack propose, relu, puis remplace l'ancien ; le contenu des fichiers ne change pas.": "回车 = 不写入任何内容。每个 zip 都按 Red Stack 建议的名称重写、回读，然后替换旧的；文件内容不变。",
+ "Contenu renommé dans {n} zip.": {
+  "other": "已重命名 {n} 个 zip 的内容。"
+ },
+ "Changer le nom du fichier zip dans le dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "更改仓库中 zip 文件的名称。配置、存储中的目录树和登记表会随之更新；游戏不受影响。",
+ "Renommer le zip…": "重命名 zip…",
+ "Red Stack : nom du zip": "Red Stack：zip 名称",
+ "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "文件的新名称，带 .zip 扩展名。在名称中保留 Nexus 编号，即可保留更新和从 Nexus 读取的前置。"
 }

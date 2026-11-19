@@ -1887,5 +1887,26 @@
  "prerequis --ignore : on (ne plus compter) ou off (compter de nouveau), --cle <clé du zip>, --requis <identifiant du prérequis>": "prerequis --ignore: on(집계 안 함) 또는 off(다시 집계), --cle <zip 키>, --requis <필수 항목 식별자>",
  "prerequis --ignore : ce mod n'a pas de prérequis « {0} »": "prerequis --ignore: 이 mod에는 필수 항목 “{0}”이(가) 없습니다",
  "{0} : prérequis « {1} » ignoré.": "{0}: 필수 항목 “{1}” 무시됨.",
- "{0} : prérequis « {1} » compté de nouveau.": "{0}: 필수 항목 “{1}” 다시 집계됨."
+ "{0} : prérequis « {1} » compté de nouveau.": "{0}: 필수 항목 “{1}” 다시 집계됨.",
+ "Renommer d'un coup ce que livrent les zips cochés (archives, dossiers de scripts et de tweaks), aux noms que Red Stack propose. Pour retoucher un nom : « Contenu… » sur la ligne du zip.": "선택한 zip이 제공하는 것(아카이브, 스크립트 및 tweak 폴더)을 Red Stack이 제안하는 이름으로 한 번에 바꿉니다. 이름을 고치려면 해당 zip 행의 “내용…”을 사용하세요.",
+ "Contenu de {0}…": "{0}의 내용…",
+ "Aucun contenu à renommer : {0}": "이름을 바꿀 내용이 없습니다: {0}",
+ "ces zips sont déjà à la convention": "이 zip들은 이미 규칙을 따릅니다",
+ "Renommer le contenu de {n} zip ?": {
+  "other": "zip {n}개의 내용 이름을 바꿀까요?"
+ },
+ "Récrire {n} zip": {
+  "other": "zip {n}개 다시 쓰기"
+ },
+ "{n} fichier à renommer en tout": {
+  "other": "이름을 바꿀 파일 총 {n}개"
+ },
+ "Entrée = ne rien écrire. Chaque zip est récrit aux noms que Red Stack propose, relu, puis remplace l'ancien ; le contenu des fichiers ne change pas.": "Enter = 아무것도 쓰지 않음. 각 zip은 Red Stack이 제안하는 이름으로 다시 쓰이고, 다시 읽은 뒤 이전 것을 대체합니다. 파일 내용은 바뀌지 않습니다.",
+ "Contenu renommé dans {n} zip.": {
+  "other": "zip {n}개의 내용 이름을 바꿨습니다."
+ },
+ "Changer le nom du fichier zip dans le dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "저장소에 있는 zip 파일의 이름을 바꿉니다. 프로필, 저장소 트리, 등록부가 따라갑니다. 게임은 건드리지 않습니다.",
+ "Renommer le zip…": "zip 이름 바꾸기…",
+ "Red Stack : nom du zip": "Red Stack: zip 이름",
+ "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "파일의 새 이름(.zip 확장자 포함). 이름에 Nexus 번호를 유지하면 업데이트와 Nexus에서 읽은 필수 항목이 유지됩니다."
 }

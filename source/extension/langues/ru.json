@@ -2442,5 +2442,38 @@
  "prerequis --ignore : on (ne plus compter) ou off (compter de nouveau), --cle <clé du zip>, --requis <identifiant du prérequis>": "prerequis --ignore: on (не учитывать) или off (снова учитывать), --cle <ключ zip>, --requis <идентификатор требования>",
  "prerequis --ignore : ce mod n'a pas de prérequis « {0} »": "prerequis --ignore: у этого мода нет требования «{0}»",
  "{0} : prérequis « {1} » ignoré.": "{0}: требование «{1}» игнорируется.",
- "{0} : prérequis « {1} » compté de nouveau.": "{0}: требование «{1}» снова учитывается."
+ "{0} : prérequis « {1} » compté de nouveau.": "{0}: требование «{1}» снова учитывается.",
+ "Renommer d'un coup ce que livrent les zips cochés (archives, dossiers de scripts et de tweaks), aux noms que Red Stack propose. Pour retoucher un nom : « Contenu… » sur la ligne du zip.": "Переименовать за один раз то, что поставляют отмеченные zip (архивы, папки скриптов и твиков), в имена, которые предлагает Red Stack. Чтобы поправить имя: «Содержимое…» в строке zip.",
+ "Contenu de {0}…": "Содержимое: {0}…",
+ "Aucun contenu à renommer : {0}": "Нет содержимого для переименования: {0}",
+ "ces zips sont déjà à la convention": "эти zip уже соответствуют соглашению",
+ "Renommer le contenu de {n} zip ?": {
+  "one": "Переименовать содержимое {n} zip?",
+  "few": "Переименовать содержимое {n} zip?",
+  "many": "Переименовать содержимое {n} zip?",
+  "other": "Переименовать содержимое {n} zip?"
+ },
+ "Récrire {n} zip": {
+  "one": "Перезаписать {n} zip",
+  "few": "Перезаписать {n} zip",
+  "many": "Перезаписать {n} zip",
+  "other": "Перезаписать {n} zip"
+ },
+ "{n} fichier à renommer en tout": {
+  "one": "всего {n} файл к переименованию",
+  "few": "всего {n} файла к переименованию",
+  "many": "всего {n} файлов к переименованию",
+  "other": "всего {n} файла к переименованию"
+ },
+ "Entrée = ne rien écrire. Chaque zip est récrit aux noms que Red Stack propose, relu, puis remplace l'ancien ; le contenu des fichiers ne change pas.": "Enter = ничего не записывать. Каждый zip перезаписывается с именами, которые предлагает Red Stack, перечитывается и затем заменяет старый; содержимое файлов не меняется.",
+ "Contenu renommé dans {n} zip.": {
+  "one": "Содержимое переименовано в {n} zip.",
+  "few": "Содержимое переименовано в {n} zip.",
+  "many": "Содержимое переименовано в {n} zip.",
+  "other": "Содержимое переименовано в {n} zip."
+ },
+ "Changer le nom du fichier zip dans le dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "Изменить имя zip-файла в библиотеке. Профиль, дерево в хранилище и реестр следуют за ним; игра не затрагивается.",
+ "Renommer le zip…": "Переименовать zip…",
+ "Red Stack : nom du zip": "Red Stack: имя zip",
+ "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "Новое имя файла с расширением .zip. Если оставить в имени номер Nexus, сохранятся обновления и требования, прочитанные на Nexus."
 }

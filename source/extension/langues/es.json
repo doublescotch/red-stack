@@ -2072,5 +2072,30 @@
  "prerequis --ignore : on (ne plus compter) ou off (compter de nouveau), --cle <clé du zip>, --requis <identifiant du prérequis>": "prerequis --ignore: on (dejar de contar) u off (volver a contar), --cle <clave del zip>, --requis <identificador del requisito>",
  "prerequis --ignore : ce mod n'a pas de prérequis « {0} »": "prerequis --ignore: este mod no tiene el requisito «{0}»",
  "{0} : prérequis « {1} » ignoré.": "{0}: requisito «{1}» ignorado.",
- "{0} : prérequis « {1} » compté de nouveau.": "{0}: requisito «{1}» contado de nuevo."
+ "{0} : prérequis « {1} » compté de nouveau.": "{0}: requisito «{1}» contado de nuevo.",
+ "Renommer d'un coup ce que livrent les zips cochés (archives, dossiers de scripts et de tweaks), aux noms que Red Stack propose. Pour retoucher un nom : « Contenu… » sur la ligne du zip.": "Renombrar de una vez lo que entregan los zips marcados (archivos, carpetas de scripts y de tweaks), con los nombres que propone Red Stack. Para retocar un nombre: «Contenido…» en la línea del zip.",
+ "Contenu de {0}…": "Contenido de {0}…",
+ "Aucun contenu à renommer : {0}": "Ningún contenido por renombrar: {0}",
+ "ces zips sont déjà à la convention": "estos zips ya siguen la convención",
+ "Renommer le contenu de {n} zip ?": {
+  "one": "¿Renombrar el contenido de {n} zip?",
+  "other": "¿Renombrar el contenido de {n} zips?"
+ },
+ "Récrire {n} zip": {
+  "one": "Reescribir {n} zip",
+  "other": "Reescribir {n} zips"
+ },
+ "{n} fichier à renommer en tout": {
+  "one": "{n} archivo por renombrar en total",
+  "other": "{n} archivos por renombrar en total"
+ },
+ "Entrée = ne rien écrire. Chaque zip est récrit aux noms que Red Stack propose, relu, puis remplace l'ancien ; le contenu des fichiers ne change pas.": "Intro = no escribir nada. Cada zip se reescribe con los nombres que propone Red Stack, se relee y luego sustituye al anterior; el contenido de los archivos no cambia.",
+ "Contenu renommé dans {n} zip.": {
+  "one": "Contenido renombrado en {n} zip.",
+  "other": "Contenido renombrado en {n} zips."
+ },
+ "Changer le nom du fichier zip dans le dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "Cambiar el nombre del archivo zip en el repositorio. El perfil, el árbol del almacén y el registro lo siguen; el juego no se toca.",
+ "Renommer le zip…": "Renombrar el zip…",
+ "Red Stack : nom du zip": "Red Stack: nombre del zip",
+ "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "Nuevo nombre del archivo, con su extensión .zip. Conservar el número de Nexus en el nombre conserva las actualizaciones y los requisitos leídos en Nexus."
 }
