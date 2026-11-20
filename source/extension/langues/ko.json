@@ -1908,5 +1908,69 @@
  "Changer le nom du fichier zip dans le dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "저장소에 있는 zip 파일의 이름을 바꿉니다. 프로필, 저장소 트리, 등록부가 따라갑니다. 게임은 건드리지 않습니다.",
  "Renommer le zip…": "zip 이름 바꾸기…",
  "Red Stack : nom du zip": "Red Stack: zip 이름",
- "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "파일의 새 이름(.zip 확장자 포함). 이름에 Nexus 번호를 유지하면 업데이트와 Nexus에서 읽은 필수 항목이 유지됩니다."
+ "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "파일의 새 이름(.zip 확장자 포함). 이름에 Nexus 번호를 유지하면 업데이트와 Nexus에서 읽은 필수 항목이 유지됩니다.",
+ "Red Stack · Objets": "Red Stack · 아이템",
+ "Objets": "아이템",
+ "face à une sauvegarde": "저장 파일과 대조",
+ "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "mod의 무기, 의류, 사이버웨어: 게임 저장 파일에서 사용되는 것과 사용되지 않는 것",
+ "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "mod의 무기, 의류, 사이버웨어를 게임 저장 파일과 대조: V가 소지한 것, 창고나 옷장에 있는 것, 사용되지 않는 것. 별도 탭에서 열립니다. 읽기 전용.",
+ "Filtrer : mod ou objet…": "필터: mod 또는 아이템…",
+ "Filtrer par mod ou par nom d'objet": "mod 또는 아이템 이름으로 필터링",
+ "Armes": "무기",
+ "arme": "무기",
+ "Vêtements": "의류",
+ "vêtement": "의류",
+ "Implants": "사이버웨어",
+ "implant": "사이버웨어",
+ "sur V": "V 소지",
+ "dans la planque": "창고 안",
+ "dans la garde-robe": "옷장 안",
+ "La lecture des objets a échoué (message en haut de l'onglet).": "아이템을 읽지 못했습니다(탭 상단의 메시지 참조).",
+ "Lecture des tweaks du profil et de la sauvegarde… La première fois, quelques dizaines de secondes ; ensuite quelques secondes.": "프로필의 tweak과 저장 파일을 읽는 중… 처음에는 수십 초, 이후에는 몇 초가 걸립니다.",
+ "niveau {0}": "레벨 {0}",
+ "Sauvegarde": "저장 파일",
+ "Le dossier des sauvegardes se règle dans « Réglages », section « Dossier des parties »": "저장 파일 폴더는 “설정”의 “저장 파일 폴더” 섹션에서 지정합니다",
+ "Dossier des parties…": "저장 파일 폴더…",
+ "Aucun de leurs objets n'est sur V, dans la planque ni dans la garde-robe de cette sauvegarde. Le clic ne montre qu'eux ; un second clic revient à tous.": "이 저장 파일에서 이 mod들의 아이템은 V 소지품, 창고, 옷장 어디에도 없습니다. 클릭하면 이 항목만 표시되고, 다시 클릭하면 모두 표시로 돌아갑니다.",
+ "Une partie de leurs objets est possédée, le reste non.": "아이템 중 일부는 보유하고 있고, 나머지는 보유하지 않았습니다.",
+ "Tous leurs objets sont possédés.": "아이템을 모두 보유하고 있습니다.",
+ "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "이 보기에서 읽지 못한 tweak 파일: 이 파일들이 만드는 아이템은 집계되지 않습니다.",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>보유</b>: 이 저장 파일에서 V가 소지하고 있거나 창고 또는 옷장에 있는 것. 보유한 아이템이 하나도 없는 mod가 목록 맨 위에 표시됩니다.",
+ "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "이 보기는 프로필이 게임에 넣으려는 tweak(및 Red Stack 외부에서 설치된 것)과 디스크에 있는 그대로의 저장 파일을 읽습니다. 읽기 전용: 게임에도 저장 파일에도 아무것도 쓰지 않습니다.",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "여기에 표시되지 않는 것: RED 형식의 <code>.tweak</code> 파일, CET의 Lua 또는 Redscript로 만든 아이템, 무기도 의류도 사이버웨어도 아닌 레코드(부품, 부착물, 제작법, 외형, NPC).",
+ "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "{0}에서 저장 파일을 찾을 수 없습니다. 폴더는 “설정”의 “저장 파일 폴더” 섹션에서 지정합니다.",
+ "Sauvegarde {0} illisible : {1}": "저장 파일 {0}을(를) 읽을 수 없음: {1}",
+ "{0} : {1} sur {2}": "{0}: {1}/{2}",
+ "{n} mod sur {0}, {1} montrés : affinez par une sorte, une puce ou le champ de filtre.": {
+  "other": "{0}개 중 mod {n}개, {1}개 표시: 종류, 칩 또는 필터 필드로 범위를 좁히십시오."
+ },
+ "{n} mod sur {0}.": {
+  "other": "{0}개 중 mod {n}개."
+ },
+ "Détail du mod": "mod 세부 정보",
+ "pas dans cette sauvegarde": "이 저장 파일에 없음",
+ "Dossier des parties": "저장 파일 폴더",
+ "Les sauvegardes de Cyberpunk 2077, lues par l'onglet « Objets ». Red Stack les lit, il n'y écrit jamais.": "Cyberpunk 2077의 저장 파일로, “아이템” 탭에서 읽습니다. Red Stack은 읽기만 하며 절대 쓰지 않습니다.",
+ "{n} mod sans objet possédé": {
+  "other": "보유 아이템이 없는 mod {n}개"
+ },
+ "{n} mod utilisé en partie": {
+  "other": "일부 사용된 mod {n}개"
+ },
+ "{n} mod entièrement possédé": {
+  "other": "전부 보유한 mod {n}개"
+ },
+ "{0} sur {n} objet possédé": {
+  "other": "아이템 {n}개 중 {0}개 보유"
+ },
+ "bloc LZ4 illisible": "읽을 수 없는 LZ4 블록",
+ "Aucune sauvegarde dans {0} : réglage « Dossier des parties ».": "{0}에 저장 파일 없음: 설정 “저장 파일 폴더”.",
+ "pas une sauvegarde de Cyberpunk 2077": "Cyberpunk 2077 저장 파일이 아님",
+ "sauvegarde d'une version du jeu d'avant la 2.0 : format non lu": "게임 2.0 이전 버전의 저장 파일: 읽지 않는 형식",
+ "table des nœuds introuvable": "노드 테이블을 찾을 수 없음",
+ "table de compression introuvable": "압축 테이블을 찾을 수 없음",
+ "inventaire introuvable": "인벤토리를 찾을 수 없음",
+ "structure non comprise": "이해할 수 없는 구조",
+ "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "저장 파일 {0}({1}), 보유한 프로필 mod 아이템(V, 창고, 옷장): {2}/{3}",
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "저장 파일을 찾을 수 없음: {0}(저장 파일 폴더: {1})"
 }

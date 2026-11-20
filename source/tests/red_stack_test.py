@@ -55,6 +55,15 @@ def check(label, cond, detail=""):
         fails.append(label)
 
 
+
+def refuse_lz4(m):                          # banc 29 : bloc LZ4 qui copie depuis avant le début de ce qui est écrit
+    try:
+        m._lz4_bloc(bytes([0x14]) + b"A" + struct.pack("<H", 5) + bytes([0x00]), 9)
+    except m.PartieErreur:
+        return True
+    return False
+
+
 def plan_counts():
     return rs("plan", "--profil", "t")["compte"]
 
@@ -1613,6 +1622,115 @@ os.remove(os.path.join(DONNEES, "nexus.json"))
 rs("profils", "--profil", "q", "--supprime")
 c = plan_counts()
 check("profil « t » intact après l'essai (28)", c["pose"] == c["remplace"] == c["retire"] == c["conflit"] == 0, str(c))
+
+# ---------------------------------------------------------------- 29. objets des mods face à une sauvegarde de partie
+print("29. objets des mods (armes, vêtements, implants) face à une sauvegarde fabriquée : V, planque, garde-robe")
+import zlib
+tdb = lambda n: zlib.crc32(n.encode()) | (len(n) << 32)
+
+
+def lz4_litteraux(b):                       # bloc LZ4 fait d'une seule séquence de littéraux (valide pour tout décodeur)
+    n = len(b)
+    if n < 15:
+        return bytes([n << 4]) + b
+    reste, out = n - 15, bytearray([0xF0])
+    while reste >= 255:
+        out.append(255)
+        reste -= 255
+    return bytes(out + bytes([reste])) + b
+
+
+def fausse_partie(v, planque, ailleurs, garde_robe, compresse=True, version=2500):
+    """sav.dat minimal : en-tête, table FZLC d'un bloc, nœuds inventory / itemData / WardrobeSystem, table NODE, DONE"""
+    tete = b"VASC" + struct.pack("<II", 1, version) + b"\x00" + struct.pack("<QI", 0, 0)
+    base = len(tete) + 8 + 0x100 * 12
+    corps, noeuds = bytearray(), []
+    inv = len(corps)
+    corps += struct.pack("<ii", 0, 3)
+    for ident, noms in ((1, v), (0xF4240, planque), (0x999, ailleurs)):
+        corps += struct.pack("<QI", ident, len(noms))
+        for n in noms:
+            corps += struct.pack("<QIBHB", tdb(n), 7, 0, 0, 0)
+            noeuds.append(("itemData", base + len(corps), 13))
+            corps += struct.pack("<i", 1) + b"\x01" * 9
+    noeuds.insert(0, ("inventory", base + inv, len(corps) - inv))
+    gr = len(corps)
+    corps += struct.pack("<i", 9) + b"\x05\x00\x07" + b"".join(struct.pack("<Q", tdb(n)) + b"\x00\x02" for n in garde_robe)
+    noeuds.append(("WardrobeSystem", base + gr, len(corps) - gr))
+    bloc = (b"4ZLX" + struct.pack("<I", len(corps)) + lz4_litteraux(bytes(corps))) if compresse else bytes(corps)
+    table = b"FZLC" + struct.pack("<i", 1) + struct.pack("<iii", base, len(bloc), len(corps)) + b"\x00" * (0xFF * 12)
+    f = bytearray(tete + table + bloc)
+    info = len(f)
+    f += b"EDON" + bytes([len(noeuds)])
+    for nom, off, taille in noeuds:
+        f += bytes([0x80 | len(nom)]) + nom.encode() + struct.pack("<iiii", -1, -1, off, taille)
+    return bytes(f + struct.pack("<i", info) + b"ENOD")
+
+
+PARTIES = os.path.join(BASE, "parties")
+for nom, octets in (("ManualSave-1", fausse_partie(["Items.Banc_Veste"], ["Items.Banc_Pistolet"], ["Items.Banc_Implant"], ["Items.Banc_Variante", "Items.Banc_Veste"])),
+                    ("ManualSave-2", fausse_partie([], [], [], [], compresse=False)),
+                    ("AutoSave-0", b"pas une sauvegarde")):
+    os.makedirs(os.path.join(PARTIES, nom))
+    open(os.path.join(PARTIES, nom, "sav.dat"), "wb").write(octets)
+json.dump({"Data": {"metadata": {"level": 12.0, "lifePath": "Nomad", "playTime": 3600.5, "gameVersion": 2500}}},
+          open(os.path.join(PARTIES, "ManualSave-1", "metadata.9.json"), "w", encoding="utf-8"))
+for k, t in enumerate((1700000000, 1700000100, 1700000050)):   # plus récente : ManualSave-2, puis AutoSave-0, puis ManualSave-1
+    os.utime(os.path.join(PARTIES, ("ManualSave-1", "ManualSave-2", "AutoSave-0")[k], "sav.dat"), (t, t))
+mkzip("9_Objets/Garde Robe-9101-1-0-1700000901.zip", {"r6/tweaks/banc/objets.yaml":
+      "Items.Banc_Veste:\n  $base: Items.GenericOuterChestClothing\nItems.Banc_Variante:\n  $base: Items.Banc_Veste\n"
+      "Items.Banc_Pistolet:\n  $type: gamedataWeaponItem_Record\nItems.Banc_Implant:\n  $base: Items.AdvancedSandevistanC1MK1\n"
+      "Items.Banc_Crane:\n  $type: gamedataItem_Record\n  equipArea: EquipmentArea.FrontalCortexCW\n"
+      "Items.Banc_Lunette:\n  $base: Items.w_att_scope_short_01\nItems.Banc_Veste_inline0:\n  $type: gamedataClothing_Record\n"
+      "Items.Banc_Modele_$(c):\n  $instances:\n    - { c: rouge }\n    - { c: bleu }\n  $base: Items.Preset_Lexington_Default\n"})
+mkzip("9_Objets/Jamais Porte-9102-1-0-1700000902.zip", {"r6/tweaks/jamais.yaml": "Items.Banc_Robe:\n  $type: gamedataClothing_Record\n",
+                                                      "r6/tweaks/vieux.tweak": "Items.Banc_Rien = { }\n"})
+rs("profils", "--profil", "x", "--copie", "t")
+for m in ("Garde Robe-9101-1-0-1700000901", "Jamais Porte-9102-1-0-1700000902"):
+    rs("bascule", "on", "--profil", "x", "--mod", "9_Objets/" + m)
+rs("config", "--fixe", json.dumps({"parties": PARTIES}))
+d = rs("objets", "--profil", "x", "--partie", "ManualSave-1")
+M = {m["prov"].split("/")[-1][:-4].split("-")[0]: m for m in d["mods"]}
+O = {o["rec"]: o for m in d["mods"] for o in m["objets"]}
+check("tri : $base vanilla par familles de noms, $type, equipArea, base écrite par un autre enregistrement du mod, $instances développées",
+      {k: O[k]["sorte"] for k in O} == {"Items.Banc_Veste": "vetement", "Items.Banc_Variante": "vetement", "Items.Banc_Pistolet": "arme",
+                                         "Items.Banc_Implant": "implant", "Items.Banc_Crane": "implant", "Items.Banc_Robe": "vetement",
+                                         "Items.Banc_Modele_rouge": "arme", "Items.Banc_Modele_bleu": "arme"}, str({k: O[k]["sorte"] for k in O}))
+check("ni accessoire d'arme ni sous-enregistrement « _inline » dans la liste ; ils sont comptés à part",
+      "Items.Banc_Lunette" not in O and "Items.Banc_Veste_inline0" not in O and d["non_classes"] >= 2, str(d["non_classes"]))
+check("lieux lus dans la sauvegarde (LZ4) : V, planque, garde-robe seule ; un autre inventaire que V et la planque ne compte pas",
+      O["Items.Banc_Veste"]["lieux"] == ["v", "garde_robe"] and O["Items.Banc_Pistolet"]["lieux"] == ["planque"]
+      and O["Items.Banc_Variante"]["lieux"] == ["garde_robe"] and O["Items.Banc_Implant"]["lieux"] == [] and O["Items.Banc_Crane"]["lieux"] == [],
+      str({k: O[k]["lieux"] for k in O}))
+check("comptes par mod et par sorte ; le mod sans objet possédé vient en tête ; la sauvegarde dit ce que sa metadata porte",
+      d["mods"][0]["prov"].endswith("Jamais Porte-9102-1-0-1700000902.zip") and M["Garde Robe"]["possedes"] == 3 and M["Garde Robe"]["total"] == 7
+      and M["Garde Robe"]["sortes"] == {"arme": [1, 3], "vetement": [2, 2], "implant": [0, 2]} and d["possedes"] == 3 and d["objets"] == 8
+      and d["partie"]["niveau"] == 12 and d["partie"]["vie"] == "Nomad" and d["partie"]["jeu"] == 2500, str(M.get("Garde Robe")) + str(d["partie"]))
+check("limite dite : un .tweak au format RED est nommé ; la liste des parties va de la plus récente à la plus ancienne",
+      any(l["fichier"] == "r6/tweaks/vieux.tweak" for l in d["limites"]) and [x["nom"] for x in d["parties"]] == ["ManualSave-2", "AutoSave-0", "ManualSave-1"],
+      str(d["limites"]) + str([x["nom"] for x in d["parties"]]))
+d2 = rs("objets", "--profil", "x")
+d3 = rs("objets", "--profil", "x", "--partie", "AutoSave-0")
+d4 = rs("objets", "--profil", "x", "--partie", "Introuvable", ok=False)
+check("sans --partie : la plus récente (bloc non compressé, inventaire vide) ; fichier qui n'est pas une sauvegarde = erreur dite, la liste reste ; nom inconnu = refus",
+      d2["partie"]["nom"] == "ManualSave-2" and d2["erreur"] is None and d2["possedes"] == 0 and d2["objets"] == 8
+      and d3["erreur"] and d3["possedes"] == 0 and len(d3["mods"]) == 2 and isinstance(d4, str) and "Introuvable" in d4, str(d3["erreur"]) + str(d4)[:200])
+open(os.path.join(PARTIES, "ManualSave-2", "sav.dat"), "wb").write(fausse_partie([], [], [], [], version=1600))
+check("sauvegarde d'avant la 2.0 : refus dit, pas une lecture fausse", "2.0" in (rs("objets", "--profil", "x")["erreur"] or ""))
+vu = rs("config")
+check("dossier des parties : réglé, existant, défaut connu ; ni la sauvegarde ni le jeu ne sont écrits",
+      vu["parties"] == PARTIES and vu["existe"]["parties"] and "Cyberpunk 2077" in rs("config", "--fixe", json.dumps({"parties": ""}))["effectif"]["parties"]
+      and open(os.path.join(PARTIES, "AutoSave-0", "sav.dat"), "rb").read() == b"pas une sauvegarde" and get("r6/tweaks/jamais.yaml") is None)
+sys.path.insert(0, os.path.dirname(TOOL))
+import red_stack as moteur_rs
+bloc = bytes([0x22]) + b"AB" + struct.pack("<H", 2) + bytes([0x10]) + b"Z"      # « AB », copie recouvrante de 6, « Z »
+check("LZ4 : une copie qui recouvre ce qu'elle écrit se déroule octet par octet ; une distance hors de ce qui est écrit est refusée",
+      bytes(moteur_rs._lz4_bloc(bloc, 9)) == b"ABABABABZ" and refuse_lz4(moteur_rs))
+shutil.rmtree(os.path.join(DEPOT, "9_Objets"))
+shutil.rmtree(PARTIES)
+rs("profils", "--profil", "x", "--supprime")
+c = plan_counts()
+check("profil « t » intact après l'essai (29)", c["pose"] == c["remplace"] == c["retire"] == c["conflit"] == 0, str(c))
 
 print(f"\n{'TOUT VERT' if not fails else str(len(fails)) + ' KO : ' + ', '.join(fails)}")
 sys.exit(1 if fails else 0)

@@ -2097,5 +2097,75 @@
  "Changer le nom du fichier zip dans le dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "Cambiar el nombre del archivo zip en el repositorio. El perfil, el árbol del almacén y el registro lo siguen; el juego no se toca.",
  "Renommer le zip…": "Renombrar el zip…",
  "Red Stack : nom du zip": "Red Stack: nombre del zip",
- "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "Nuevo nombre del archivo, con su extensión .zip. Conservar el número de Nexus en el nombre conserva las actualizaciones y los requisitos leídos en Nexus."
+ "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "Nuevo nombre del archivo, con su extensión .zip. Conservar el número de Nexus en el nombre conserva las actualizaciones y los requisitos leídos en Nexus.",
+ "Red Stack · Objets": "Red Stack · Objetos",
+ "Objets": "Objetos",
+ "face à une sauvegarde": "frente a una partida guardada",
+ "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Armas, ropa e implantes de los mods: lo que se usa en una partida guardada y lo que no",
+ "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Armas, ropa e implantes de los mods, frente a una partida guardada: lo que está con V, en el alijo o en el armario, y lo que no se usa. Se abre en su propia pestaña. Solo lectura.",
+ "Filtrer : mod ou objet…": "Filtrar: mod u objeto…",
+ "Filtrer par mod ou par nom d'objet": "Filtrar por mod o por nombre de objeto",
+ "Armes": "Armas",
+ "arme": "arma",
+ "Vêtements": "Ropa",
+ "vêtement": "prenda",
+ "Implants": "Implantes",
+ "implant": "implante",
+ "sur V": "con V",
+ "dans la planque": "en el alijo",
+ "dans la garde-robe": "en el armario",
+ "La lecture des objets a échoué (message en haut de l'onglet).": "La lectura de los objetos ha fallado (mensaje en la parte superior de la pestaña).",
+ "Lecture des tweaks du profil et de la sauvegarde… La première fois, quelques dizaines de secondes ; ensuite quelques secondes.": "Leyendo los tweaks del perfil y la partida guardada… La primera vez, unas decenas de segundos; después, unos segundos.",
+ "niveau {0}": "nivel {0}",
+ "Sauvegarde": "Partida guardada",
+ "Le dossier des sauvegardes se règle dans « Réglages », section « Dossier des parties »": "La carpeta de partidas guardadas se configura en «Ajustes», sección «Carpeta de partidas»",
+ "Dossier des parties…": "Carpeta de partidas…",
+ "Aucun de leurs objets n'est sur V, dans la planque ni dans la garde-robe de cette sauvegarde. Le clic ne montre qu'eux ; un second clic revient à tous.": "Ninguno de sus objetos está con V, en el alijo ni en el armario de esta partida guardada. El clic solo muestra estos; un segundo clic vuelve a todos.",
+ "Une partie de leurs objets est possédée, le reste non.": "Parte de sus objetos está en posesión, el resto no.",
+ "Tous leurs objets sont possédés.": "Todos sus objetos están en posesión.",
+ "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "Archivos de tweaks que esta vista no ha podido leer: sus posibles objetos no se cuentan.",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>Poseído</b>: con V, en el alijo o en el armario de esta partida guardada. Un mod sin ningún objeto en posesión aparece al principio de la lista.",
+ "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "La vista lee los tweaks que el perfil quiere en el juego (más los instalados fuera de Red Stack) y la partida guardada tal como está en el disco. Solo lectura: no se escribe nada, ni en el juego ni en la partida guardada.",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "No se ven aquí: los objetos creados por un archivo <code>.tweak</code> en formato RED, por Lua de CET o por Redscript; los registros que no son ni armas, ni ropa, ni implantes (piezas, accesorios, recetas, apariencias, PNJ).",
+ "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "No se ha encontrado ninguna partida guardada en {0}. La carpeta se configura en «Ajustes», sección «Carpeta de partidas».",
+ "Sauvegarde {0} illisible : {1}": "Partida guardada {0} ilegible: {1}",
+ "{0} : {1} sur {2}": "{0}: {1} de {2}",
+ "{n} mod sur {0}, {1} montrés : affinez par une sorte, une puce ou le champ de filtre.": {
+  "one": "{n} mod de {0}, {1} mostrados: afine con una clase, una etiqueta o el campo de filtro.",
+  "other": "{n} mods de {0}, {1} mostrados: afine con una clase, una etiqueta o el campo de filtro."
+ },
+ "{n} mod sur {0}.": {
+  "one": "{n} mod de {0}.",
+  "other": "{n} mods de {0}."
+ },
+ "Détail du mod": "Detalle del mod",
+ "pas dans cette sauvegarde": "no está en esta partida guardada",
+ "Dossier des parties": "Carpeta de partidas",
+ "Les sauvegardes de Cyberpunk 2077, lues par l'onglet « Objets ». Red Stack les lit, il n'y écrit jamais.": "Las partidas guardadas de Cyberpunk 2077, leídas por la pestaña «Objetos». Red Stack las lee, nunca escribe en ellas.",
+ "{n} mod sans objet possédé": {
+  "one": "{n} mod sin objetos en posesión",
+  "other": "{n} mods sin objetos en posesión"
+ },
+ "{n} mod utilisé en partie": {
+  "one": "{n} mod usado en parte",
+  "other": "{n} mods usados en parte"
+ },
+ "{n} mod entièrement possédé": {
+  "one": "{n} mod poseído por completo",
+  "other": "{n} mods poseídos por completo"
+ },
+ "{0} sur {n} objet possédé": {
+  "one": "{0} de {n} objeto en posesión",
+  "other": "{0} de {n} objetos en posesión"
+ },
+ "bloc LZ4 illisible": "bloque LZ4 ilegible",
+ "Aucune sauvegarde dans {0} : réglage « Dossier des parties ».": "Ninguna partida guardada en {0}: ajuste «Carpeta de partidas».",
+ "pas une sauvegarde de Cyberpunk 2077": "no es una partida guardada de Cyberpunk 2077",
+ "sauvegarde d'une version du jeu d'avant la 2.0 : format non lu": "partida guardada de una versión del juego anterior a la 2.0: formato no leído",
+ "table des nœuds introuvable": "tabla de nodos no encontrada",
+ "table de compression introuvable": "tabla de compresión no encontrada",
+ "inventaire introuvable": "inventario no encontrado",
+ "structure non comprise": "estructura no comprendida",
+ "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "Partida guardada {0} ({1}), objetos de los mods del perfil en posesión (V, alijo, armario): {2} de {3}",
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Partida guardada no encontrada: {0} (carpeta de partidas: {1})"
 }

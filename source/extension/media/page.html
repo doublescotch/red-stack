@@ -346,6 +346,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
   <span class="groupe" role="group" aria-label="Analyses, chacune dans son onglet">
     <button id="conf" title="Analyse des conflits dans les archives : ordre de chargement, qui gagne sur qui. S'ouvre dans un onglet à côté. Lecture seule.">Conflits</button>
     <button id="scripts" title="Conflits de code entre mods : méthodes Redscript, propriétés TweakXL. S'ouvre dans un onglet à lui. Lecture seule ; la première fois, quelques dizaines de secondes.">Scripts</button>
+    <button id="objets" title="Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.">Objets</button>
   </span>
   <span class="sep"></span>
   <button id="regle" title="Dossiers du dépôt, du jeu et du magasin, convention, réglages, hors Red Stack, référence du jeu" aria-pressed="false">Réglages</button>
@@ -389,7 +390,9 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
   const $ = (id) => document.getElementById(id);
   const SEULE = document.body.classList.contains('analyse');   // onglet d'analyse des conflits, à part de la page
   const CODE = document.body.classList.contains('code');       // onglet « Scripts et tweaks » : la même page, réduite aux conflits de code
+  const OBJ = document.body.classList.contains('objets');      // onglet « Objets » : la même page, réduite aux objets des mods face à une sauvegarde
   if (SEULE) { document.getElementById('cherche').placeholder = T('Filtrer : mod, archive ou ressource…'); document.getElementById('cherche').setAttribute('aria-label', T("Filtrer par mod, par nom d'archive ou par chemin de ressource")); }
+  if (OBJ) { document.getElementById('cherche').placeholder = T('Filtrer : mod ou objet…'); document.getElementById('cherche').setAttribute('aria-label', T("Filtrer par mod ou par nom d'objet")); }
   if (CODE) { document.getElementById('cherche').placeholder = T('Filtrer : mod, méthode, propriété ou fichier…'); document.getElementById('cherche').setAttribute('aria-label', T('Filtrer par mod, par méthode, par propriété ou par fichier')); }
   const E = { profil: '', profils: [], data: null, plies: new Set(), choisi: '', volet: null, sauve: vscode.getState() || {}, filtre: 'tous', tri: { col: '', sens: 1 }, nature: '', lot: new Set(), attente: new Map(), vol: new Map() };
   if (E.sauve.tri && E.sauve.tri.col) E.tri = E.sauve.tri;
@@ -1042,10 +1045,81 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       }).join('') + (lues.length ? '' : `<p class="vide">${duNiveau.length ? T('Rien ne correspond à ces filtres.') : niv === 'agir' ? T('Aucun conflit de code à regarder ni à revoir dans ce profil.') : T('Rien à ce niveau.')}</p>`));
   }
 
+  // ---- Objets : armes, vêtements, implants que les tweaks du profil créent, face à une sauvegarde de partie. E.conf.obj = réponse du moteur.
+  const SORTE_OBJ = { arme: [T('Armes'), T('arme')], vetement: [T('Vêtements'), T('vêtement')], implant: [T('Implants'), T('implant')] };
+  const LIEU_OBJ = { v: T('sur V'), planque: T('dans la planque'), garde_robe: T('dans la garde-robe') };
+  const ETAT_OBJ = { aucun: 'gris', part: 'ambre', tous: 'vert' };
+  function dessineObjets() {
+    const C = E.conf, d = C.obj;
+    if (!d) {
+      if (!C.objDemande && !C.objEchec) { C.objDemande = true; vscode.postMessage({ t: 'objets', partie: C.oPartie || '' }); }
+      $('conflits').innerHTML = `<p class="vide">${C.objEchec
+        ? `${T`La lecture des objets a échoué (message en haut de l\'onglet).`} <button class="lien" data-orelit="1">${T`Relire`}</button>`
+        : T('Lecture des tweaks du profil et de la sauvegarde… La première fois, quelques dizaines de secondes ; ensuite quelques secondes.')}</p>`;
+      return;
+    }
+    const t = $('cherche').value.trim().toLowerCase(), so = C.oSorte || '', fi = C.oFiltre || '';
+    // un mod se compte sur la sorte choisie : ses objets de cette sorte seulement
+    const rangs = d.mods.map((m) => { const o = so ? m.objets.filter((x) => x.sorte === so) : m.objets; return { m, o, p: o.filter((x) => x.lieux.length).length }; }).filter((r) => r.o.length);
+    const etat = (r) => (r.p === 0 ? 'aucun' : r.p === r.o.length ? 'tous' : 'part');
+    const n = { aucun: 0, part: 0, tous: 0 };
+    for (const r of rangs) n[etat(r)]++;
+    const nbSorte = (k) => d.mods.filter((m) => m.sortes[k]).length;
+    const quand = (x) => { const [jour, heure] = String(x || '').slice(0, 16).split('T'); return heure ? T`${jour} à ${heure}` : jour; };
+    const option = (p) => `<option value="${h(p.nom)}"${d.partie && p.nom === d.partie.nom ? ' selected' : ''}>${h(p.nom)} · ${h(quand(p.date))}${p.niveau ? ` · ${h(T`niveau ${p.niveau}`)}` : ''}</option>`;
+    const puce = (k, texte, titre) => `<button class="puce${fi === k ? ' on' : ''}" data-ofiltre="${k}" title="${h(titre)}"><span class="pastille ${ETAT_OBJ[k] || 'gris'}"></span>${texte}</button>`;
+    const html = ['<div class="intro">'
+      + `<div class="grille"><label for="opartie">${T`Sauvegarde`}</label>`
+      + (d.parties.length ? `<select id="opartie">${d.parties.map(option).join('')}</select>` : '')
+      + (d.partie && !d.parties.some((p) => p.nom === d.partie.nom) ? ` <code>${h(d.partie.chemin)}</code>` : '')
+      + `<span class="pousse"></span><button data-ofen="regle" title="${T`Le dossier des sauvegardes se règle dans « Réglages », section « Dossier des parties »`}">${T`Dossier des parties…`}</button></div>`
+      + (d.partie && !d.erreur ? '<div class="chiffres">'
+        + puce('aucun', N(n.aucun, '{n} mod sans objet possédé', '{n} mods sans objet possédé'), T('Aucun de leurs objets n\'est sur V, dans la planque ni dans la garde-robe de cette sauvegarde. Le clic ne montre qu\'eux ; un second clic revient à tous.'))
+        + puce('part', N(n.part, '{n} mod utilisé en partie', '{n} mods utilisés en partie'), T('Une partie de leurs objets est possédée, le reste non.'))
+        + puce('tous', N(n.tous, '{n} mod entièrement possédé', '{n} mods entièrement possédés'), T('Tous leurs objets sont possédés.'))
+        + (d.limites.length ? `<button class="puce${fi === 'limites' ? ' on' : ''}" data-ofiltre="limites" title="${T`Fichiers de tweaks que cette vue n\'a pas pu lire : leurs objets éventuels ne sont pas comptés.`}">${N(d.limites.length, '{n} limite de lecture', '{n} limites de lecture')}</button>` : '')
+        + (d.a_appliquer ? `<span class="puce attente" title="${T`Cette analyse lit ce que le profil veut. Le jeu le suit après « Aperçu du plan » puis « Appliquer », dans la page.`}">${N(d.a_appliquer, '{n} changement à appliquer au jeu', '{n} changements à appliquer au jeu')}</span>` : '')
+        + '</div>'
+        + `<div class="grille"><span>${T`Sorte`}</span>` + Object.keys(SORTE_OBJ).filter(nbSorte).map((k) =>
+          `<button data-osorte="${k}" class="${so === k ? 'on' : ''}" aria-pressed="${so === k}">${h(SORTE_OBJ[k][0])} <small>${nbSorte(k)}</small></button>`).join('') + '</div>' : '')
+      + `<p>${T`<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n\'est possédé est en tête de liste.`} `
+      + `${T`La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu\'elle est sur le disque. Lecture seule : rien n\'est écrit, ni dans le jeu ni dans la sauvegarde.`}</p>`
+      + `<p>${T`Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).`}</p>`
+      + '</div>'];
+    const haut = $('conflits').scrollTop;
+    const pose = (corps) => { $('conflits').innerHTML = html.join('') + corps; $('conflits').scrollTop = haut; };
+    if (!d.partie) return pose(`<p class="vide">${T`Aucune sauvegarde trouvée dans ${h(d.dossier)}. Le dossier se règle dans « Réglages », section « Dossier des parties ».`}</p>`);
+    if (d.erreur) return pose(`<p class="vide">${T`Sauvegarde ${h(d.partie.nom)} illisible : ${h(d.erreur)}`}</p>`);
+    if (fi === 'limites') {
+      return pose('<ul>' + d.limites.filter((l) => !t || l.fichier.toLowerCase().includes(t) || nomProv(l.prov).toLowerCase().includes(t))
+        .map((l) => `<li class="ress"><code>${h(l.fichier)}</code><div><b>${h(nomProv(l.prov))}</b> · ${h(l.quoi)}</div></li>`).join('') + '</ul>');
+    }
+    const lues = rangs.filter((r) => (!fi || etat(r) === fi) && (!t || nomProv(r.m.prov).toLowerCase().includes(t) || r.m.prov.toLowerCase().includes(t)
+      || r.o.some((x) => x.rec.toLowerCase().includes(t)))), MAX = 300;
+    // une seule sorte : son nom ; plusieurs : le compte de chacune ; une sorte choisie : rien de plus que le compte
+    const bilan = (r) => { const ks = Object.keys(r.m.sortes); return (so ? '' : ks.length > 1 ? ks.map((k) => T`${SORTE_OBJ[k][0]} : ${r.m.sortes[k][0]} sur ${r.m.sortes[k][1]}`).join(' · ') + ' · ' : SORTE_OBJ[ks[0]][0] + ' · ')
+      + N(r.o.length, '{0} sur {n} objet possédé', '{0} sur {n} objets possédés', r.p); };
+    pose(`<p class="compte">${lues.length > MAX ? N(lues.length, '{n} mod sur {0}, {1} montrés : affinez par une sorte, une puce ou le champ de filtre.', '{n} mods sur {0}, {1} montrés : affinez par une sorte, une puce ou le champ de filtre.', rangs.length, MAX) : N(lues.length, '{n} mod sur {0}.', '{n} mods sur {0}.', rangs.length)}</p>`
+      + lues.slice(0, MAX).map((r) => {
+        const id = 'o:' + r.m.prov, ouvert = C.deplies.has(id), hors = r.m.prov.startsWith('hors:');
+        const tete = `<details class="arch code" data-groupe="${h(id)}"${ouvert ? ' open' : ''}><summary><span class="pastille ${ETAT_OBJ[etat(r)]}"></span>`
+          + `<b>${h(nomProv(r.m.prov))}</b><span class="du">${h(hors ? '' : r.m.prov.split('/')[0])}</span><span class="bilan">${h(bilan(r))}</span></summary>`;
+        if (!ouvert) return tete + '</details>';
+        return tete + '<div class="corps">'
+          + (hors ? '' : `<p><button class="lien" data-va="${h(r.m.prov)}" title="${T`Ouvrir le détail de ce mod`}">${T`Détail du mod`}</button></p>`)
+          + '<ul>' + r.o.filter((x) => !t || !r.o.some((y) => y.rec.toLowerCase().includes(t)) || x.rec.toLowerCase().includes(t)).map((x) => `<li class="site${x.lieux.length ? ' gagne' : ''}">`
+            + `<code>${h(x.rec)}</code> <small>${h(SORTE_OBJ[x.sorte][1])}</small> · ${x.lieux.length ? h(x.lieux.map((l) => LIEU_OBJ[l]).join(', ')) : `<small>${T`pas dans cette sauvegarde`}</small>`}`
+            + (x.chemin ? `<div><button class="lien fich" data-ouvre="${h(x.chemin)}" data-ligne="${x.ligne}" title="${T`Ouvrir ce fichier du jeu à la ligne ${x.ligne}`}">${h(x.fichier)}:${x.ligne}</button></div>`
+              : `<div><small title="${T`Ce fichier n'est pas encore dans le jeu : il sera posé au prochain « Appliquer »`}">${T`${h(x.fichier)}:${x.ligne} · pas encore posé`}</small></div>`)
+            + '</li>').join('') + '</ul></div></details>';
+      }).join('') + (lues.length ? '' : `<p class="vide">${T('Rien ne correspond à ces filtres.')}</p>`));
+  }
+
   function dessineConflits() {
     const C = E.conf, d = E.cf;
     if (!C) return;
     if (C.grille === 'code') return dessineCode();
+    if (C.grille === 'objets') return dessineObjets();
     if (!d) { $('conflits').innerHTML = `<p class="vide">${T`Lecture des archives du profil…`}</p>`; return; }
     const o = d.ordre, c = d.compte, t = $('cherche').value.trim().toLowerCase();
     // filtre par ressource : les archives qui portent une ressource (en conflit ou en copie identique) dont le chemin contient le texte
@@ -1739,8 +1813,8 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     if (E.regle) fermeReglages();
     if (E.arr) fermeArrivages();
     if (E.maj) fermeMaj();
-    E.conf = { details: {}, toutes: {}, ouverts: new Set(), deplies: new Set(cle ? [cle] : []), egaux: false, internes: true, grille: CODE ? 'code' : cle ? 'mod' : 'archive', montre: 'tous', tri: 'charge' };
-    if (cle && !CODE) $('cherche').value = titreZip(cle);
+    E.conf = { details: {}, toutes: {}, ouverts: new Set(), deplies: new Set(cle ? [cle] : []), egaux: false, internes: true, grille: CODE ? 'code' : OBJ ? 'objets' : cle ? 'mod' : 'archive', montre: 'tous', tri: 'charge' };
+    if (cle && !CODE && !OBJ) $('cherche').value = titreZip(cle);
     document.body.classList.add('conf');
     dessineConflits();
     if (!E.cf) vscode.postMessage({ t: 'conflits' });
@@ -1753,6 +1827,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
   // dans la page, « Conflits » ouvre l'analyse dans un onglet à elle, à côté : la liste des mods reste sous les yeux
   $('conf').addEventListener('click', () => vscode.postMessage({ t: 'conflitsFenetre' }));
   $('scripts').addEventListener('click', () => vscode.postMessage({ t: 'codeFenetre' }));
+  $('objets').addEventListener('click', () => vscode.postMessage({ t: 'objetsFenetre' }));
   $('histo').addEventListener('click', () => vscode.postMessage({ t: 'journal' }));
   $('aide').addEventListener('click', () => vscode.postMessage({ t: 'aide', section: E.regle ? 'reglages' : E.arr ? 'arrivages' : E.maj ? 'maj' : '' }));
   $('magasin').addEventListener('click', () => { E.volet = { t: 'magasin' }; ouvre(T('Magasin'), `<p class="vide">${T`Lecture du magasin et du jeu…`}</p>`); vscode.postMessage({ t: 'magasin' }); });
@@ -1777,6 +1852,16 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     else if (d.grille) { C.grille = d.grille; C.deplies.clear(); }
     else if (d.ouvre) return vscode.postMessage({ t: 'ouvreFichier', chemin: d.ouvre, ligne: +d.ligne || 1 });
     else if (d.crelit) C.codeEchec = false;
+    else if (d.orelit) C.objEchec = false;
+    else if (d.ofen) return vscode.postMessage({ t: 'ouvreReglages' });
+    else if (e.target.closest('[data-ofiltre]')) {     // une puce ne montre que ce qu'elle compte ; un second clic revient à tous
+      const k = e.target.closest('[data-ofiltre]').dataset.ofiltre;
+      C.oFiltre = C.oFiltre === k ? '' : k; C.deplies.clear();
+    }
+    else if (e.target.closest('[data-osorte]')) {
+      const k = e.target.closest('[data-osorte]').dataset.osorte;
+      C.oSorte = C.oSorte === k ? '' : k; C.deplies.clear();
+    }
     else if (e.target.closest('[data-cniv]')) {       // une puce de niveau ne montre que lui ; un second clic revient à la vue de départ
       const k = e.target.closest('[data-cniv]').dataset.cniv;
       C.cNiv = C.cNiv === k ? 'agir' : k; C.cSorte = ''; C.deplies.clear();
@@ -1812,6 +1897,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     if (e.target.id === 'egaux') E.conf.egaux = e.target.checked;
     else if (e.target.id === 'internes') E.conf.internes = e.target.checked;
     else if (e.target.id === 'baseSeul') E.conf.baseSeul = e.target.checked;
+    else if (e.target.id === 'opartie') { E.conf.oPartie = e.target.value; E.conf.obj = null; E.conf.objDemande = false; E.conf.deplies.clear(); }
     dessineConflits();
   });
   // boîte au survol d'une pastille de conflits, dans la liste des mods
@@ -1841,6 +1927,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     ['magasin', T('Magasin'), T('Un arbre extrait par mod, lié au jeu. Sur le même disque que le jeu, sinon les fichiers sont copiés.')],
     ['sauvegardes', T('Sauvegardes'), T('Copies faites avant de remplacer un fichier modifié ou de refaire un arbre retouché.')],
     ['reference', T('Référence du jeu'), T('Copie du jeu sans ses archives : retour arrière du socle après une mise à jour forcée.')],
+    ['parties', T('Dossier des parties'), T('Les sauvegardes de Cyberpunk 2077, lues par l\'onglet « Objets ». Red Stack les lit, il n\'y écrit jamais.')],
   ];
   const WOLVENKIT = [
     ['wolvenkit', T('CLI WolvenKit'), T('Le dossier qui porte WolvenKit.CLI.exe (WolvenKit Console, à télécharger à part ; elle demande le .NET Runtime).')],
@@ -1871,6 +1958,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       const etat = k === 'reference' ? (d.existe.reference ? T('Référence présente.') : T('Aucune référence à cet endroit.'))
         : k === 'wolvenkit' ? (d[k] ? (d.existe.wolvenkit ? T('CLI trouvée.') : T('WolvenKit.CLI.exe introuvable à cet endroit.')) : '')
         : k === 'atelier' ? (d[k] && !d.existe.atelier ? T('Ce dossier sera créé à la première écriture.') : '')
+        : k === 'parties' ? (d.existe.parties ? '' : T('Dossier introuvable.'))
         : k === 'magasin' ? (d.existe.magasin ? '' : T('Ce dossier sera créé au premier « Appliquer ».')) : manque && d[k] ? T('Dossier introuvable.') : '';
       return `<div class="champ"><label for="c_${k}">${mot}</label><input type="text" id="c_${k}" value="${h(d[k])}" spellcheck="false"${manque ? ' class="manque"' : ''}`
         + `${k in d.effectif ? ` placeholder="${h(d.effectif[k])}"` : ''}><button type="button" data-parcourir="c_${k}">${T`Parcourir…`}</button>`
@@ -2278,7 +2366,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
   window.addEventListener('message', (e) => {
     const m = e.data;
     // fenêtre d'analyse : elle ne garde que l'état, les conflits et les signaux du moteur
-    if (SEULE && !['etat', 'conflits', 'conflitsDetail', 'conflitsToutes', 'conflitsRessources', 'conflitsCode', 'conflitsCible', 'occupe', 'verrou', 'erreur'].includes(m.t)) return;
+    if (SEULE && !['etat', 'conflits', 'conflitsDetail', 'conflitsToutes', 'conflitsRessources', 'conflitsCode', 'objets', 'conflitsCible', 'occupe', 'verrou', 'erreur'].includes(m.t)) return;
     if (m.t === 'conflitsCible') { if (SEULE && E.data) ouvreConflits(m.cle || ''); return; }
     if (m.t === 'reglages') {
       if (m.premier) $('chiffres').textContent = T('À régler : le dépôt de zips et le dossier du jeu.');
@@ -2332,10 +2420,12 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       etatSauve(m);
     } else if (m.t === 'conflits') {
       E.cf = m.data; E.cfMods = conflitsParMod();
-      if (E.conf) { E.conf.details = {}; E.conf.ouverts = new Set(); E.conf.res = null; E.conf.resDemande = false; E.conf.code = null; E.conf.codeDemande = false; }
+      if (E.conf) { E.conf.details = {}; E.conf.ouverts = new Set(); E.conf.res = null; E.conf.resDemande = false; E.conf.code = null; E.conf.codeDemande = false; E.conf.obj = null; E.conf.objDemande = false; }
       dessine(); dessineConflits();
     } else if (m.t === 'conflitsCode') {
       if (E.conf) { E.conf.code = m.data; E.conf.codeDemande = false; E.conf.codeEchec = false; if (E.conf.grille === 'code') dessineConflits(); }
+    } else if (m.t === 'objets') {
+      if (E.conf) { E.conf.obj = m.data; E.conf.objDemande = false; E.conf.objEchec = false; if (E.conf.grille === 'objets') dessineConflits(); }
     } else if (m.t === 'conflitsRessources') {
       if (E.conf) { E.conf.res = m.data; dessineConflits(); }
     } else if (m.t === 'convention') {
@@ -2391,6 +2481,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       $('occupe').className = m.n ? 'on' : '';
     } else if (m.t === 'erreur') {
       if (E.conf && E.conf.codeDemande && !E.conf.code) { E.conf.codeDemande = false; E.conf.codeEchec = true; if (E.conf.grille === 'code') dessineConflits(); }
+      if (E.conf && E.conf.objDemande && !E.conf.obj) { E.conf.objDemande = false; E.conf.objEchec = true; if (E.conf.grille === 'objets') dessineConflits(); }
       $('alerte').querySelector('span').textContent = m.message;
       $('alerte').className = 'on';
     }

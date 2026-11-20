@@ -31,6 +31,7 @@ for _i in range(len(maj["lignes"]), 4 if maj["lignes"] else 0):   # dépôt pres
 if maj["lignes"]:                           # une ligne ignorée d'exemple, pour voir son rang et son bouton
     maj["lignes"][-1] = dict(maj["lignes"][-1], ignore=True)
 cfr = rs("conflits", "--ressources")
+objets = rs("objets")                      # objets des mods face à la sauvegarde la plus récente (lue, jamais écrite)
 code = rs("scripts")                        # conflits de code : tout ce qui est à regarder ou à revoir, soixante « sans action » pour la capture
 code["trouvailles"] = ([t for t in code["trouvailles"] if t["niveau"] in ("attention", "revoir")]
                        + [t for t in code["trouvailles"] if t["niveau"] not in ("attention", "revoir")][:60])
@@ -58,7 +59,9 @@ detail_req["prerequis"] = dict(detail_req["prerequis"], nexus="jamais lu", requi
                                                                                     dict(_cadre, nom="Codeware", cadre="codeware", ident="c:codeware", ignore=True)])
 # dépôt sans arrivage (dossiers d'arrivée vides) : une ligne d'exemple, tirée d'un zip rangé du dépôt, pour voir la vue
 if not any(not r["convertir"] for r in convention["lignes"]):
-    _x = next((m for m in etat["mods"] if m["lieu"]), etat["mods"][0])
+    import fnmatch                          # un zip rangé, pas un retiré : « Contenu… » refuse les zips des retirés
+    _ret = lambda m: any(fnmatch.fnmatch((m["lieu"] or "").lower(), x.lower()) for x in conf["convention"]["retires"])
+    _x = next((m for m in etat["mods"] if m["lieu"] and not _ret(m)), etat["mods"][0])
     convention["lignes"].append({"cle": _x["cle"], "section": _x["section"], "lieu": _x["lieu"] or "__NEW", "genre": "nouveau", "nom": _x["nom"],
                                  "taille": _x["taille"], "convertir": False, "statut": "hors_nexus", "mod": None})
     convention["compte"] = dict(convention.get("compte") or {}, hors_nexus=1)
@@ -132,7 +135,8 @@ page = (open(os.path.join(HERE, "..", "media", "page.html"), encoding="utf-8").r
 # textes attendus dans une autre langue que le français (RED_STACK_LANGUE=en) : quelques-uns par vue, pris au catalogue
 AILLEURS = {"en": {"liste": ["active mods out of", "Plan preview", "Fold / unfold all", "Full names"], "historique": ["recorded actions", "Applied"],
                    "magasin": ["Real size", "Windows Explorer adds up", "Trees without an active mod", "Purge "], "conflits": ["archives loaded", "per archive", "Wins over"],
-                   "code": ["to look at", "to review", "Code conflict", "Filter: mod, method"], "detail": ["Pack options", "Show the zip", "Rename the content…"],
+                   "code": ["to look at", "to review", "Code conflict", "Filter: mod, method"],
+                   "objets": ["with no item owned", "Saves folder…", "Filter: mod or item", "Mod detail", "<b>Owned</b>"], "detail": ["Pack options", "Show the zip", "Rename the content…"],
                    "plan": ["already in place", "Apply to the game…", "Plan of the profile", "mod disabled"], "arrivages": ["Wanted name", "Re-read Nexus", "File the update…"],
                    "maj": ["Zip of the repository", "New version", "free account", "Stop ignoring"], "fomod": ["Installer of “", "What the installer installs"],
                    "prerequis": ["<h3>Requirements</h3>", "deduced from its files", "Read on Nexus", "⚠ requirement", "outside Nexus, not checked", "Required by 1 mod of the repository, 1 of them active"],
@@ -162,6 +166,10 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
                                      "document.querySelectorAll('#conflits details.code summary').forEach((x, i) => { if (i < 3) x.click(); });",
                              ["à regarder", "à revoir", "sans action", "de lecture", "Conflits d'archives…", "Conflit de code", '<body class="analyse code conf"', "Filtrer : mod, méthode", 'data-csorte="', 'data-cniv="limites"',
                               'data-ouvre="', "Ouvrir le détail de ce mod", "prévu, pas observé en jeu", "de code sur"]),
+                            ("objets", "recoit({t:'objets', data: D.objets});"
+                                       "document.querySelectorAll('#conflits details.code summary').forEach((x, i) => { if (i < 2) x.click(); });",
+                             ['<body class="analyse objets conf"', "sans objet possédé", "Dossier des parties…", 'id="opartie"', 'data-ofiltre="aucun"',
+                              'data-osorte="', "Filtrer : mod ou objet", "Détail du mod", 'data-ouvre="', "<b>Possédé</b>"]),
                             ("ordre", "document.querySelectorAll('#conflits details.arch summary').forEach((x, i) => { if (i < 4) x.click(); });",
                              ["Changer l'ordre", "Renommer dans le jeu…", "Passer de", 'data-sens="']),
                             ("paires", "document.querySelector('[data-grille=paires]').click();"
@@ -280,7 +288,7 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
     if MAJ_VIDE and vue in ("plie_vues", "maj_verrou"):
         print(f"  --   {vue} : sans objet, aucune mise à jour à montrer dans ce dépôt")
         continue
-    stub = ("<script nonce=\"banc\">const D = " + json.dumps({"etat": etat, "profils": profils, "plan": plan, "detail": detail, "detailReq": detail_req, "conf": conf, "poste": poste, "conflits": conflits, "cfr": cfr, "code": code, "convention": convention, "maj": maj, "majCompte": maj_compte, "contenu": contenu, "contenuCle": contenu_cle, "noms": noms, "journal": journal, "magasin": magasin, "sauve": sauve, "sauveCompare": sauve_compare, "fomod": fomod, "detailFo": detail_fo, "png": PNG, "majOccupe": maj_occupe, "nxm": nxm_etat}).replace("</", "<\\/")
+    stub = ("<script nonce=\"banc\">const D = " + json.dumps({"etat": etat, "profils": profils, "plan": plan, "detail": detail, "detailReq": detail_req, "conf": conf, "poste": poste, "conflits": conflits, "cfr": cfr, "code": code, "objets": objets, "convention": convention, "maj": maj, "majCompte": maj_compte, "contenu": contenu, "contenuCle": contenu_cle, "noms": noms, "journal": journal, "magasin": magasin, "sauve": sauve, "sauveCompare": sauve_compare, "fomod": fomod, "detailFo": detail_fo, "png": PNG, "majOccupe": maj_occupe, "nxm": nxm_etat}).replace("</", "<\\/")
             + ";\nconst recoit = (m) => window.dispatchEvent(new MessageEvent('message', {data: m}));\n"
             + "window.onerror = (m) => { document.title = 'ERREUR ' + m; };\n"
             + "const E_noms = () => recoit({t:'noms', cle: D.detail.cle, data: Object.assign({}, D.noms, {cle: D.detail.cle})});\n"
@@ -288,8 +296,8 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
             + "setTimeout(() => { recoit({t:'etat', data: D.etat, profils: D.profils}); recoit({t:'conflits', data: D.conflits}); " + suite + " }, 0); } }; }\n</script>\n")
     html = page.replace("<script nonce=\"banc\">\n(function () {", stub + "<script nonce=\"banc\">\n(function () {", 1)
     assert stub in html
-    if vue in ("plie_conflits", "conflits", "code", "ordre", "paires", "ressource", "puces", "identiques", "fichier"):   # l'onglet d'analyse : la même page, corps marqué par l'extension
-        html = html.replace("<body>", '<body class="analyse code">' if vue == "code" else '<body class="analyse">', 1)
+    if vue in ("plie_conflits", "conflits", "code", "objets", "ordre", "paires", "ressource", "puces", "identiques", "fichier"):   # l'onglet d'analyse : la même page, corps marqué par l'extension
+        html = html.replace("<body>", '<body class="analyse code">' if vue == "code" else '<body class="analyse objets">' if vue == "objets" else '<body class="analyse">', 1)
     f = os.path.join(OUT, vue + ".html")
     open(f, "w", encoding="utf-8").write(html)
     url = "file:///" + f.replace("\\", "/").replace(" ", "%20")

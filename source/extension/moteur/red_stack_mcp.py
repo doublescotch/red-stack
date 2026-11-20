@@ -152,6 +152,17 @@ TOOLS = [
           "requis": {"type": "string", "description": "With `mod` and `ignore`: the `ident` of ONE requirement of that mod (as returned in its list)"},
           "ignore": {"type": "boolean", "description": "With `mod` and `requis`: true = stop counting this requirement for this mod (not needed, or held "
                                                        "under another zip), false = count it again. Noted in the settings, reversible; the game is not touched."}}),
+    tool("red_stack_objets", "Items of the mods against a game save (read only, the save is never written): the weapons, clothing and "
+                             "cyberware that the profile's TweakXL tweaks create, and for each one where the save holds it: `v` (on V), "
+                             "`planque` (the stash), `garde_robe` (the wardrobe, which remembers clothing even once sold). Without "
+                             "`partie`: the most recent save of the saves folder. Mods with nothing owned come first. Not seen: items "
+                             "created by a RED-format .tweak file, by CET Lua or by Redscript; records that are neither weapons, clothing "
+                             "nor cyberware (parts, attachments, recipes, appearances, NPCs) are only counted (`non_classes`).",
+         {**P_PROFIL, "partie": {"type": "string", "description": "Save to read: its folder name (e.g. ManualSave-183), or the path of its folder or sav.dat"},
+          "mod": {"type": "string", "description": "Text that designates ONE active zip, or its exact key: its full list of items"},
+          "sorte": {"type": "string", "enum": ["arme", "vetement", "implant"], "description": "Only this kind (weapon, clothing, cyberware)"},
+          "sans_objet_possede": {"type": "boolean", "description": "Only the mods of which no item is owned"},
+          "limite": {"type": "integer", "description": "Mods returned at most (default 60)"}}),
     tool("red_stack_sauvegardes", "Backups of the mods' settings (files never linked, delivered or written in game). Without an argument: the "
                                   "list. `cree`: makes one now (dated copy, the game is not touched). `compare` (name of a backup, or “derniere” "
                                   "for the latest): what a restore would change in the game; restoring is done in VS Code.",
@@ -287,7 +298,7 @@ class Serveur:
         nom = lambda i: {"rang": i + 1, "archive": o[i]["archive"], "mod": o[i]["zip"] or "(outside Red Stack)"}
         tete = {k: d[k] for k in ("profil", "ordre_par", "compte", "illisibles")}
         if p.get("ressources"):                      # lecture par ressource : où le jeu la prend, qui la perd
-            lib = lambda i: f"{o[i]['archive']} ({o[i]['zip'] or "outside Red Stack"})"
+            lib = lambda i: f"{o[i]['archive']} ({o[i]['zip'] or 'outside Red Stack'})"
             rows = [{"ressource": r["ressource"], "prise_dans": lib(r["prise_dans"]), "perdue_par": [lib(i) for i in r["perd"]],
                      **({"identique_dans": [lib(i) for i in r["identiques"]]} if r["identiques"] else {}),
                      **({"remplace_le_jeu_de_base": True} if r["base"] else {})} for r in d["ressources"]]
@@ -319,6 +330,23 @@ class Serveur:
                                        **({"valeur": l["valeur"][:120]} if l["valeur"] else {})} for l in t["lignes"][:12]]}
         return {"profil": d["profil"], "lus": d["lus"], "compte": d["compte"], "sortes": d["sortes"], "limites": d["limites"][:20],
                 "limites_total": len(d["limites"]), "trouvailles": [court(t) for t in vues[:n]], "total": len(vues)}
+
+    def red_stack_objets(self, p):
+        d = self.rs("objets", "--profil", p.get("profil") or "actuel", *(["--partie", p["partie"]] if p.get("partie") else []),
+                    *(["--mod", p["mod"]] if p.get("mod") else []))
+        so, n = p.get("sorte"), int(p.get("limite") or 60)
+        mods = []
+        for m in d["mods"]:
+            objs = [o for o in m["objets"] if not so or o["sorte"] == so]
+            possedes = sum(1 for o in objs if o["lieux"])
+            if not objs or (p.get("sans_objet_possede") and possedes):
+                continue
+            mods.append({"mod": m["prov"], "possedes": possedes, "total": len(objs), "sortes": m["sortes"],
+                         "objets": [{"rec": o["rec"], "sorte": o["sorte"], "lieux": o["lieux"]} for o in objs[:200 if p.get("mod") else 30]]})
+        partie = d["partie"] and {k: d["partie"].get(k) for k in ("nom", "chemin", "date", "niveau", "vie", "jeu")}
+        return {"dossier": d["dossier"], "partie": partie, "erreur": d["erreur"], "parties": [x["nom"] for x in d["parties"][:30]],
+                "possedes": d["possedes"], "objets": d["objets"], "non_classes": d["non_classes"], "limites": d["limites"][:20],
+                "mods_total": len(mods), "mods": mods[:n]}
 
     def red_stack_ordre(self, p):
         args = ["--nom=" + p["archive"]] if p.get("archive") else []

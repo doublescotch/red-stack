@@ -1908,5 +1908,69 @@
  "Changer le nom du fichier zip dans le dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "リポジトリ内の zip ファイルの名前を変更します。プロファイル、ストアのツリー、登録簿が追従します。ゲームには触れません。",
  "Renommer le zip…": "zip の名前を変更…",
  "Red Stack : nom du zip": "Red Stack: zip の名前",
- "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "ファイルの新しい名前 (拡張子 .zip を含む)。名前に Nexus 番号を残すと、更新と Nexus から読み込んだ前提が保たれます。"
+ "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "ファイルの新しい名前 (拡張子 .zip を含む)。名前に Nexus 番号を残すと、更新と Nexus から読み込んだ前提が保たれます。",
+ "Red Stack · Objets": "Red Stack · アイテム",
+ "Objets": "アイテム",
+ "face à une sauvegarde": "セーブデータと照合",
+ "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "MOD の武器、衣服、サイバーウェア: ゲームのセーブデータで使われているものと使われていないもの",
+ "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "MOD の武器、衣服、サイバーウェアをゲームのセーブデータと照合: V が所持しているもの、スタッシュやワードローブにあるもの、使われていないもの。専用のタブで開きます。読み取り専用。",
+ "Filtrer : mod ou objet…": "フィルター: MOD、アイテム…",
+ "Filtrer par mod ou par nom d'objet": "MOD またはアイテム名でフィルター",
+ "Armes": "武器",
+ "arme": "武器",
+ "Vêtements": "衣服",
+ "vêtement": "衣服",
+ "Implants": "サイバーウェア",
+ "implant": "サイバーウェア",
+ "sur V": "V が所持",
+ "dans la planque": "スタッシュ内",
+ "dans la garde-robe": "ワードローブ内",
+ "La lecture des objets a échoué (message en haut de l'onglet).": "アイテムの読み込みに失敗しました (タブ上部のメッセージを参照)。",
+ "Lecture des tweaks du profil et de la sauvegarde… La première fois, quelques dizaines de secondes ; ensuite quelques secondes.": "プロファイルの tweak とセーブデータを読み込んでいます… 初回は数十秒、以降は数秒かかります。",
+ "niveau {0}": "レベル {0}",
+ "Sauvegarde": "セーブデータ",
+ "Le dossier des sauvegardes se règle dans « Réglages », section « Dossier des parties »": "セーブデータのフォルダーは「設定」の「セーブデータのフォルダー」セクションで指定します",
+ "Dossier des parties…": "セーブデータのフォルダー…",
+ "Aucun de leurs objets n'est sur V, dans la planque ni dans la garde-robe de cette sauvegarde. Le clic ne montre qu'eux ; un second clic revient à tous.": "これらの MOD のアイテムは、このセーブデータの V の所持品、スタッシュ、ワードローブのどこにもありません。クリックでこれらだけを表示し、もう一度クリックですべてに戻ります。",
+ "Une partie de leurs objets est possédée, le reste non.": "アイテムの一部は所持していますが、残りは所持していません。",
+ "Tous leurs objets sont possédés.": "アイテムをすべて所持しています。",
+ "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "このビューで読み取れなかった tweak ファイル: そこで作成されるアイテムは数に入っていません。",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>所持</b>: このセーブデータで V が持っているか、スタッシュまたはワードローブにあるもの。所持アイテムが 1 つもない MOD は一覧の先頭に表示されます。",
+ "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "このビューは、プロファイルがゲームに入れる tweak (および Red Stack 外でインストールされたもの) と、ディスク上にあるままのセーブデータを読み取ります。読み取り専用: ゲームにもセーブデータにも何も書き込みません。",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "ここに表示されないもの: RED 形式の <code>.tweak</code> ファイル、CET の Lua、または Redscript で作成されたアイテム。武器、衣服、サイバーウェアのいずれでもないレコード (パーツ、アタッチメント、レシピ、外観、NPC)。",
+ "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "{0} にセーブデータが見つかりません。フォルダーは「設定」の「セーブデータのフォルダー」セクションで指定します。",
+ "Sauvegarde {0} illisible : {1}": "セーブデータ {0} を読み取れません: {1}",
+ "{0} : {1} sur {2}": "{0}: {1} / {2}",
+ "{n} mod sur {0}, {1} montrés : affinez par une sorte, une puce ou le champ de filtre.": {
+  "other": "MOD {n} 個 / {0}、{1} 個を表示: 種別、チップ、またはフィルター欄で絞り込んでください。"
+ },
+ "{n} mod sur {0}.": {
+  "other": "MOD {n} 個 / {0}。"
+ },
+ "Détail du mod": "MOD の詳細",
+ "pas dans cette sauvegarde": "このセーブデータにはない",
+ "Dossier des parties": "セーブデータのフォルダー",
+ "Les sauvegardes de Cyberpunk 2077, lues par l'onglet « Objets ». Red Stack les lit, il n'y écrit jamais.": "Cyberpunk 2077 のセーブデータ。「アイテム」タブが読み取ります。Red Stack は読み取るだけで、書き込むことはありません。",
+ "{n} mod sans objet possédé": {
+  "other": "所持アイテムのない MOD {n} 個"
+ },
+ "{n} mod utilisé en partie": {
+  "other": "一部使用の MOD {n} 個"
+ },
+ "{n} mod entièrement possédé": {
+  "other": "すべて所持の MOD {n} 個"
+ },
+ "{0} sur {n} objet possédé": {
+  "other": "所持アイテム {0} / {n} 個"
+ },
+ "bloc LZ4 illisible": "LZ4 ブロックを読み取れません",
+ "Aucune sauvegarde dans {0} : réglage « Dossier des parties ».": "{0} にセーブデータがありません: 設定「セーブデータのフォルダー」。",
+ "pas une sauvegarde de Cyberpunk 2077": "Cyberpunk 2077 のセーブデータではありません",
+ "sauvegarde d'une version du jeu d'avant la 2.0 : format non lu": "ゲームのバージョン 2.0 より前のセーブデータ: この形式は読み取りません",
+ "table des nœuds introuvable": "ノード テーブルが見つかりません",
+ "table de compression introuvable": "圧縮テーブルが見つかりません",
+ "inventaire introuvable": "インベントリが見つかりません",
+ "structure non comprise": "構造を解釈できません",
+ "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "セーブデータ {0} ({1})、所持しているプロファイルの MOD のアイテム (V、スタッシュ、ワードローブ): {2} / {3}",
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "セーブデータが見つかりません: {0} (セーブデータのフォルダー: {1})"
 }

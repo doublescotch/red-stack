@@ -33,6 +33,10 @@ Red Stack reads the zips where you file them, does not copy them and does not mo
   sort, a filter, and each row opens the file at the right line. The “last word” announced is
   predicted from the order of the file names, not observed in the game. Detection taken from
   Conflict Studio (MIT). Read-only.
+- “Items”: a separate analysis that reads a game save. For each mod of the profile, the weapons,
+  clothing and cyberware its TweakXL tweaks create, and whether the save holds them: on V, in the
+  stash or in the wardrobe. The mods with no item owned come first: a way to spot the item mods
+  you do not use. The save is only read, never written (format after WolvenKit, MIT).
 - “Arrivals”: the archives of the arrival folders, the names in the format of the Nexus app and
   the `.7z` / `.rar` files. Red Stack proposes the name of the Nexus site
   (`Name-modId-version-timestamp`, read through the public Nexus API), you edit it and then
@@ -117,7 +121,7 @@ It then offers to read the game to create the profile “actuel” (current); th
 The “Settings” button of the page sets everything the tool remembers:
 
 - the folders: repository, game, store (one extracted tree per mod, linked to the game), backups,
-  game reference, log;
+  game reference, game saves (read by “Items”), log;
 - the convention of your repository: which folders are stacks, which ones are parked, new,
   retired, which folders of a zip are never installed;
 - the settings files of the mods, copied instead of being linked so that they survive updates;
@@ -166,7 +170,7 @@ icon pack, which we recommend with these themes.
 
 ## Driving by a Claude Code session
 
-The package carries an MCP server (27 tools): a session reads the state, the conflicts, the history,
+The package carries an MCP server (28 tools): a session reads the state, the conflicts, the history,
 the arrivals and the proposed updates, changes a profile and prepares a plan. It writes neither
 the game nor the zip repository: parking, renaming, downloading stay your actions, in the page.
 For the game, it leaves a request, which this extension shows you (plan with its figures, Apply or

@@ -1908,5 +1908,69 @@
  "Changer le nom du fichier zip dans le dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "更改仓库中 zip 文件的名称。配置、存储中的目录树和登记表会随之更新；游戏不受影响。",
  "Renommer le zip…": "重命名 zip…",
  "Red Stack : nom du zip": "Red Stack：zip 名称",
- "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "文件的新名称，带 .zip 扩展名。在名称中保留 Nexus 编号，即可保留更新和从 Nexus 读取的前置。"
+ "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "文件的新名称，带 .zip 扩展名。在名称中保留 Nexus 编号，即可保留更新和从 Nexus 读取的前置。",
+ "Red Stack · Objets": "Red Stack · 物品",
+ "Objets": "物品",
+ "face à une sauvegarde": "对照存档",
+ "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "模组中的武器、服装和义体：游戏存档中用到了哪些，没用到哪些",
+ "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "模组中的武器、服装和义体，对照游戏存档：哪些在 V 身上、储物箱中或衣柜中，哪些没有用到。在单独的选项卡中打开。只读。",
+ "Filtrer : mod ou objet…": "筛选：模组或物品…",
+ "Filtrer par mod ou par nom d'objet": "按模组或物品名称筛选",
+ "Armes": "武器",
+ "arme": "武器",
+ "Vêtements": "服装",
+ "vêtement": "服装",
+ "Implants": "义体",
+ "implant": "义体",
+ "sur V": "在 V 身上",
+ "dans la planque": "在储物箱中",
+ "dans la garde-robe": "在衣柜中",
+ "La lecture des objets a échoué (message en haut de l'onglet).": "读取物品失败（消息见选项卡顶部）。",
+ "Lecture des tweaks du profil et de la sauvegarde… La première fois, quelques dizaines de secondes ; ensuite quelques secondes.": "正在读取配置文件的 tweak 和存档… 首次需要几十秒；之后只需几秒。",
+ "niveau {0}": "等级 {0}",
+ "Sauvegarde": "存档",
+ "Le dossier des sauvegardes se règle dans « Réglages », section « Dossier des parties »": "存档文件夹可在“设置”的“存档文件夹”部分中更改",
+ "Dossier des parties…": "存档文件夹…",
+ "Aucun de leurs objets n'est sur V, dans la planque ni dans la garde-robe de cette sauvegarde. Le clic ne montre qu'eux ; un second clic revient à tous.": "它们的物品都不在此存档的 V 身上、储物箱中或衣柜中。点击只显示这些项；再次点击返回全部。",
+ "Une partie de leurs objets est possédée, le reste non.": "它们的物品部分已拥有，其余未拥有。",
+ "Tous leurs objets sont possédés.": "它们的物品已全部拥有。",
+ "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "此视图无法读取的 tweak 文件：其中可能创建的物品未计入。",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>已拥有</b>：在此存档的 V 身上、储物箱中或衣柜中。没有任何已拥有物品的模组排在列表最前。",
+ "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "此视图读取配置文件要放入游戏的 tweak（以及在 Red Stack 之外安装的 tweak），以及磁盘上原样的存档。只读：不会写入任何内容，无论是游戏还是存档。",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "此处看不到：由 RED 格式的 <code>.tweak</code> 文件、CET 的 Lua 或 Redscript 创建的物品；既不是武器、服装也不是义体的记录（部件、配件、配方、外观、NPC）。",
+ "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "在 {0} 中未找到存档。该文件夹可在“设置”的“存档文件夹”部分中更改。",
+ "Sauvegarde {0} illisible : {1}": "存档 {0} 无法读取：{1}",
+ "{0} : {1} sur {2}": "{0}：{1}/{2}",
+ "{n} mod sur {0}, {1} montrés : affinez par une sorte, une puce ou le champ de filtre.": {
+  "other": "{n} 个模组（共 {0} 个），显示 {1} 个：可按类别、标签或用筛选框缩小范围。"
+ },
+ "{n} mod sur {0}.": {
+  "other": "{n} 个模组（共 {0} 个）。"
+ },
+ "Détail du mod": "模组详情",
+ "pas dans cette sauvegarde": "不在此存档中",
+ "Dossier des parties": "存档文件夹",
+ "Les sauvegardes de Cyberpunk 2077, lues par l'onglet « Objets ». Red Stack les lit, il n'y écrit jamais.": "Cyberpunk 2077 的存档，由“物品”选项卡读取。Red Stack 只读取它们，从不写入。",
+ "{n} mod sans objet possédé": {
+  "other": "{n} 个模组没有已拥有的物品"
+ },
+ "{n} mod utilisé en partie": {
+  "other": "{n} 个模组部分使用"
+ },
+ "{n} mod entièrement possédé": {
+  "other": "{n} 个模组的物品已全部拥有"
+ },
+ "{0} sur {n} objet possédé": {
+  "other": "已拥有 {0}/{n} 个物品"
+ },
+ "bloc LZ4 illisible": "LZ4 块无法读取",
+ "Aucune sauvegarde dans {0} : réglage « Dossier des parties ».": "{0} 中没有存档：设置“存档文件夹”。",
+ "pas une sauvegarde de Cyberpunk 2077": "不是 Cyberpunk 2077 存档",
+ "sauvegarde d'une version du jeu d'avant la 2.0 : format non lu": "游戏 2.0 之前版本的存档：不读取此格式",
+ "table des nœuds introuvable": "找不到节点表",
+ "table de compression introuvable": "找不到压缩表",
+ "inventaire introuvable": "找不到物品栏",
+ "structure non comprise": "无法理解的结构",
+ "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "存档 {0}（{1}），配置文件中模组的已拥有物品（V、储物箱、衣柜）：{2}/{3}",
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "找不到存档：{0}（存档文件夹：{1}）"
 }

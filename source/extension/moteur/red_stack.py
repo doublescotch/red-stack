@@ -2785,10 +2785,253 @@ def analyse_code(sources):
     return trouv, limites + lim, {"reds": compte["reds"], "tweaks": compte["tweak"], "lua": compte["lua"], "red": compte["red"]}
 
 
+# ---------------------------------------------------------------- objets des mods face à une sauvegarde de partie
+# Lecture seule d'un `sav.dat` (format du jeu 2.0 et après, lu d'après WolvenKit.RED4/Save, licence MIT) : en-tête `CSAV`,
+# blocs LZ4 (`4ZLX`) sous une table `FZLC`, table des nœuds `NODE` en fin de fichier. Le nœud `inventory` porte des
+# sous-inventaires (identifiant, objets) ; chaque objet commence par son identifiant TweakDB sur 64 bits : CRC32 du nom
+# de l'enregistrement, puis sa longueur sur 8 bits. La garde-robe (`WardrobeSystem`) garde les vêtements déjà portés,
+# même vendus : leurs identifiants y sont cherchés tels quels. Rien n'est jamais écrit dans une sauvegarde.
+
+INV_V, INV_PLANQUE = 0x1, 0xF4240                    # V, et la planque (le coffre des appartements, un seul pour tous)
+LIEUX_OBJET = ("v", "planque", "garde_robe")
+SORTES_OBJET = ("arme", "vetement", "implant")
+DOSSIER_PARTIES = os.path.join(os.path.expanduser("~"), "Saved Games", "CD Projekt Red", "Cyberpunk 2077")
+
+
+class PartieErreur(ValueError):
+    pass
+
+
+def _lz4_bloc(src, taille):
+    """un bloc LZ4 (format « block », sans cadre) ; `taille` = taille décompressée annoncée"""
+    dst, i, n = bytearray(), 0, len(src)
+    while i < n:
+        jeton = src[i]
+        i += 1
+        lit = jeton >> 4
+        if lit == 15:
+            while True:
+                b = src[i]
+                i += 1
+                lit += b
+                if b != 255:
+                    break
+        dst += src[i:i + lit]
+        i += lit
+        if i >= n:
+            break
+        dec = src[i] | (src[i + 1] << 8)
+        i += 2
+        lg = jeton & 15
+        if lg == 15:
+            while True:
+                b = src[i]
+                i += 1
+                lg += b
+                if b != 255:
+                    break
+        lg += 4
+        if not 0 < dec <= len(dst):
+            raise PartieErreur(T("bloc LZ4 illisible"))
+        debut = len(dst) - dec
+        if dec >= lg:
+            dst += dst[debut:debut + lg]
+        else:                                        # recouvrement : la copie relit ce qu'elle vient d'écrire
+            while lg > 0:
+                k = min(dec, lg)
+                dst += dst[debut:debut + k]
+                lg -= k
+                debut += k
+    if len(dst) != taille:
+        raise PartieErreur(T("bloc LZ4 illisible"))
+    return dst
+
+
+def _vlq(b, p):
+    x = b[p]
+    p += 1
+    neg, v = x & 0x80, x & 0x3F
+    if x & 0x40:
+        dec = 6
+        while True:
+            x = b[p]
+            p += 1
+            v |= (x & 0x7F) << dec
+            dec += 7
+            if not x & 0x80:
+                break
+    return (-v if neg else v), p
+
+
+def _chaine(b, p):
+    n, p = _vlq(b, p)
+    if n > 0:
+        return b[p:p + 2 * n].decode("utf-16-le", "replace"), p + 2 * n
+    return b[p:p - n].decode("utf-8", "replace"), p - n
+
+
+def tdbid(nom):
+    """identifiant TweakDB d'un nom d'enregistrement (les 40 bits qu'une sauvegarde compare)"""
+    o = nom.encode("utf-8")
+    return zlib.crc32(o) | (len(o) << 32)
+
+
+def lit_partie(chemin):
+    """objets d'une sauvegarde : ({identifiant TweakDB : {"v", "planque"}}, octets de la garde-robe, version du jeu).
+    PartieErreur si le fichier n'est pas une sauvegarde que ce lecteur comprend."""
+    try:
+        f = open(chemin, "rb").read()
+    except OSError as e:
+        raise PartieErreur(T("illisible : {0}", e))
+    try:
+        if f[:4] != b"VASC" or f[-4:] != b"ENOD":
+            raise PartieErreur(T("pas une sauvegarde de Cyberpunk 2077"))
+        version = struct.unpack_from("<I", f, 8)[0]
+        if version < 2000:
+            raise PartieErreur(T("sauvegarde d'une version du jeu d'avant la 2.0 : format non lu"))
+        info = struct.unpack_from("<i", f, len(f) - 8)[0]
+        if f[info:info + 4] != b"EDON":
+            raise PartieErreur(T("table des nœuds introuvable"))
+        p = info + 4
+        nb, p = _vlq(f, p)
+        noeuds = []
+        for _ in range(nb):
+            nom, p = _chaine(f, p)
+            noeuds.append((nom,) + struct.unpack_from("<iiii", f, p))
+            p += 16
+        t = f.find(b"FZLC")
+        if t < 0:
+            raise PartieErreur(T("table de compression introuvable"))
+        blocs = [struct.unpack_from("<iii", f, t + 8 + 12 * k) for k in range(struct.unpack_from("<i", f, t + 4)[0])]
+        data = bytearray(f[:blocs[0][0]])           # même espace d'adresses que les positions des nœuds
+        for off, taille, dec in blocs:
+            data += _lz4_bloc(f[off + 8:off + taille], dec) if f[off:off + 4] == b"4ZLX" else f[off:off + taille]
+        inv = next((n for n in noeuds if n[0] == "inventory"), None)
+        if inv is None:
+            raise PartieErreur(T("inventaire introuvable"))
+        _, _, _, off, taille = inv
+        items = [n for n in noeuds if n[0] == "itemData" and off <= n[3] < off + taille]
+        objets, k, p = collections.defaultdict(set), 0, off + 8     # identifiant du nœud, puis nombre de sous-inventaires
+        for _ in range(struct.unpack_from("<i", data, off + 4)[0]):
+            ident, nb = struct.unpack_from("<QI", data, p)
+            p += 12
+            lieu = "v" if ident == INV_V else "planque" if ident == INV_PLANQUE else None
+            for _ in range(nb):                      # tête de l'objet (identifiant TweakDB d'abord), puis son nœud itemData
+                if lieu:
+                    objets[struct.unpack_from("<Q", data, p)[0] & 0xFFFFFFFFFF].add(lieu)
+                p = items[k][3] + items[k][4]
+                k += 1
+        gr = next((n for n in noeuds if n[0] == "WardrobeSystem"), None)
+        return objets, bytes(data[gr[3]:gr[3] + gr[4]]) if gr else b"", version
+    except (struct.error, IndexError, StopIteration):
+        raise PartieErreur(T("structure non comprise"))
+
+
+def parties(dossier):
+    """les sauvegardes du dossier, la plus récente d'abord : nom, chemin, date, et ce que leur `metadata` en dit"""
+    out = []
+    try:
+        noms = os.listdir(dossier)
+    except OSError:
+        return out
+    for nom in noms:
+        d = os.path.join(dossier, nom)
+        sav = os.path.join(d, "sav.dat")
+        if not os.path.isfile(sav):
+            continue
+        st = os.stat(sav)
+        r = {"nom": nom, "chemin": sav, "date": datetime.datetime.fromtimestamp(st.st_mtime).isoformat(timespec="seconds"),
+             "octets": st.st_size}
+        for m in sorted(x for x in os.listdir(d) if x.startswith("metadata.") and x.endswith(".json")):
+            try:
+                md = json.load(open(os.path.join(d, m), encoding="utf-8"))["Data"]["metadata"]
+                r.update(niveau=int(md.get("level") or 0), vie=md.get("lifePath") or "", duree=int(md.get("playTime") or 0),
+                         partie=md.get("playthroughID") or "", jeu=md.get("gameVersion") or 0)
+            except (OSError, ValueError, KeyError, TypeError):
+                pass
+        out.append(r)
+    return sorted(out, key=lambda r: r["date"], reverse=True)
+
+
+# Sorte d'un objet : d'abord ce que l'enregistrement dit de lui (itemType, equipArea, placementSlots, itemCategory), le sien
+# ou celui d'une base écrite par un mod ; puis son `$type` ; puis le nom de sa base du jeu, par familles de noms. Ce qui
+# ne se classe pas (pièces, accessoires d'armes, recettes, apparences, PNJ…) n'est pas un objet pour cette vue.
+PROPS_OBJET = ("itemType", "equipArea", "placementSlots", "itemCategory")
+RX_SORTE_PROPS = (("arme", re.compile(r"ItemType\.(Wea_|Gad_Grenade)|EquipmentArea\.Weapon|ItemCategory\.Weapon")),
+                  ("vetement", re.compile(r"ItemType\.Clo_|OutfitSlots\.|EquipmentArea\.(Head|Face|OuterChest|InnerChest|Legs|Feet|Outfit)\b|ItemCategory\.Clothing")),
+                  ("implant", re.compile(r"ItemType\.Cyb|EquipmentArea\.\w*CW\b|ItemCategory\.Cyberware")))
+TYPES_OBJET = {"WeaponItem": "arme", "Grenade": "arme", "Clothing": "vetement"}
+RX_SORTE_BASE = (("arme", re.compile(r"^Items\.(Preset_|Base_|Grenade)")),
+                 ("vetement", re.compile(r"^Items\.(Generic\w*Clothing$|Outfit$|[A-Za-z]+_\d\d_[A-Za-z]+_\d\d)")),
+                 ("implant", re.compile(r"^Items\.(Advanced|Berserk|Sandevistan|Kiroshi|\w*Cyberdeck|\w*Netdriver)")))
+RX_SOUS_ENREG = re.compile(r"_inline\d+$")
+
+
+def objets_des_tweaks(sources):
+    """objets (armes, vêtements, implants) que les tweaks lus créent : ({prov : [{rec, sorte, fichier, chemin, ligne}]}, non classés)"""
+    defs, props, ou = {}, collections.defaultdict(dict), collections.defaultdict(list)
+    for s in sources:
+        if s["voie"] != "tweak" or "erreur" in s.get("lu", {"erreur": 1}):
+            continue
+        for cible, valeur, genre, ligne, _ in s["lu"]["ops"]:
+            if cible.endswith(".$definition") and genre in ("type", "base"):
+                rec = cible[:-len(".$definition")]
+                defs.setdefault(rec, (genre, valeur))
+                ou[rec].append((s["prov"], s["fichier"], s["chemin"], ligne))
+            else:
+                rec, _, p = cible.rpartition(".")
+                if p in PROPS_OBJET:
+                    props[rec][p] = valeur
+
+    memo = {}
+
+    def sorte(rec, vus=()):
+        if rec in memo:
+            return memo[rec]
+        s = next((k for k, rx in RX_SORTE_PROPS if rx.search(" ".join(props.get(rec, {}).values()))), None)
+        if s is None and rec not in vus:
+            genre, v = defs.get(rec, (None, ""))
+            if genre == "type":
+                s = TYPES_OBJET.get(v.replace("gamedata", "").replace("_Record", ""))
+            elif genre == "base" and v in defs:
+                s = sorte(v, vus + (rec,))
+            elif genre == "base" and not RX_SOUS_ENREG.search(v):
+                s = next((k for k, rx in RX_SORTE_BASE if rx.search(v)), None)
+        memo[rec] = s
+        return s
+
+    par, hors = collections.defaultdict(list), 0
+    for rec in defs:
+        s = None if RX_SOUS_ENREG.search(rec) else sorte(rec)
+        if s is None:
+            hors += 1
+            continue
+        for prov in dict.fromkeys(o[0] for o in ou[rec]):
+            _, fichier, chemin, ligne = next(o for o in ou[rec] if o[0] == prov)
+            par[prov].append({"rec": rec, "sorte": s, "fichier": fichier, "chemin": chemin, "ligne": ligne})
+    return par, hors
+
+
+def objets_face_partie(par, objets, garde_robe):
+    """chaque mod, ses objets et où la sauvegarde les tient ; les mods sans objet possédé d'abord"""
+    mods = []
+    for prov, recs in par.items():
+        for r in recs:
+            i = tdbid(r["rec"])
+            r["lieux"] = [l for l in LIEUX_OBJET if l in objets.get(i, ())
+                          or (l == "garde_robe" and garde_robe and struct.pack("<Q", i) in garde_robe)]
+        recs.sort(key=lambda r: (SORTES_OBJET.index(r["sorte"]), not r["lieux"], r["rec"].lower()))
+        compte = {s: [sum(1 for r in recs if r["sorte"] == s and r["lieux"]), sum(1 for r in recs if r["sorte"] == s)] for s in SORTES_OBJET}
+        mods.append({"prov": prov, "objets": recs, "possedes": sum(1 for r in recs if r["lieux"]), "total": len(recs),
+                     "sortes": {s: c for s, c in compte.items() if c[1]}})
+    mods.sort(key=lambda m: (m["possedes"] > 0, m["possedes"] / m["total"], m["prov"].lower()))
+    return mods
+
+
 # ---------------------------------------------------------------- configuration
 
 CHEMINS =("depot", "jeu", "magasin", "sauvegardes", "reference", "journal",
-          "wolvenkit", "atelier")                   # volet WolvenKit (red_stack_wk_mcp.py) : la CLI, et le seul dossier où il écrit
+          "wolvenkit", "atelier", "parties")        # parties : dossier des sauvegardes du jeu ; volet WolvenKit (red_stack_wk_mcp.py) : la CLI, et le seul dossier où il écrit
 
 
 def conf_fixe(conf, neuf):
@@ -2858,13 +3101,15 @@ def conf_view(conf, data, conf_path):
     eff = {"magasin": conf.get("magasin") or (jeu.rstrip("\\/") + " - Red Stack" if jeu else ""),
            "sauvegardes": conf.get("sauvegardes") or os.path.join(data, "sauvegardes"),
            "reference": conf.get("reference") or (jeu.rstrip("\\/") + " - Référence" if jeu else ""),
-           "journal": conf.get("journal") or os.path.join(data, "red_stack.log")}
+           "journal": conf.get("journal") or os.path.join(data, "red_stack.log"),
+           "parties": conf.get("parties") or DOSSIER_PARTIES}
     return {"fichier": conf_path, "donnees": data, **{k: conf.get(k, "") for k in CHEMINS}, "effectif": eff,
             "existe": {"depot": os.path.isdir(conf.get("depot", "") or "?"), "jeu": os.path.isdir(jeu or "?"),
                        "magasin": os.path.isdir(eff["magasin"] or "?"),
                        "reference": os.path.isfile(os.path.join(eff["reference"] or "?", REF_MARK)),
                        "wolvenkit": any(os.path.isfile(p) for p in (conf.get("wolvenkit") or "?", os.path.join(conf.get("wolvenkit") or "?", "WolvenKit.CLI.exe"))),
-                       "atelier": os.path.isdir(conf.get("atelier") or "?")},
+                       "atelier": os.path.isdir(conf.get("atelier") or "?"),
+                       "parties": os.path.isdir(conf.get("parties") or DOSSIER_PARTIES)},
             "adopte": bool(jeu) and os.path.isfile(Jeu(jeu, data).pose_path),
             "convention": {k: list(v) for k, v in CONV.items()}, "convention_defaut": CONVENTION,
             "reglages": conf["reglages"], "reglages_defaut": REGLAGES, "hors": conf["hors"],
@@ -4187,7 +4432,7 @@ def main():
     ap.add_argument("action", choices=["index", "adopte", "etat", "bascule", "option", "priorite", "plan", "applique",
                                        "reglage", "retouche", "purge", "config", "profils", "detail", "fichier", "hors", "reference",
                                        "conflits", "deplace", "convention", "contenu", "ordre", "noms", "scripts", "journal",
-                                       "magasin", "sauvegarde", "nexus", "fomod", "prerequis"])
+                                       "magasin", "sauvegarde", "nexus", "fomod", "prerequis", "objets"])
     ap.add_argument("--requis", help="prerequis on|off --cle CLE --ignore --requis IDENT : ne plus compter (on) ou compter de nouveau (off) "
                     "ce prérequis pour ce mod ; IDENT est l'`ident` rendu par `prerequis --mod`")
     ap.add_argument("--nexus", action="store_true", help="prerequis : lit d'abord sur Nexus les prérequis des mods qui ne sont pas "
@@ -4251,6 +4496,8 @@ def main():
     ap.add_argument("--designe", action="store_true", help="convention --range : l'utilisateur désigne lui-même le zip remplacé ; ni le modId, "
                     "ni le nom, ni la version ne sont comparés, l'arrivage garde son nom (ou --nom)")
     ap.add_argument("--ignore", action="store_true", help="nexus on|off --cle CLE --ignore : ne plus proposer / reproposer les mises à jour de ce mod")
+    ap.add_argument("--partie", help="objets : la sauvegarde de partie à lire (nom de son dossier, ou chemin du dossier ou de son sav.dat) ; "
+                    "défaut : la plus récente du dossier des parties")
     ap.add_argument("--si-plan", help="applique : empreinte du plan vu à l'aperçu ; refuse si le plan a changé")
     a = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
@@ -5225,9 +5472,9 @@ def main():
         return out({"arbres": gone, "octets": poids, "supprimes": bool(a.go), "retouches_sauvees": store.sauves}, msg)
 
     plan, pose = build_plan(index, prof, jeu, a.force or {d.replace("\\", "/").lower() for d in a.remplace}, store, (lambda d: d.lower().endswith(".archive")) if a.action in ("conflits", "ordre")
-                            else (lambda d: d.lower().endswith(CODE_EXT_LUES)) if a.action == "scripts" else None)
+                            else (lambda d: d.lower().endswith(CODE_EXT_LUES)) if a.action in ("scripts", "objets") else None)
     libres_de = lambda provs: [p["archive"] for p in provs if not p["dossier"]]
-    plan["modlist"] = [] if prof.get("modlist") is None or a.action == "scripts" else modlist_plan(
+    plan["modlist"] = [] if prof.get("modlist") is None or a.action in ("scripts", "objets") else modlist_plan(
         prof, jeu, libres_de(archives_du_profil(index, plan, pose, jeu, store, prof["modlist"])[0]))
     jeu.save()
 
@@ -5311,6 +5558,50 @@ def main():
                 txt.append("      " + (T("dernier mot prévu") if t.get('gagnant') is not None else T("dernier mot non prévu")) + f" : {t['raison']}")
         return out({"profil": a.profil, "lus": lus, "compte": dict(compte), "sortes": dict(sortes), "trouvailles": trouv, "limites": limites,
                     "a_appliquer": sum(len(plan[k]) for k in ("pose", "remplace", "retire"))}, "\n".join(txt))
+
+    if a.action == "objets":                         # armes, vêtements, implants des mods, face à une sauvegarde : lecture seule
+        dossier = conf.get("parties") or DOSSIER_PARTIES
+        liste = parties(dossier)
+        choisie = None
+        if a.partie:
+            p = os.path.abspath(a.partie)
+            p = os.path.join(p, "sav.dat") if os.path.isdir(p) else p
+            choisie = next((x for x in liste if x["nom"].lower() == a.partie.lower() or os.path.normcase(x["chemin"]) == os.path.normcase(p)), None)
+            if choisie is None and os.path.isfile(p):
+                choisie = {"nom": os.path.basename(os.path.dirname(p)), "chemin": p,
+                           "date": datetime.datetime.fromtimestamp(os.stat(p).st_mtime).isoformat(timespec="seconds")}
+            if choisie is None:
+                sys.exit(T("Sauvegarde introuvable : {0} (dossier des parties : {1})", a.partie, dossier))
+        elif liste:
+            choisie = liste[0]
+        srcs = sources_code(index, plan, pose, jeu, store, data)
+        jeu.save()
+        par, hors = objets_des_tweaks(srcs)
+        if a.mod:
+            cle = find_mod(index, prof, a.mod)
+            par = {k: v for k, v in par.items() if k == cle}
+        limites = [{"prov": s["prov"], "fichier": s["fichier"],
+                    "quoi": T("fichier .tweak (format RED) : posé, pas analysé") if s["voie"] == "red" else s["lu"]["erreur"]}
+                   for s in srcs if s["voie"] in ("tweak", "red") and (s["voie"] == "red" or "erreur" in s["lu"])]
+        objets, garde_robe, erreur = {}, b"", None
+        if choisie:
+            try:
+                objets, garde_robe, choisie["jeu"] = lit_partie(choisie["chemin"])
+            except PartieErreur as e:
+                erreur = str(e)
+        mods = objets_face_partie(par, objets, garde_robe)
+        d = {"profil": a.profil, "dossier": dossier, "parties": liste, "partie": choisie, "erreur": erreur,
+             "mods": mods, "objets": sum(m["total"] for m in mods), "possedes": sum(m["possedes"] for m in mods),
+             "non_classes": hors, "limites": limites, "a_appliquer": sum(len(plan[k]) for k in ("pose", "remplace", "retire"))}
+        if not choisie:
+            tete = T("Aucune sauvegarde dans {0} : réglage « Dossier des parties ».", dossier)
+        elif erreur:
+            tete = T("Sauvegarde {0} illisible : {1}", choisie["nom"], erreur)
+        else:
+            tete = T("Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}", choisie["nom"], choisie["date"], d["possedes"], d["objets"])
+        nom = lambda pr: pr[5:] + T("  [hors Red Stack]") if pr.startswith("hors:") else pr.split("/")[-1][:-4]
+        txt = [tete] + [f"  {m['possedes']:>4}/{m['total']:<4} {nom(m['prov'])}" for m in mods]
+        return out(d, "\n".join(txt))
 
     if a.action == "ordre":
         provs, source = archives_du_profil(index, plan, pose, jeu, store, prof.get("modlist"))

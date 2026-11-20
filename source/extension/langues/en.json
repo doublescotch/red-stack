@@ -2097,5 +2097,75 @@
  "Changer le nom du fichier zip dans le dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "Change the name of the zip file in the repository. The profile, the store tree and the registry follow; the game is not touched.",
  "Renommer le zip…": "Rename the zip…",
  "Red Stack : nom du zip": "Red Stack: zip name",
- "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "New name of the file, with its .zip extension. Keeping the Nexus number in the name keeps the updates and the requirements read on Nexus."
+ "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "New name of the file, with its .zip extension. Keeping the Nexus number in the name keeps the updates and the requirements read on Nexus.",
+ "Red Stack · Objets": "Red Stack · Items",
+ "Objets": "Items",
+ "face à une sauvegarde": "against a save",
+ "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Weapons, clothing and cyberware from mods: what is used in a game save, and what is not",
+ "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Weapons, clothing and cyberware from mods, against a game save: what is on V, in the stash or in the wardrobe, and what is not used. Opens in a tab of its own. Read only.",
+ "Filtrer : mod ou objet…": "Filter: mod or item…",
+ "Filtrer par mod ou par nom d'objet": "Filter by mod or by item name",
+ "Armes": "Weapons",
+ "arme": "weapon",
+ "Vêtements": "Clothing",
+ "vêtement": "clothing",
+ "Implants": "Cyberware",
+ "implant": "cyberware",
+ "sur V": "on V",
+ "dans la planque": "in the stash",
+ "dans la garde-robe": "in the wardrobe",
+ "La lecture des objets a échoué (message en haut de l'onglet).": "Reading the items failed (message at the top of the tab).",
+ "Lecture des tweaks du profil et de la sauvegarde… La première fois, quelques dizaines de secondes ; ensuite quelques secondes.": "Reading the profile's tweaks and the save… The first time, a few tens of seconds; then a few seconds.",
+ "niveau {0}": "level {0}",
+ "Sauvegarde": "Save",
+ "Le dossier des sauvegardes se règle dans « Réglages », section « Dossier des parties »": "The saves folder is set in “Settings”, section “Saves folder”",
+ "Dossier des parties…": "Saves folder…",
+ "Aucun de leurs objets n'est sur V, dans la planque ni dans la garde-robe de cette sauvegarde. Le clic ne montre qu'eux ; un second clic revient à tous.": "None of their items is on V, in the stash or in the wardrobe of this save. A click shows only them; a second click goes back to all.",
+ "Une partie de leurs objets est possédée, le reste non.": "Some of their items are owned, the rest are not.",
+ "Tous leurs objets sont possédés.": "All their items are owned.",
+ "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "Tweak files this view could not read: any items they create are not counted.",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>Owned</b>: on V, in the stash or in the wardrobe of this save. A mod with no item owned comes first in the list.",
+ "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "The view reads the tweaks the profile wants in the game (plus those installed outside Red Stack), and the save as it is on disk. Read only: nothing is written, neither in the game nor in the save.",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "Not seen here: items created by a RED-format <code>.tweak</code> file, by CET Lua or by Redscript; records that are neither weapons, clothing nor cyberware (parts, attachments, recipes, appearances, NPCs).",
+ "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "No save found in {0}. The folder is set in “Settings”, section “Saves folder”.",
+ "Sauvegarde {0} illisible : {1}": "Save {0} unreadable: {1}",
+ "{0} : {1} sur {2}": "{0}: {1} of {2}",
+ "{n} mod sur {0}, {1} montrés : affinez par une sorte, une puce ou le champ de filtre.": {
+  "one": "{n} mod of {0}, {1} shown: narrow down by a kind, a chip or the filter field.",
+  "other": "{n} mods of {0}, {1} shown: narrow down by a kind, a chip or the filter field."
+ },
+ "{n} mod sur {0}.": {
+  "one": "{n} mod of {0}.",
+  "other": "{n} mods of {0}."
+ },
+ "Détail du mod": "Mod detail",
+ "pas dans cette sauvegarde": "not in this save",
+ "Dossier des parties": "Saves folder",
+ "Les sauvegardes de Cyberpunk 2077, lues par l'onglet « Objets ». Red Stack les lit, il n'y écrit jamais.": "The Cyberpunk 2077 saves, read by the “Items” tab. Red Stack reads them, it never writes to them.",
+ "{n} mod sans objet possédé": {
+  "one": "{n} mod with no item owned",
+  "other": "{n} mods with no item owned"
+ },
+ "{n} mod utilisé en partie": {
+  "one": "{n} mod partly used",
+  "other": "{n} mods partly used"
+ },
+ "{n} mod entièrement possédé": {
+  "one": "{n} mod fully owned",
+  "other": "{n} mods fully owned"
+ },
+ "{0} sur {n} objet possédé": {
+  "one": "{0} of {n} item owned",
+  "other": "{0} of {n} items owned"
+ },
+ "bloc LZ4 illisible": "unreadable LZ4 block",
+ "Aucune sauvegarde dans {0} : réglage « Dossier des parties ».": "No save in {0}: setting “Saves folder”.",
+ "pas une sauvegarde de Cyberpunk 2077": "not a Cyberpunk 2077 save",
+ "sauvegarde d'une version du jeu d'avant la 2.0 : format non lu": "save from a game version before 2.0: format not read",
+ "table des nœuds introuvable": "node table not found",
+ "table de compression introuvable": "compression table not found",
+ "inventaire introuvable": "inventory not found",
+ "structure non comprise": "structure not understood",
+ "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "Save {0} ({1}), items of the profile's mods owned (V, stash, wardrobe): {2} of {3}",
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Save not found: {0} (saves folder: {1})"
 }

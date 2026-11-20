@@ -2097,5 +2097,75 @@
  "Changer le nom du fichier zip dans le dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "Mudar o nome do arquivo zip no repositório. O perfil, a árvore do armazém e o registro acompanham; o jogo não é tocado.",
  "Renommer le zip…": "Renomear o zip…",
  "Red Stack : nom du zip": "Red Stack: nome do zip",
- "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "Novo nome do arquivo, com a extensão .zip. Manter o número do Nexus no nome mantém as atualizações e os requisitos lidos no Nexus."
+ "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "Novo nome do arquivo, com a extensão .zip. Manter o número do Nexus no nome mantém as atualizações e os requisitos lidos no Nexus.",
+ "Red Stack · Objets": "Red Stack · Itens",
+ "Objets": "Itens",
+ "face à une sauvegarde": "frente a um jogo salvo",
+ "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Armas, roupas e implantes dos mods: o que é usado em um jogo salvo e o que não é",
+ "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Armas, roupas e implantes dos mods, frente a um jogo salvo: o que está com V, no esconderijo ou no guarda-roupa, e o que não é usado. Abre em uma aba própria. Somente leitura.",
+ "Filtrer : mod ou objet…": "Filtrar: mod ou item…",
+ "Filtrer par mod ou par nom d'objet": "Filtrar por mod ou por nome de item",
+ "Armes": "Armas",
+ "arme": "arma",
+ "Vêtements": "Roupas",
+ "vêtement": "roupa",
+ "Implants": "Implantes",
+ "implant": "implante",
+ "sur V": "com V",
+ "dans la planque": "no esconderijo",
+ "dans la garde-robe": "no guarda-roupa",
+ "La lecture des objets a échoué (message en haut de l'onglet).": "A leitura dos itens falhou (mensagem no topo da aba).",
+ "Lecture des tweaks du profil et de la sauvegarde… La première fois, quelques dizaines de secondes ; ensuite quelques secondes.": "Lendo os tweaks do perfil e o jogo salvo… Na primeira vez, algumas dezenas de segundos; depois, alguns segundos.",
+ "niveau {0}": "nível {0}",
+ "Sauvegarde": "Jogo salvo",
+ "Le dossier des sauvegardes se règle dans « Réglages », section « Dossier des parties »": "A pasta dos jogos salvos é definida em “Configurações”, seção “Pasta dos jogos salvos”",
+ "Dossier des parties…": "Pasta dos jogos salvos…",
+ "Aucun de leurs objets n'est sur V, dans la planque ni dans la garde-robe de cette sauvegarde. Le clic ne montre qu'eux ; un second clic revient à tous.": "Nenhum dos itens deles está com V, no esconderijo nem no guarda-roupa deste jogo salvo. O clique mostra só eles; um segundo clique volta a todos.",
+ "Une partie de leurs objets est possédée, le reste non.": "Parte dos itens deles está em posse, o resto não.",
+ "Tous leurs objets sont possédés.": "Todos os itens deles estão em posse.",
+ "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "Arquivos de tweaks que esta visão não conseguiu ler: seus possíveis itens não são contados.",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>Em posse</b>: com V, no esconderijo ou no guarda-roupa deste jogo salvo. Um mod sem nenhum item em posse fica no topo da lista.",
+ "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "A visão lê os tweaks que o perfil quer no jogo (mais os instalados fora do Red Stack) e o jogo salvo tal como está no disco. Somente leitura: nada é gravado, nem no jogo nem no jogo salvo.",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "Não vistos aqui: os itens criados por um arquivo <code>.tweak</code> no formato RED, por Lua do CET ou por Redscript; os registros que não são armas, nem roupas, nem implantes (peças, acessórios, receitas, aparências, NPCs).",
+ "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "Nenhum jogo salvo encontrado em {0}. A pasta é definida em “Configurações”, seção “Pasta dos jogos salvos”.",
+ "Sauvegarde {0} illisible : {1}": "Jogo salvo {0} ilegível: {1}",
+ "{0} : {1} sur {2}": "{0}: {1} de {2}",
+ "{n} mod sur {0}, {1} montrés : affinez par une sorte, une puce ou le champ de filtre.": {
+  "one": "{n} mod de {0}, {1} mostrados: refine por uma categoria, uma etiqueta ou pelo campo de filtro.",
+  "other": "{n} mods de {0}, {1} mostrados: refine por uma categoria, uma etiqueta ou pelo campo de filtro."
+ },
+ "{n} mod sur {0}.": {
+  "one": "{n} mod de {0}.",
+  "other": "{n} mods de {0}."
+ },
+ "Détail du mod": "Detalhe do mod",
+ "pas dans cette sauvegarde": "não está neste jogo salvo",
+ "Dossier des parties": "Pasta dos jogos salvos",
+ "Les sauvegardes de Cyberpunk 2077, lues par l'onglet « Objets ». Red Stack les lit, il n'y écrit jamais.": "Os jogos salvos do Cyberpunk 2077, lidos pela aba “Itens”. O Red Stack os lê, nunca grava neles.",
+ "{n} mod sans objet possédé": {
+  "one": "{n} mod sem item em posse",
+  "other": "{n} mods sem item em posse"
+ },
+ "{n} mod utilisé en partie": {
+  "one": "{n} mod usado em parte",
+  "other": "{n} mods usados em parte"
+ },
+ "{n} mod entièrement possédé": {
+  "one": "{n} mod totalmente em posse",
+  "other": "{n} mods totalmente em posse"
+ },
+ "{0} sur {n} objet possédé": {
+  "one": "{0} de {n} item em posse",
+  "other": "{0} de {n} itens em posse"
+ },
+ "bloc LZ4 illisible": "bloco LZ4 ilegível",
+ "Aucune sauvegarde dans {0} : réglage « Dossier des parties ».": "Nenhum jogo salvo em {0}: configuração “Pasta dos jogos salvos”.",
+ "pas une sauvegarde de Cyberpunk 2077": "não é um jogo salvo do Cyberpunk 2077",
+ "sauvegarde d'une version du jeu d'avant la 2.0 : format non lu": "jogo salvo de uma versão do jogo anterior à 2.0: formato não lido",
+ "table des nœuds introuvable": "tabela de nós não encontrada",
+ "table de compression introuvable": "tabela de compressão não encontrada",
+ "inventaire introuvable": "inventário não encontrado",
+ "structure non comprise": "estrutura não compreendida",
+ "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "Jogo salvo {0} ({1}), itens dos mods do perfil em posse (V, esconderijo, guarda-roupa): {2} de {3}",
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Jogo salvo não encontrado: {0} (pasta dos jogos salvos: {1})"
 }

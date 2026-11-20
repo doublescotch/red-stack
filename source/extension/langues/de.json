@@ -2097,5 +2097,75 @@
  "Changer le nom du fichier zip dans le dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "Den Namen der Zip-Datei im Depot ändern. Profil, Baum im Lager und Register folgen; das Spiel wird nicht angefasst.",
  "Renommer le zip…": "Zip umbenennen…",
  "Red Stack : nom du zip": "Red Stack: Name des Zips",
- "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "Neuer Name der Datei, mit der Endung .zip. Bleibt die Nexus-Nummer im Namen, bleiben auch die Updates und die auf Nexus gelesenen Voraussetzungen erhalten."
+ "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "Neuer Name der Datei, mit der Endung .zip. Bleibt die Nexus-Nummer im Namen, bleiben auch die Updates und die auf Nexus gelesenen Voraussetzungen erhalten.",
+ "Red Stack · Objets": "Red Stack · Gegenstände",
+ "Objets": "Gegenstände",
+ "face à une sauvegarde": "mit einem Spielstand abgeglichen",
+ "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Waffen, Kleidung und Cyberware aus Mods: was in einem Spielstand genutzt wird und was nicht",
+ "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Waffen, Kleidung und Cyberware aus Mods, mit einem Spielstand abgeglichen: was bei V, im Versteck oder im Kleiderschrank ist, und was nicht genutzt wird. Öffnet sich in einem eigenen Reiter. Schreibgeschützt.",
+ "Filtrer : mod ou objet…": "Filtern: Mod oder Gegenstand…",
+ "Filtrer par mod ou par nom d'objet": "Nach Mod oder Gegenstandsname filtern",
+ "Armes": "Waffen",
+ "arme": "Waffe",
+ "Vêtements": "Kleidung",
+ "vêtement": "Kleidung",
+ "Implants": "Cyberware",
+ "implant": "Cyberware",
+ "sur V": "bei V",
+ "dans la planque": "im Versteck",
+ "dans la garde-robe": "im Kleiderschrank",
+ "La lecture des objets a échoué (message en haut de l'onglet).": "Das Lesen der Gegenstände ist fehlgeschlagen (Meldung oben im Reiter).",
+ "Lecture des tweaks du profil et de la sauvegarde… La première fois, quelques dizaines de secondes ; ensuite quelques secondes.": "Tweaks des Profils und Spielstand werden gelesen… Beim ersten Mal einige Dutzend Sekunden; danach einige Sekunden.",
+ "niveau {0}": "Level {0}",
+ "Sauvegarde": "Spielstand",
+ "Le dossier des sauvegardes se règle dans « Réglages », section « Dossier des parties »": "Der Ordner der Spielstände wird in „Einstellungen“ festgelegt, Abschnitt „Spielstand-Ordner“",
+ "Dossier des parties…": "Spielstand-Ordner…",
+ "Aucun de leurs objets n'est sur V, dans la planque ni dans la garde-robe de cette sauvegarde. Le clic ne montre qu'eux ; un second clic revient à tous.": "Keiner ihrer Gegenstände ist bei V, im Versteck oder im Kleiderschrank dieses Spielstands. Der Klick zeigt nur diese; ein zweiter Klick kehrt zu allen zurück.",
+ "Une partie de leurs objets est possédée, le reste non.": "Ein Teil ihrer Gegenstände ist im Besitz, der Rest nicht.",
+ "Tous leurs objets sont possédés.": "Alle ihre Gegenstände sind im Besitz.",
+ "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "Tweak-Dateien, die diese Ansicht nicht lesen konnte: Ihre etwaigen Gegenstände werden nicht gezählt.",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>Im Besitz</b>: bei V, im Versteck oder im Kleiderschrank dieses Spielstands. Ein Mod, von dessen Gegenständen keiner im Besitz ist, steht oben in der Liste.",
+ "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "Die Ansicht liest die Tweaks, die das Profil im Spiel will (plus die außerhalb von Red Stack installierten), und den Spielstand so, wie er auf dem Datenträger liegt. Schreibgeschützt: Nichts wird geschrieben, weder ins Spiel noch in den Spielstand.",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "Hier nicht erfasst: Gegenstände, die von einer <code>.tweak</code>-Datei im RED-Format, von CET-Lua oder von Redscript erstellt werden; Datensätze, die weder Waffen noch Kleidung noch Cyberware sind (Teile, Aufsätze, Rezepte, Erscheinungsbilder, NPCs).",
+ "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "Kein Spielstand in {0} gefunden. Der Ordner wird in „Einstellungen“ festgelegt, Abschnitt „Spielstand-Ordner“.",
+ "Sauvegarde {0} illisible : {1}": "Spielstand {0} unlesbar: {1}",
+ "{0} : {1} sur {2}": "{0}: {1} von {2}",
+ "{n} mod sur {0}, {1} montrés : affinez par une sorte, une puce ou le champ de filtre.": {
+  "one": "{n} Mod von {0}, {1} angezeigt: mit einem Typ, einem Chip oder dem Filterfeld eingrenzen.",
+  "other": "{n} Mods von {0}, {1} angezeigt: mit einem Typ, einem Chip oder dem Filterfeld eingrenzen."
+ },
+ "{n} mod sur {0}.": {
+  "one": "{n} Mod von {0}.",
+  "other": "{n} Mods von {0}."
+ },
+ "Détail du mod": "Mod-Details",
+ "pas dans cette sauvegarde": "nicht in diesem Spielstand",
+ "Dossier des parties": "Spielstand-Ordner",
+ "Les sauvegardes de Cyberpunk 2077, lues par l'onglet « Objets ». Red Stack les lit, il n'y écrit jamais.": "Die Spielstände von Cyberpunk 2077, gelesen vom Reiter „Gegenstände“. Red Stack liest sie, schreibt aber nie hinein.",
+ "{n} mod sans objet possédé": {
+  "one": "{n} Mod ohne Gegenstand im Besitz",
+  "other": "{n} Mods ohne Gegenstand im Besitz"
+ },
+ "{n} mod utilisé en partie": {
+  "one": "{n} Mod teilweise genutzt",
+  "other": "{n} Mods teilweise genutzt"
+ },
+ "{n} mod entièrement possédé": {
+  "one": "{n} Mod vollständig im Besitz",
+  "other": "{n} Mods vollständig im Besitz"
+ },
+ "{0} sur {n} objet possédé": {
+  "one": "{0} von {n} Gegenstand im Besitz",
+  "other": "{0} von {n} Gegenständen im Besitz"
+ },
+ "bloc LZ4 illisible": "unlesbarer LZ4-Block",
+ "Aucune sauvegarde dans {0} : réglage « Dossier des parties ».": "Kein Spielstand in {0}: Einstellung „Spielstand-Ordner“.",
+ "pas une sauvegarde de Cyberpunk 2077": "kein Spielstand von Cyberpunk 2077",
+ "sauvegarde d'une version du jeu d'avant la 2.0 : format non lu": "Spielstand einer Spielversion vor 2.0: Format nicht gelesen",
+ "table des nœuds introuvable": "Knotentabelle nicht gefunden",
+ "table de compression introuvable": "Kompressionstabelle nicht gefunden",
+ "inventaire introuvable": "Inventar nicht gefunden",
+ "structure non comprise": "Struktur nicht verstanden",
+ "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "Spielstand {0} ({1}), Gegenstände der Profil-Mods im Besitz (V, Versteck, Kleiderschrank): {2} von {3}",
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Spielstand nicht gefunden: {0} (Spielstand-Ordner: {1})"
 }

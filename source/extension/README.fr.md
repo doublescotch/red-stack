@@ -33,6 +33,11 @@ bibliothèque : Red Stack lit les zips là où vous les rangez, ne les copie pas
   sans action), des puces par sorte, un filtre, et chaque ligne ouvre le fichier à la bonne
   ligne. Le « dernier mot » annoncé est prévu d'après l'ordre des noms de fichiers, pas observé
   dans le jeu. Détection reprise de Conflict Studio (MIT). Lecture seule.
+- « Objets » : une analyse à part, qui lit une sauvegarde de partie. Pour chaque mod du profil,
+  les armes, vêtements et implants que créent ses tweaks TweakXL, et si la sauvegarde les tient :
+  sur V, dans la planque ou dans la garde-robe. Les mods dont aucun objet n'est possédé viennent
+  en tête : de quoi repérer les mods d'objets qui ne servent pas. La sauvegarde est lue, jamais
+  écrite (format d'après WolvenKit, MIT).
 - « Arrivages » : les archives des dossiers d'arrivée, les noms au format de l'application Nexus
   et les `.7z` / `.rar`. Red Stack propose le nom du site Nexus (`Nom-modId-version-horodatage`,
   lu par l'API publique de Nexus), vous le retouchez puis vous renommez ; il convertit en `.zip`
@@ -114,7 +119,7 @@ Elle propose ensuite de lire le jeu pour créer le profil « actuel » ; cette l
 Le bouton « Réglages » de la page règle tout ce que l'outil retient :
 
 - les dossiers : dépôt, jeu, magasin (un arbre extrait par mod, lié au jeu), sauvegardes,
-  référence du jeu, journal ;
+  référence du jeu, parties du jeu (lues par « Objets »), journal ;
 - la convention de votre dépôt : quels dossiers sont des piles, lesquels sont parqués, nouveaux,
   retirés, quels dossiers d'un zip ne sont jamais posés ;
 - les fichiers de réglages des mods, copiés au lieu d'être liés pour survivre aux mises à jour ;
@@ -164,7 +169,7 @@ que nous recommandons avec ces thèmes.
 
 ## Pilotage par une session Claude Code
 
-Le paquet porte un serveur MCP (27 outils) : une session lit l'état, les conflits, l'historique,
+Le paquet porte un serveur MCP (28 outils) : une session lit l'état, les conflits, l'historique,
 les arrivages et les mises à jour proposées, change un profil et prépare un plan. Elle n'écrit ni
 le jeu ni le dépôt de zips : parquer, renommer, télécharger restent vos gestes, dans la page.
 Pour le jeu, elle dépose une demande, que cette extension vous montre (plan

@@ -323,6 +323,18 @@
 <div class="note garde">The “<b>last word predicted</b>” is deduced from the order of the file names. It is not observed in the game: take it as an indication. Not analysed: the Lua overlaps of CET (<code>Override</code>, <code>Observe</code>) and the <code>.tweak</code> files of the old format. Detection taken from Conflict Studio (MIT licence).</div>
 </section>
 
+<section id="objets" data-groupe="Analyses">
+<h2>Mod items against a save</h2>
+<p><b class="b">Items</b> opens an analysis of its own: for each mod of the profile, the weapons, clothing and cyberware it adds to the game, and what a game save holds of them. A way to spot the item mods that are not used. Read only: nothing is written, neither in the game nor in the save.</p>
+<ul>
+<li>The list at the top picks the save; by default, the most recent one of the <b>saves folder</b> (see <a href="#reglages">Settings</a>).</li>
+<li>An item is <b>owned</b> if it is on V, in the stash or in the wardrobe. The wardrobe remembers a piece of clothing even once sold: it can still be worn as an appearance.</li>
+<li>The chips count the mods with no item owned (first in the list), those partly used and those fully owned; a click shows only them. The kind buttons keep the weapons, the clothing or the cyberware.</li>
+<li>An unfolded row lists the items of the mod, each with where the save holds it. A click on <code>file:line</code> opens the tweak that creates it; “Mod detail” opens its detail.</li>
+</ul>
+<div class="note garde">Items are read from the profile's TweakXL tweaks (<code>.yaml</code>). Not seen: items created by a <code>.tweak</code> file of the old format, by CET Lua or by Redscript. The kind of an item is deduced from what its record says about itself, then from the name of its base in the game: a rare base can stay out of the list. The save is read after the format described by WolvenKit (MIT licence), for game 2.0 and later.</div>
+</section>
+
 <section id="historique" data-groupe="Tracking">
 <h2>History</h2>
 <p><b class="b">History</b> opens a panel: what Red Stack has written, action by action, from the most recent to the oldest.</p>
@@ -368,6 +380,7 @@
 <ul>
 <li><b>Repository</b> and <b>game</b>: the only two that are required.</li>
 <li><b>Store</b> and <b>game reference</b>: left empty, they are placed next to the game folder (“… - Red Stack”, “… - Référence”). <b>Backups</b> and <b>log</b>: left empty, they go to the data folder.</li>
+<li><b>Saves folder</b>: the game saves, read by <a href="#objets">the Items tab</a>, never written. Left empty: the game's folder in “Saved Games”.</li>
 <li><b>New zips</b>: unticked by default, a zip that arrived in a stack is left for you to tick. Ticked, it is enabled by default: all that remains is to apply.</li>
 </ul>
 <h3>Repository convention</h3>

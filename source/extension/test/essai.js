@@ -43,7 +43,7 @@ const faux = {
     createStatusBarItem: () => ({ show() { etat.barre = true; }, hide() { etat.barre = false; }, dispose() {} }),
     createTreeView: (id, o) => { etat.arbre = o.treeDataProvider; return { onDidChangeVisibility: (f) => { etat.vue = f; }, dispose() {} }; },
     createWebviewPanel: (type) => { etat.crees = (etat.crees || 0) + 1; etat.dernier = fauxPanneau(); etat.dernier.type = type; return etat.dernier; },
-    registerWebviewPanelSerializer: (type, s) => { if (type === 'redStack') etat.serialiseur = s; else if (type === 'redStackCode') etat.serialiseurCode = s; else if (type === 'redStackAide') etat.serialiseurAide = s; else etat.serialiseurAnalyse = s; return { dispose() {} }; },
+    registerWebviewPanelSerializer: (type, s) => { if (type === 'redStack') etat.serialiseur = s; else if (type === 'redStackCode') etat.serialiseurCode = s; else if (type === 'redStackAide') etat.serialiseurAide = s; else if (type === 'redStackObjets') etat.serialiseurObjets = s; else etat.serialiseurAnalyse = s; return { dispose() {} }; },
     onDidChangeWindowState: (f) => { etat.fenetre = f; return { dispose() {} }; },
     registerUriHandler: (g) => { etat.adresse = g.handleUri; return { dispose() {} }; },
     showWarningMessage: async (texte, opt) => { modales.push({ texte, detail: opt.detail }); return reponse; },
@@ -263,6 +263,18 @@ const instantane = () => {
       (dbl.jete === true || /class="analyse"/.test(dbl.webview.html)) && dbl2.jete === true);
     if (!dbl.jete) dbl.ferme();
     versPage = pagePrincipale;
+    const ob = fauxPanneau(), ob2 = fauxPanneau();       // l'onglet « Objets » rouvert : la même page, corps marqué « objets »
+    await etat.serialiseurObjets.deserializeWebviewPanel(ob, undefined);
+    await etat.serialiseurObjets.deserializeWebviewPanel(ob2, undefined);
+    controle("onglet « Objets » rouvert par VS Code : page d'analyse « objets », un doublon est fermé",
+      /class="analyse objets"/.test(ob.webview.html) && ob2.jete === true && !!etat.serialiseurAnalyse && !!etat.serialiseurCode);
+    ob.ferme();
+    versPage = pagePrincipale;
+    nr = recus.length;
+    await pagePrincipale({ t: 'objets', partie: '' });
+    const ob3 = (await attend('objets', nr)).data;
+    controle("« Objets » : le moteur répond, dossier des parties dit, liste des mods (rien n'est écrit)",
+      ob3 && typeof ob3.dossier === 'string' && Array.isArray(ob3.mods) && Array.isArray(ob3.parties), ob3);
     const profilAvant = fs.readFileSync(path.join(DONNEES, 'profils', 't.json'), 'utf8'), jeuAvant = instantane();
     const alpha = cf.data.ordre.find((a) => a.genre === 'mod' && a.zip).zip;
     nr = recus.length;

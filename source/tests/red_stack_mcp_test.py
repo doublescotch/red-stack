@@ -59,8 +59,8 @@ check("initialize rend la version demandée et le nom du serveur",
       r["result"]["protocolVersion"] == "2025-06-18" and r["result"]["serverInfo"]["name"] == "red-stack", r)
 rpc("notifications/initialized", notif=True)
 tools = rpc("tools/list")["result"]["tools"]
-check("tools/list : 27 outils, tous avec un schéma objet",
-      len(tools) == 27 and all(t["inputSchema"]["type"] == "object" for t in tools), len(tools))
+check("tools/list : 28 outils, tous avec un schéma objet",
+      len(tools) == 28 and all(t["inputSchema"]["type"] == "object" for t in tools), len(tools))
 check("ping répond", rpc("ping")["result"] == {})
 check("méthode inconnue = erreur -32601", rpc("nimporte")["error"]["code"] == -32601)
 r = rpc("tools/call", {"name": "red_stack_inexistant", "arguments": {}})
@@ -181,6 +181,11 @@ r, err = call("red_stack_mises_a_jour", ignore="on")
 check("mises à jour : ignore sans cle = erreur d'outil", err and "cle" in r, r)
 j, err = call("red_stack_journal", geste="maj", limite=3)
 check("journal : le geste « maj » est accepté", not err and isinstance(j["entrees"], list), j)
+o, err = call("red_stack_objets", profil="mcp", sorte="vetement", sans_objet_possede=True)
+check("objets : réponse lisible sans sauvegarde à lire (dossier dit, comptes, mods filtrés par sorte)",
+      not err and "dossier" in o and isinstance(o["mods"], list) and all(x["possedes"] == 0 for x in o["mods"]), o)
+o, err = call("red_stack_objets", profil="mcp", partie="Aucune-Sauvegarde")
+check("objets : sauvegarde inconnue = erreur dite", err and "Aucune-Sauvegarde" in o, o)
 check("LE JEU N'A PAS BOUGÉ pendant ces lectures", snapshot() == before)
 check("LE DÉPÔT N'A PAS BOUGÉ (aucun zip créé, renommé ni récrit par le serveur)",
       depot_avant == sorted((os.path.relpath(os.path.join(d, f), DEPOT), os.path.getsize(os.path.join(d, f))) for d, _, fs in os.walk(DEPOT) for f in fs))

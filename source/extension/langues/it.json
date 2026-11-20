@@ -2097,5 +2097,75 @@
  "Changer le nom du fichier zip dans le dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "Cambia il nome del file zip nel repository. Il profilo, l'albero del magazzino e il registro seguono; il gioco non viene toccato.",
  "Renommer le zip…": "Rinomina lo zip…",
  "Red Stack : nom du zip": "Red Stack: nome dello zip",
- "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "Nuovo nome del file, con l'estensione .zip. Mantenere il numero Nexus nel nome mantiene gli aggiornamenti e i requisiti letti su Nexus."
+ "Nouveau nom du fichier, avec son extension .zip. Garder le numéro Nexus dans le nom garde les mises à jour et les prérequis lus sur Nexus.": "Nuovo nome del file, con l'estensione .zip. Mantenere il numero Nexus nel nome mantiene gli aggiornamenti e i requisiti letti su Nexus.",
+ "Red Stack · Objets": "Red Stack · Oggetti",
+ "Objets": "Oggetti",
+ "face à une sauvegarde": "a confronto con un salvataggio",
+ "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Armi, abbigliamento e impianti dei mod: ciò che serve in un salvataggio e ciò che non serve",
+ "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Armi, abbigliamento e impianti dei mod, a confronto con un salvataggio: ciò che è su V, nel deposito o nel guardaroba, e ciò che non serve. Si apre in una scheda dedicata. Sola lettura.",
+ "Filtrer : mod ou objet…": "Filtra: mod o oggetto…",
+ "Filtrer par mod ou par nom d'objet": "Filtra per mod o per nome di oggetto",
+ "Armes": "Armi",
+ "arme": "arma",
+ "Vêtements": "Abbigliamento",
+ "vêtement": "indumento",
+ "Implants": "Impianti",
+ "implant": "impianto",
+ "sur V": "su V",
+ "dans la planque": "nel deposito",
+ "dans la garde-robe": "nel guardaroba",
+ "La lecture des objets a échoué (message en haut de l'onglet).": "La lettura degli oggetti non è riuscita (messaggio in cima alla scheda).",
+ "Lecture des tweaks du profil et de la sauvegarde… La première fois, quelques dizaines de secondes ; ensuite quelques secondes.": "Lettura dei tweak del profilo e del salvataggio… La prima volta, qualche decina di secondi; poi qualche secondo.",
+ "niveau {0}": "livello {0}",
+ "Sauvegarde": "Salvataggio",
+ "Le dossier des sauvegardes se règle dans « Réglages », section « Dossier des parties »": "La cartella dei salvataggi si imposta in «Impostazioni», sezione «Cartella dei salvataggi»",
+ "Dossier des parties…": "Cartella dei salvataggi…",
+ "Aucun de leurs objets n'est sur V, dans la planque ni dans la garde-robe de cette sauvegarde. Le clic ne montre qu'eux ; un second clic revient à tous.": "Nessuno dei loro oggetti è su V, nel deposito o nel guardaroba di questo salvataggio. Il clic mostra solo questi; un secondo clic torna a tutti.",
+ "Une partie de leurs objets est possédée, le reste non.": "Una parte dei loro oggetti è posseduta, il resto no.",
+ "Tous leurs objets sont possédés.": "Tutti i loro oggetti sono posseduti.",
+ "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "File di tweak che questa vista non ha potuto leggere: i loro eventuali oggetti non vengono contati.",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>Posseduto</b>: su V, nel deposito o nel guardaroba di questo salvataggio. Un mod di cui nessun oggetto è posseduto è in cima all'elenco.",
+ "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "La vista legge i tweak che il profilo vuole nel gioco (più quelli installati fuori da Red Stack) e il salvataggio così com'è sul disco. Sola lettura: nulla viene scritto, né nel gioco né nel salvataggio.",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "Non visti qui: gli oggetti creati da un file <code>.tweak</code> in formato RED, da Lua di CET o da Redscript; i record che non sono né armi, né abbigliamento, né impianti (componenti, accessori, ricette, aspetti, PNG).",
+ "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "Nessun salvataggio trovato in {0}. La cartella si imposta in «Impostazioni», sezione «Cartella dei salvataggi».",
+ "Sauvegarde {0} illisible : {1}": "Salvataggio {0} illeggibile: {1}",
+ "{0} : {1} sur {2}": "{0}: {1} di {2}",
+ "{n} mod sur {0}, {1} montrés : affinez par une sorte, une puce ou le champ de filtre.": {
+  "one": "{n} mod su {0}, {1} mostrati: restringere per categoria, per etichetta o con il campo filtro.",
+  "other": "{n} mod su {0}, {1} mostrati: restringere per categoria, per etichetta o con il campo filtro."
+ },
+ "{n} mod sur {0}.": {
+  "one": "{n} mod su {0}.",
+  "other": "{n} mod su {0}."
+ },
+ "Détail du mod": "Dettagli del mod",
+ "pas dans cette sauvegarde": "non in questo salvataggio",
+ "Dossier des parties": "Cartella dei salvataggi",
+ "Les sauvegardes de Cyberpunk 2077, lues par l'onglet « Objets ». Red Stack les lit, il n'y écrit jamais.": "I salvataggi di Cyberpunk 2077, letti dalla scheda «Oggetti». Red Stack li legge, non vi scrive mai.",
+ "{n} mod sans objet possédé": {
+  "one": "{n} mod senza oggetti posseduti",
+  "other": "{n} mod senza oggetti posseduti"
+ },
+ "{n} mod utilisé en partie": {
+  "one": "{n} mod usato in parte",
+  "other": "{n} mod usati in parte"
+ },
+ "{n} mod entièrement possédé": {
+  "one": "{n} mod posseduto interamente",
+  "other": "{n} mod posseduti interamente"
+ },
+ "{0} sur {n} objet possédé": {
+  "one": "{0} di {n} oggetto posseduto",
+  "other": "{0} di {n} oggetti posseduti"
+ },
+ "bloc LZ4 illisible": "blocco LZ4 illeggibile",
+ "Aucune sauvegarde dans {0} : réglage « Dossier des parties ».": "Nessun salvataggio in {0}: impostazione «Cartella dei salvataggi».",
+ "pas une sauvegarde de Cyberpunk 2077": "non è un salvataggio di Cyberpunk 2077",
+ "sauvegarde d'une version du jeu d'avant la 2.0 : format non lu": "salvataggio di una versione del gioco precedente alla 2.0: formato non letto",
+ "table des nœuds introuvable": "tabella dei nodi non trovata",
+ "table de compression introuvable": "tabella di compressione non trovata",
+ "inventaire introuvable": "inventario non trovato",
+ "structure non comprise": "struttura non compresa",
+ "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "Salvataggio {0} ({1}), oggetti dei mod del profilo posseduti (V, deposito, guardaroba): {2} di {3}",
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Salvataggio non trovato: {0} (cartella dei salvataggi: {1})"
 }
