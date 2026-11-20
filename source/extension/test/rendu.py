@@ -32,6 +32,9 @@ if maj["lignes"]:                           # une ligne ignorée d'exemple, pour
     maj["lignes"][-1] = dict(maj["lignes"][-1], ignore=True)
 cfr = rs("conflits", "--ressources")
 objets = rs("objets")                      # objets des mods face à la sauvegarde la plus récente (lue, jamais écrite)
+dep = rs("prerequis")                       # « Dépendances » : prérequis du dépôt (socles), puis la chaîne de CET (ou d'un cadre du jeu)
+_cet = next((c for c in dep["cadres"] if c["cadre"] == "cet"), {"par": []})["par"]
+chaine = rs("prerequis", "--mod", _cet[0], "--chute") if _cet else rs("prerequis", "--cadre", "redscript", "--chute")
 code = rs("scripts")                        # conflits de code : tout ce qui est à regarder ou à revoir, soixante « sans action » pour la capture
 code["trouvailles"] = ([t for t in code["trouvailles"] if t["niveau"] in ("attention", "revoir")]
                        + [t for t in code["trouvailles"] if t["niveau"] not in ("attention", "revoir")][:60])
@@ -56,7 +59,10 @@ detail_req["actif"] = False
 detail_req["prerequis"] = dict(detail_req["prerequis"], nexus="jamais lu", requis_par=[_z[0]], requis_par_actifs=1,
                                requis=detail_req["prerequis"]["requis"] + [_cadre, {"cadre": None, "mod": 0, "nom": "ReShade", "notes": "Download and install it", "url": "https://reshade.me/",
                                                                                      "sources": ["nexus"], "par": [], "etat": "externe", "optionnel": False, "ident": "x:reshade", "ignore": False},
-                                                                                    dict(_cadre, nom="Codeware", cadre="codeware", ident="c:codeware", ignore=True)])
+                                                                                    dict(_cadre, nom="Codeware", cadre="codeware", ident="c:codeware", ignore=True),
+                                                                                    dict(_cadre, nom="RedFunctions", cadre=None, mod=0, ident="r:redfunctions|", sources=["code"], etat="coupé",
+                                                                                         souple=False, usages=4, preuves=[{"fichier": "r6/scripts/Exemple/Main.reds", "ligne": 3, "genre": "i",
+                                                                                                                           "cible": "RedFunctions.Storage", "souple": False, "zip": ""}])])
 # dépôt sans arrivage (dossiers d'arrivée vides) : une ligne d'exemple, tirée d'un zip rangé du dépôt, pour voir la vue
 if not any(not r["convertir"] for r in convention["lignes"]):
     import fnmatch                          # un zip rangé, pas un retiré : « Contenu… » refuse les zips des retirés
@@ -139,7 +145,10 @@ AILLEURS = {"en": {"liste": ["active mods out of", "Plan preview", "Fold / unfol
                    "objets": ["with no item owned", "Saves folder…", "Filter: mod or item", "Mod detail", "<b>Owned</b>", "Weapon attachments", "Equipment mods"], "detail": ["Pack options", "Show the zip", "Rename the content…"],
                    "plan": ["already in place", "Apply to the game…", "Plan of the profile", "mod disabled"], "arrivages": ["Wanted name", "Re-read Nexus", "File the update…"],
                    "maj": ["Zip of the repository", "New version", "free account", "Stop ignoring"], "fomod": ["Installer of “", "What the installer installs"],
-                   "prerequis": ["<h3>Requirements</h3>", "deduced from its files", "Read on Nexus", "⚠ requirement", "outside Nexus, not checked", "Required by 1 mod of the repository, 1 of them active"],
+                   "dependances": ["Here, the mods that the most active mods depend on", "Filter: mod…", "required by "],
+                   "chaine": ["← Foundations", "What falls without it", "What it needs", "Tier 1", "falls with: ", "Its chain", "Mod detail"],
+                   "graphe": ["Tier 1 · "],
+                   "prerequis": ["read in its code", "What falls without it…", "Everything it needs…", "<h3>Requirements</h3>", "deduced from its files", "Read on Nexus", "⚠ requirement", "outside Nexus, not checked", "Required by 1 mod of the repository, 1 of them active"],
                    "noms": ["In-game names of", "Author's name"], "ressource": ["per resource", "taken from", "lost by"],
                    "reglages": ["<legend>Language</legend>", "Automatic (VS Code: en)", "Settings backups", "Back up now", "Save", "<legend>Theme</legend>", "Current theme: <b>Red Stack Jaune</b>"]}}
 fails = []
@@ -171,6 +180,18 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
                              ['<body class="analyse objets conf"', "sans objet possédé", "Dossier des parties…", 'id="opartie"', 'data-ofiltre="aucun"',
                               'data-osorte="', "Filtrer : mod ou objet", "Détail du mod", 'data-ouvre="', "<b>Possédé</b>",
                               'data-osorte="accessoire"', 'data-osorte="module"', "Accessoires d'armes", "Mods d'équipement", "tweakdb.bin"]),
+                            ("dependances", "recoit({t:'dependances', data: D.dep});",
+                             ['<body class="analyse dependances conf"', "Ici, les mods dont dépendent le plus de mods actifs", 'class="socles"', 'data-ddepart="',
+                              "exigé par ", "mods actifs", "lu dans le code", "Filtrer : mod…"]),
+                            ("chaine", "recoit({t:'conflitsCible', cle: D.chaine.depart + '|chute'}); recoit({t:'dependances', data: D.dep}); recoit({t:'chaine', data: D.chaine});",
+                             ["← Socles", "Ce qui tombe sans lui", "Ce qu'il lui faut", "Palier 1", "tombe avec : ", "Sa chaîne", 'data-dsens="chute" class="on"',
+                              'data-dvue="graphe"', "ne se chargent plus.", "Détail du mod"]),
+                            ("graphe", "recoit({t:'conflitsCible', cle: D.chaine.depart + '|chute'}); recoit({t:'dependances', data: D.dep}); recoit({t:'chaine', data: D.chaine});"
+                                       "document.querySelector('[data-dvue=graphe]').click();"
+                                       "const g = document.querySelector('#conflits g.noeud[data-ddepart]'); g.dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));"
+                                       "document.title = 'graphe ' + document.querySelectorAll('#conflits g.noeud').length + ' mods, ' + document.querySelectorAll('#conflits path.lien').length + ' traits, '"
+                                       " + document.querySelectorAll('#conflits path.lien.lit').length + ' éclairé(s)';",
+                             ['<svg viewBox="0 0', 'class="noeud depart"', 'class="lien ferme"', 'class="palier"', 'data-dzoom="1.25"', 'data-dvue="graphe" class="on"']),
                             ("ordre", "document.querySelectorAll('#conflits details.arch summary').forEach((x, i) => { if (i < 4) x.click(); });",
                              ["Changer l'ordre", "Renommer dans le jeu…", "Passer de", 'data-sens="']),
                             ("paires", "document.querySelector('[data-grille=paires]').click();"
@@ -194,7 +215,8 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
                              ["Noms dans le jeu de", "Nom de l'auteur", "Dans le jeu", 'id="nmNote"', "data-nomde=", "Cité par son nom"]),
                             ("prerequis", "recoit({t:'detail', data: D.detailReq}); document.querySelector('button[data-filtre=prerequis]').click();",
                              ["<h3>Prérequis</h3>", "déduit de ses fichiers", "Lire sur Nexus", 'data-reqlit="', 'data-reqignore="c:tweakxl"', 'data-reqreprend="c:codeware"', "Exigé par 1 mod du dépôt, dont 1 actifs", "hors Nexus, non contrôlé", "Note de l'auteur : Download and install it",
-                              "⚠ prérequis", 'data-filtre="prerequis" class="on"', "1 mod actif exige ce mod, qui n'est pas actif.", 'class="pastille rouge"']),
+                              "⚠ prérequis", 'data-filtre="prerequis" class="on"', "1 mod actif exige ce mod, qui n'est pas actif.", 'class="pastille rouge"', "lu dans son code", "vu dans r6/scripts/Exemple/Main.reds, ligne 3 : RedFunctions.Storage", "3 autres usages",
+                              "Ce qui tombe sans lui…", "Tout ce qu'il lui faut…", 'data-depfen="']),
                             ("plan", "recoit({t:'plan', data: D.plan});", ["mod actif sans un de ses prérequis", "exige TweakXL (absent)", "Voir les fichiers", "déjà en place", "Appliquer au jeu", "Plan du profil", "mod coupé", "repris à l'identique", "déjà tenus avec un autre contenu", "fichiers communs repris de", "pris au registre pour un mod", "modlist.txt à écrire (1 ligne)"]),
                             ("tri", "for (const i of [1, 2]) document.querySelector('th[data-tri=taille]').click();"
                                     "document.querySelector('button[data-filtre=actifs]').click();",
@@ -289,7 +311,7 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
     if MAJ_VIDE and vue in ("plie_vues", "maj_verrou"):
         print(f"  --   {vue} : sans objet, aucune mise à jour à montrer dans ce dépôt")
         continue
-    stub = ("<script nonce=\"banc\">const D = " + json.dumps({"etat": etat, "profils": profils, "plan": plan, "detail": detail, "detailReq": detail_req, "conf": conf, "poste": poste, "conflits": conflits, "cfr": cfr, "code": code, "objets": objets, "convention": convention, "maj": maj, "majCompte": maj_compte, "contenu": contenu, "contenuCle": contenu_cle, "noms": noms, "journal": journal, "magasin": magasin, "sauve": sauve, "sauveCompare": sauve_compare, "fomod": fomod, "detailFo": detail_fo, "png": PNG, "majOccupe": maj_occupe, "nxm": nxm_etat}).replace("</", "<\\/")
+    stub = ("<script nonce=\"banc\">const D = " + json.dumps({"etat": etat, "profils": profils, "plan": plan, "detail": detail, "detailReq": detail_req, "conf": conf, "poste": poste, "conflits": conflits, "cfr": cfr, "code": code, "objets": objets, "dep": dep, "chaine": chaine, "convention": convention, "maj": maj, "majCompte": maj_compte, "contenu": contenu, "contenuCle": contenu_cle, "noms": noms, "journal": journal, "magasin": magasin, "sauve": sauve, "sauveCompare": sauve_compare, "fomod": fomod, "detailFo": detail_fo, "png": PNG, "majOccupe": maj_occupe, "nxm": nxm_etat}).replace("</", "<\\/")
             + ";\nconst recoit = (m) => window.dispatchEvent(new MessageEvent('message', {data: m}));\n"
             + "window.onerror = (m) => { document.title = 'ERREUR ' + m; };\n"
             + "const E_noms = () => recoit({t:'noms', cle: D.detail.cle, data: Object.assign({}, D.noms, {cle: D.detail.cle})});\n"
@@ -297,8 +319,8 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
             + "setTimeout(() => { recoit({t:'etat', data: D.etat, profils: D.profils}); recoit({t:'conflits', data: D.conflits}); " + suite + " }, 0); } }; }\n</script>\n")
     html = page.replace("<script nonce=\"banc\">\n(function () {", stub + "<script nonce=\"banc\">\n(function () {", 1)
     assert stub in html
-    if vue in ("plie_conflits", "conflits", "code", "objets", "ordre", "paires", "ressource", "puces", "identiques", "fichier"):   # l'onglet d'analyse : la même page, corps marqué par l'extension
-        html = html.replace("<body>", '<body class="analyse code">' if vue == "code" else '<body class="analyse objets">' if vue == "objets" else '<body class="analyse">', 1)
+    if vue in ("plie_conflits", "conflits", "code", "objets", "dependances", "chaine", "graphe", "ordre", "paires", "ressource", "puces", "identiques", "fichier"):   # l'onglet d'analyse : la même page, corps marqué par l'extension
+        html = html.replace("<body>", '<body class="analyse code">' if vue == "code" else '<body class="analyse objets">' if vue == "objets" else '<body class="analyse dependances">' if vue in ("dependances", "chaine", "graphe") else '<body class="analyse">', 1)
     f = os.path.join(OUT, vue + ".html")
     open(f, "w", encoding="utf-8").write(html)
     url = "file:///" + f.replace("\\", "/").replace(" ", "%20")
@@ -315,7 +337,7 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
     bad = [a for a in attendu if a not in text]
     title = re.search(r"<title>(.*?)</title>", text).group(1)
     # « fichier » : le champ de filtre vide aussi la liste, cachée dans cet onglet
-    ok = (rows > 100 or vue in ("fichier", "filtre_neufs", "filtre_parques") or (vue == "verrou" and rows > 50) or (vue == "prerequis" and rows > 0)) and not errs and not bad and not title.startswith("ERREUR")
+    ok = (rows > 100 or vue in ("fichier", "filtre_neufs", "filtre_parques", "graphe") or (vue == "verrou" and rows > 50) or (vue == "prerequis" and rows > 0)) and not errs and not bad and not title.startswith("ERREUR")
     print(("  ok   " if ok else "  KO   ") + f"{vue} : {rows} lignes de mods, {len(errs)} erreur(s) de console, manquants {bad}, titre « {title} »")
     for l in errs[:5]:
         print("       " + l[:300])

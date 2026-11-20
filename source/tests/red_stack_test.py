@@ -1810,5 +1810,86 @@ rs("profils", "--profil", "x", "--supprime")
 c = plan_counts()
 check("profil « t » intact après l'essai (29)", c["pose"] == c["remplace"] == c["retire"] == c["conflit"] == 0, str(c))
 
+# ---------------------------------------------------------------- 30. prérequis lus dans le code, chaîne de ce qui tombe et de ce qu'il faut
+print("30. prérequis lus dans le code (module importé, nom global, ModuleExists, GetMod, $base) ; chaîne d'un mod, dans les deux sens")
+D, CETM = "12_Deps/", "bin/x64/plugins/cyber_engine_tweaks/mods/"   # CETM : `CM` est repris par la section 23
+LIB, IMP, GLO, SOU, LUS, LUF, TWK, CH2, RED, UFT, AUT = (D + x for x in (
+    "Lib-8001-1-0-1700000801.zip", "Importe-8002-1-0-1700000802.zip", "Global-8003-1-0-1700000803.zip", "Souple-8004-1-0-1700000804.zip",
+    "Lua Teste-8005-1-0-1700000805.zip", "Lua Ferme-8006-1-0-1700000806.zip", "Tweak Base-8007-1-0-1700000807.zip", "Second-8008-1-0-1700000808.zip",
+    "Redeclare-8009-1-0-1700000809.zip", "Appelle Jeu-8010-1-0-1700000810.zip", "Autre Module-8011-1-0-1700000811.zip"))
+mkzip(LIB, {"r6/scripts/Lib/Lib.reds": "module LibMod\npublic class LibThing {\n  public func Go() -> Int32 { return 1; }\n}\n",
+            "r6/scripts/Lib/Global.reds": "// GlobalHelper en commentaire ne compte pas\npublic class GlobalHelper {\n}\n",
+            CETM + "libcet/init.lua": "return { go = function() end }\n",
+            "r6/tweaks/Lib/lib.yaml": "Items.LibBase:\n  $type: gamedataClothing_Record\n"})
+mkzip(IMP, {"r6/scripts/Imp/Imp.reds": "import LibMod.*\n\npublic class ImpThing {\n  let t: ref<LibThing>;\n}\n"})
+mkzip(GLO, {"r6/scripts/Glo/Glo.reds": "public class GloThing {\n  func F() -> Void {\n    let g = new GlobalHelper();\n  }\n}\n"})
+mkzip(SOU, {"r6/scripts/Sou/Sou.reds": "@if(ModuleExists(\"LibMod\"))\nimport LibMod.*\n\npublic class SouThing {\n}\n"})
+mkzip(LUS, {CETM + "luateste/init.lua": "local lib = GetMod(\"libcet\")\nif not lib then return end\nlib.go()\n"})
+mkzip(LUF, {CETM + "luaferme/init.lua": "local lib = GetMod(\"libcet\")\nlib.go()\n"})
+mkzip(TWK, {"r6/tweaks/Twk/twk.yaml": "Items.TwkItem:\n  $base: Items.LibBase\n"})
+mkzip(CH2, {"r6/scripts/Ch2/Ch2.reds": "public class SecondThing {\n  let i: ref<ImpThing>;\n}\n"})
+mkzip(RED, {"r6/scripts/Red/Red.reds": "public static func FTLog(s: String) -> Void {\n}\n"})
+mkzip(UFT, {"r6/scripts/Uft/Uft.reds": "public class UftThing {\n  func F() -> Void { FTLog(\"x\"); }\n}\n"})
+mkzip(AUT, {"r6/scripts/Aut/Aut.reds": "module LibMod.Extra\nimport LibMod.*\n\npublic class AutThing {\n}\n"})
+put("r6/cache/final.redscripts", "\x00FTLog\x00PlayerPuppet\x00")        # noms du jeu de base : FTLog est au jeu, pas à Redeclare
+rs("profils", "--profil", "d", "--copie", "t")
+for z in (LIB, IMP, GLO, SOU, LUS, LUF, TWK, CH2, RED, UFT, AUT):
+    rs("bascule", "on", "--profil", "d", "--mod", z[:-4])
+R = {r["cle"]: r for r in rs("prerequis", "--profil", "d")["mods"]}
+de = lambda k: {e["nom"]: e for e in R[k]["requis"] if "code" in e["sources"]}
+lib = lambda k: next((e for e in R[k]["requis"] if LIB in e["par"]), {})
+check("module importé, nom global, $base de TweakXL, GetMod non testé : prérequis fermes lus dans le code, fournis par Lib, preuve à la ligne",
+      all(lib(k).get("sources") == ["code"] and lib(k)["optionnel"] is False and lib(k)["etat"] == "actif" for k in (IMP, GLO, LUF, TWK))
+      and lib(IMP)["preuves"][0]["fichier"] == "r6/scripts/Imp/Imp.reds" and lib(IMP)["preuves"][0]["ligne"] == 1
+      and lib(TWK)["preuves"][0]["cible"] == "Items.LibBase" and lib(GLO)["preuves"][0]["cible"] == "GlobalHelper", str([lib(k) for k in (IMP, GLO, LUF, TWK)]))
+check("@if(ModuleExists) et GetMod testé : lus dans le code, optionnels (le mod s'en passe), pas comptés à voir",
+      lib(SOU).get("optionnel") is True and lib(SOU)["souple"] is True and lib(LUS).get("optionnel") is True and R[SOU]["a_voir"] == R[LUS]["a_voir"] == 0,
+      str([lib(SOU), lib(LUS)]))
+check("nom du jeu redéclaré (FTLog), module partagé (LibMod.Extra importe LibMod.*), nom en commentaire : aucun lien",
+      not de(UFT) and not de(AUT) and not de(RED) and not lib(LIB), str([de(UFT), de(AUT), de(RED)]))
+check("chaîne de second rang : Second exige Importe (nom global d'Importe), qui exige Lib ; Lib dit qui l'exige",
+      next(iter(de(CH2).values()), {}).get("par") == [IMP] and set(R[LIB]["requis_par"]) >= {IMP, GLO, LUF, TWK, SOU, LUS}, str(de(CH2)) + str(R[LIB]["requis_par"]))
+ch = rs("prerequis", "--profil", "d", "--mod", LIB[:-4], "--chute")
+pal = {k: n["palier"] for k, n in ch["noeuds"].items()}
+check("ce qui tombe si Lib part : palier 1 les fermes, palier 2 Second (par Importe), les optionnels amputés sans tomber",
+      pal == {LIB: 0, IMP: 1, GLO: 1, LUF: 1, TWK: 1, CH2: 2} and sorted(a["cle"] for a in ch["amputes"]) == sorted([SOU, LUS])
+      and ch["noeuds"][CH2]["via"] == [IMP] and any(l["de"] == IMP and l["vers"] == CH2 and l["ferme"] for l in ch["liens"]), str(ch))
+be = rs("prerequis", "--profil", "d", "--mod", CH2[:-4], "--besoin")
+pb = {k: n["palier"] for k, n in be["noeuds"].items() if not k.startswith(("c:", "x:"))}
+check("ce qu'il faut à Second : Importe au palier 1, Lib au palier 2, et le cadre redscript déduit des fichiers",
+      pb.get(IMP) == 1 and pb.get(LIB) == 2 and any(n["nom"] == "redscript" for n in be["noeuds"].values()), str(be["noeuds"]))
+rs("bascule", "off", "--profil", "d", "--mod", IMP[:-4])
+ch2 = rs("prerequis", "--profil", "d", "--mod", LIB[:-4], "--chute")
+check("Importe coupé : il ne tombe plus avec Lib, ni Second (déjà privé d'Importe avant la coupe)",
+      IMP not in ch2["noeuds"] and CH2 not in ch2["noeuds"] and GLO in ch2["noeuds"], str(ch2["noeuds"]))
+rs("bascule", "on", "--profil", "d", "--mod", IMP[:-4])
+vide = rs("prerequis", "--profil", "d", "--cadre", "redscript", "--chute")
+put("engine/tools/scc_lib.dll", "posé à la main")
+cc = rs("prerequis", "--profil", "d", "--cadre", "redscript", "--chute")
+os.remove(os.path.join(JEU, "engine", "tools", "scc_lib.dll"))
+check("chaîne d'un cadre : absent, rien ne tombe de plus ; posé hors Red Stack, tout mod à script tombe ; cadre inconnu, ou --besoin sans --mod : refus dit",
+      list(vide["noeuds"]) == ["c:redscript"] and {IMP, GLO, CH2, SOU} <= set(cc["noeuds"]) and "--cadre" in str(rs("prerequis", "--profil", "d", "--cadre", "rien", "--chute", ok=False))
+      and "--besoin" in str(rs("prerequis", "--profil", "d", "--cadre", "cet", "--besoin", ok=False)), str(cc["noeuds"].keys()))
+mkzip(GLO, {"r6/scripts/Glo/Glo.reds": "public class GloThing {\n}\n"})
+R = {r["cle"]: r for r in rs("prerequis", "--profil", "d")["mods"]}
+check("zip changé : son code est relu seul (fiche par signature), le lien disparu n'est plus dit",
+      not de(GLO) and lib(IMP).get("sources") == ["code"] and os.path.isfile(os.path.join(DONNEES, "dependances.json")), str(de(GLO)))
+COD, OPT = D + "Codeware-7780-1-0-1700000812.zip", D + "Cadre Optionnel-8013-1-0-1700000813.zip"
+mkzip(COD, {"red4ext/plugins/Codeware/Codeware.dll": "dll", "red4ext/plugins/Codeware/Scripts/Codeware.reds": "module Codeware\npublic class CwThing {\n}\n"})
+mkzip(OPT, {"r6/scripts/Opt/Opt.reds": "@if(ModuleExists(\"Codeware\"))\nimport Codeware.*\n\npublic class OptThing {\n}\n"})
+rs("bascule", "on", "--profil", "d", "--mod", OPT[:-4])
+R = {r["cle"]: r for r in rs("prerequis", "--profil", "d")["mods"]}
+cw = next((e for e in R[OPT]["requis"] if e["cadre"] == "codeware"), {})
+check("cadre vu seulement dans du code gardé, et coupé : optionnel, pas compté parmi les cadres qui manquent (redscript seul l'est)",
+      cw.get("optionnel") is True and cw["etat"] == "coupé" and cw["sources"] == ["code"] and R[OPT]["manque"] == 1 and R[OPT]["optionnels"] == 1, str(R[OPT]))
+txt = subprocess.run([sys.executable, "-I", TOOL, "prerequis", "--profil", "d", "--mod", LIB[:-4], "--chute", "--depot", DEPOT, "--jeu", JEU,
+                      "--donnees", DONNEES, *MODE], capture_output=True, text=True, encoding="utf-8").stdout
+check("mode texte de la chaîne : le compte, les paliers, les amputés", "palier 2" in txt and "Second" in txt and "Souple" in txt, txt)
+shutil.rmtree(os.path.join(DEPOT, "12_Deps"))
+os.remove(os.path.join(JEU, "r6", "cache", "final.redscripts"))
+rs("profils", "--profil", "d", "--supprime")
+c = plan_counts()
+check("profil « t » intact après l'essai (30)", c["pose"] == c["remplace"] == c["retire"] == c["conflit"] == 0, str(c))
+
 print(f"\n{'TOUT VERT' if not fails else str(len(fails)) + ' KO : ' + ', '.join(fails)}")
 sys.exit(1 if fails else 0)

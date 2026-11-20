@@ -3430,7 +3430,315 @@ def qui_requiert(nom):
     return mid or radical
 
 
-def prerequis(index, prof, jeu, data, ignores=None):
+# ---------------------------------------------------------------- prérequis lus dans le code
+# Ce qu'un zip appelle d'un autre, lu dans ses scripts : module Redscript importé, classe, structure, énumération ou fonction
+# globale qu'un autre zip déclare, `ModuleExists("X")` (souple : le mod s'adapte à l'absence), mod CET appelé par `GetMod`,
+# enregistrement TweakXL bâti (`$base`) sur un enregistrement qu'un autre zip crée (ferme), ou qui en cite ou en retouche un
+# (souple). Un usage gardé par `@if(...)` est souple. Lecture des zips, une fiche par zip gardée dans `dependances.json`
+# tant que le zip ne change pas ; chaque lien garde sa preuve (fichier du zip, ligne). Faux positifs possibles : deux zips
+# qui déclarent le même nom (les deux sont dits), un nom cité sans servir. Pas lus : les `.tweak` au format RED, les `.xl`
+# d'ArchiveXL, les ressources d'une archive tirées d'une autre, le Lua qui appelle Redscript par un nom en chaîne.
+
+DEPS_V = 2                                           # version de la lecture : une fiche d'une autre version est relue
+LIENS_V = 1                                          # version du rapprochement : des liens d'une autre version sont refaits
+DEPS_AUTO = 30                                       # zips lus d'office à la volée (liste, fiche) ; au-delà, `prerequis --code`
+DEPS_PREUVES = 3                                     # preuves gardées par prérequis (le compte dit le reste)
+RX_DEP_DECL = re.compile(r"\b(class|struct|enum|func)\s+([A-Za-z_][A-Za-z0-9_]*)")
+RX_DEP_IMPORT = re.compile(r"^[ \t]*import\s+([A-Za-z_][A-Za-z0-9_.]*?)(\.\*|\.\{[^}]*\})?\s*;?[ \t]*$", re.M)
+RX_DEP_ID = re.compile(r"(?<![.\w$])([A-Za-z_][A-Za-z0-9_]{3,})\b")
+RX_DEP_EXISTE = re.compile(r"""\bModuleExists\s*\(\s*["']([A-Za-z_][A-Za-z0-9_.]*)["']""")
+RX_DEP_GETMOD = re.compile(r"""\bGetMod\s*\(\s*["']([^"'\r\n]+)["']\s*\)""")
+RX_DEP_REC = re.compile(r"(?<![\w.$\\/])([A-Z][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)+)")
+MOTS_REDS = frozenset("""func class struct enum let const return true false null this super public private protected static
+    final native abstract import module extends else while for break continue switch case default persistent cb exec
+    wrapMethod replaceMethod addMethod addField wrappedMethod ModuleExists array script_ref ref wref opt out new
+    Bool Int8 Int16 Int32 Int64 Uint8 Uint16 Uint32 Uint64 Float Double String CName TweakDBID ResRef LocKey Variant
+    Void quest importonly callback""".split())
+
+
+def _dep_gardes(code, syn):
+    """[début, fin] des déclarations gardées par un `@if(...)` : ce qu'elles utilisent est souple"""
+    out = []
+    for m in RX_SI.finditer(code):
+        if syn[m.start()] == "@":
+            f = fin_parenthese(syn, m.end() - 1)
+            if f >= 0:
+                out.append((m.start(), fin_declaration(syn, f + 1)))
+    return out
+
+
+def dep_reds(nom, texte, fiche):
+    """déclarations et usages d'un `.reds`, ajoutés à `fiche`"""
+    code, syn = masque_reds(texte, False), masque_reds(texte, True)
+    ligne, gardes = lignes_de(code), _dep_gardes(code, syn)
+    souple = lambda pos: any(a <= pos < b for a, b in gardes)
+    module = (RX_MODULE.search(code) or [None, ""])[1]
+    if module:
+        fiche["modules"].add(module)
+    prof, niveaux = 0, []                            # profondeur d'accolades à chaque position (déclarations globales seules)
+    for m in RX_ACCOLADE.finditer(syn):
+        prof += 1 if m.group() == "{" else -1
+        niveaux.append((m.start(), prof))
+    poses = [p for p, _ in niveaux]
+
+    def profondeur(pos):
+        i = bisect.bisect_left(poses, pos) - 1
+        return niveaux[i][1] if i >= 0 else 0
+    annots = [(a.end(), a.group(1)) for a in RX_ANNOT.finditer(code)]
+    propres = set()
+    for m in RX_DEP_DECL.finditer(syn):
+        propres.add(m.group(2))
+        if profondeur(m.start()) != 0:
+            continue
+        a = next((s for e, s in annots if 0 <= m.start() - e < 400 and not syn[e:m.start()].count(";")), None)
+        if m.group(1) == "func" and a in ("addMethod", "wrapMethod", "replaceMethod"):
+            continue                                 # méthode greffée sur une classe : pas un nom global
+        fiche["noms"].add((module + "." if module else "") + m.group(2))
+    for m in RX_DEP_IMPORT.finditer(code):
+        cible = m.group(1)
+        mods = [cible] if m.group(2) else [cible, cible.rpartition(".")[0]] if "." in cible else [cible]
+        fiche["usages"].append(["i", "|".join(x for x in mods if x), nom, ligne(m.start()), souple(m.start())])
+        # nom importé un par un (`import A.B.Nom`, `import A.B.{X, Y}`) : il vient de ce module, pas d'un nom global
+        fiche["importes"].update(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", m.group(2)[2:]) if m.group(2) and m.group(2) != ".*"
+                                 else [cible.rpartition(".")[2]] if not m.group(2) else [])
+    for m in RX_DEP_EXISTE.finditer(code):
+        fiche["usages"].append(["x", m.group(1), nom, ligne(m.start()), True])
+    vus = fiche.setdefault("_ids", {})
+    for m in RX_DEP_ID.finditer(syn):
+        x = m.group(1)
+        if x in MOTS_REDS or x in propres:
+            continue
+        s = souple(m.start())
+        if x not in vus or (vus[x][2] and not s):
+            vus[x] = [nom, ligne(m.start()), s]
+    fiche.setdefault("_propres", set()).update(propres)
+
+
+def dep_lua(nom, texte, fiche):
+    """mods CET appelés par `GetMod("nom")` ; souple si l'appel est testé (`if GetMod(…)`, `x = GetMod(…)` puis `if not x`)"""
+    code = RX_MASQUE_LUA.sub(lambda m: _blanc(m.group(0)), texte)
+    ligne = lignes_de(code)
+    for m in RX_DEP_GETMOD.finditer(code):
+        debut = code.rfind("\n", 0, m.start()) + 1
+        avant, apres = code[debut:m.start()], code[m.end():code.find("\n", m.end()) if "\n" in code[m.end():] else len(code)]
+        s = bool(re.search(r"\b(if|and|or|not|elseif|while)\b", avant) or re.match(r"\s*(~=|==|and\b|or\b|then\b)", apres))
+        v = re.match(r"\s*(?:local\s+)?([A-Za-z_][\w.]*)\s*=\s*$", avant)
+        if v and not s:
+            x = re.escape(v.group(1))
+            s = bool(re.search(rf"\b(if|elseif|and|or|not)\s+(not\s+)?{x}\b|\b{x}\s*(~=|==)\s*nil|\b{x}\s+(and|or)\b", code[m.end():]))
+        fiche["usages"].append(["g", m.group(1).lower(), nom, ligne(m.start()), s])
+
+
+def dep_tweak(nom, texte, fiche):
+    """enregistrements TweakXL créés, ceux sur lesquels ils sont bâtis (`$base`), ceux qu'ils citent ou retouchent"""
+    try:
+        ops = lit_tweak(texte)["ops"]
+    except YamlErreur:
+        fiche["illisibles"] += 1
+        return
+    cites = {}
+    for cible, valeur, genre, ligne, _ in ops:
+        if cible.endswith(".$definition"):
+            rec = cible[:-len(".$definition")]
+            fiche["recs"].add(rec)
+            if genre == "base" and RX_DEP_REC.fullmatch(valeur.strip()):
+                fiche["usages"].append(["b", valeur.strip(), nom, ligne, False])
+            continue
+        rec = cible.rpartition(".")[0]
+        if rec:
+            cites.setdefault(rec, (nom, ligne))
+        for x in RX_DEP_REC.findall(valeur):
+            cites.setdefault(x, (nom, ligne))
+    garde = fiche.setdefault("_cites", {})
+    for x, v in cites.items():
+        garde.setdefault(x, v)
+
+
+def fiche_du_code(z, mod):
+    """fiche d'un zip pour les prérequis lus dans le code : ce qu'il déclare, ce qu'il utilise (avec sa preuve)"""
+    f = {"modules": set(), "noms": set(), "recs": set(), "usages": [], "illisibles": 0, "importes": set()}
+    for e in mod["entrees"]:
+        d = (e.get("d") or "").lower()
+        voie = voie_code(d) if d else None
+        if voie not in ("reds", "lua", "tweak") or e["s"] > 8 << 20:
+            continue
+        try:
+            t = z.read(e["n"]).decode("utf-8-sig", "replace")
+        except (KeyError, OSError, zipfile.BadZipFile, RuntimeError):
+            f["illisibles"] += 1
+            continue
+        (dep_reds if voie == "reds" else dep_lua if voie == "lua" else dep_tweak)(e["n"], t, f)
+    propres = f.pop("_propres", set()) | {n.rpartition(".")[2] for n in f["noms"]} | f.pop("importes")
+    # un nom n'est gardé que s'il peut être un nom global déclaré ailleurs : majuscule en tête (usage de Redscript)
+    f["usages"] += [["t", x, n, l, s] for x, (n, l, s) in sorted(f.pop("_ids", {}).items()) if x not in propres and x[0].isupper()]
+    f["usages"] += [["r", x, n, l, True] for x, (n, l) in sorted(f.pop("_cites", {}).items()) if x not in f["recs"]]
+    return {"v": DEPS_V, "sig": mod["sig"], "modules": sorted(f["modules"]), "noms": sorted(f["noms"]), "recs": sorted(f["recs"]),
+            "usages": f["usages"], "illisibles": f["illisibles"]}
+
+
+def ecrit_entier(path, obj):
+    """cache JSON écrit à côté puis mis en place d'un coup : un moteur qui le lit au même instant n'en voit jamais une moitié"""
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = f"{path}.{os.getpid()}.tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(obj, f, ensure_ascii=False, separators=(",", ":"))
+    os.replace(tmp, path)
+
+
+def fiches_du_code(index, data, lire="auto"):
+    """{clé: fiche} des zips vivants ; `lire` : « tout » lit chaque zip qui n'a pas de fiche à jour, « auto » en lit au plus
+    DEPS_AUTO (sinon ils restent non lus), « cache » n'en lit aucun. Rend (fiches, non lus)."""
+    path = os.path.join(data, "dependances.json")
+    try:
+        cache = json.load(open(path, encoding="utf-8"))
+    except (OSError, ValueError):
+        cache = {}
+    out, manque = {}, []
+    for k, m in index.items():
+        if m["genre"] == "retiré" or not any((e.get("d") or "").lower().endswith((".reds", ".lua", ".yaml", ".yml")) for e in m["entrees"]):
+            continue
+        c = cache.get(k)
+        if c and c.get("sig") == m["sig"] and c.get("v") == DEPS_V:
+            out[k] = c
+        else:
+            manque.append(k)
+    lus = manque if lire == "tout" or (lire == "auto" and len(manque) <= DEPS_AUTO) else []
+    for k in lus:
+        try:
+            with zipfile.ZipFile(index[k]["zip"]) as z:
+                out[k] = fiche_du_code(z, index[k])
+        except (OSError, zipfile.BadZipFile):
+            out[k] = {"v": DEPS_V, "sig": index[k]["sig"], "modules": [], "noms": [], "recs": [], "usages": [], "illisibles": 1}
+    if lus or set(cache) - set(out) - set(manque):
+        garde = {k: v for k, v in cache.items() if k in index and k not in out and k in manque}
+        ecrit_entier(path, dict(garde, **out))
+    return out, [k for k in manque if k not in out]
+
+
+TWEAKDB_EP1 = "r6/cache/tweakdb_ep1.bin"           # la TweakDB avec Phantom Liberty : celle de `tweakdb.bin` et plus
+
+
+def enregistrements_du_jeu(racine_jeu):
+    """identifiants (40 bits) des enregistrements des TweakDB du jeu (avec et sans Phantom Liberty) ; vide s'il n'y en a pas"""
+    out = set()
+    for rel in (TWEAKDB, TWEAKDB_EP1):
+        try:
+            with open(os.path.join(racine_jeu, *rel.split("/")), "rb") as f:
+                tete = f.read(32)
+                if len(tete) < 32 or struct.unpack_from("<I", tete, 0)[0] != 0x0BB1DB47:
+                    continue
+                f.seek(struct.unpack_from("<i", tete, 20)[0])
+                n = struct.unpack("<i", f.read(4))[0]
+                out.update(i & M40 for i, _ in struct.iter_unpack("<QI", f.read(12 * n)))
+        except (OSError, struct.error):
+            continue
+    return out
+
+
+SCRIPTS_JEU = "r6/cache/final.redscripts"           # scripts compilés du jeu de base (redscript écrit les siens à côté)
+
+
+def noms_du_jeu(racine_jeu):
+    """noms (4 signes et plus) écrits dans les scripts compilés du jeu de base : un mod qui redéclare `FTLog` ou
+    `RandRange` ne fournit rien à ceux qui s'en servent ; vide si le fichier manque"""
+    try:
+        with open(os.path.join(racine_jeu, *SCRIPTS_JEU.split("/")), "rb") as f:
+            return {x.decode("ascii") for x in re.findall(rb"[A-Za-z_][A-Za-z0-9_]{3,}", f.read())}
+    except OSError:
+        return set()
+
+
+def liens_du_code(index, fiches, du_jeu=frozenset(), noms_jeu=frozenset()):
+    """{clé: [{cible, genre, par (zips qui la fournissent), preuves, souple}]} : ce que chaque zip utilise d'un AUTRE zip.
+    Un zip ne se fournit pas lui-même, ni une autre version du même mod. `du_jeu` : enregistrements de la TweakDB du jeu,
+    `noms_jeu` : noms des scripts du jeu (ce que le jeu de base porte n'est le prérequis de personne)."""
+    modules, noms, cet, recs = (collections.defaultdict(set) for _ in range(4))
+    for k, f in fiches.items():
+        for x in f["modules"]:
+            modules[x.lower()].add(k)
+        for x in f["noms"]:
+            noms[x].add(k)
+        for x in f["recs"]:
+            recs[x].add(k)
+    for k, m in index.items():                       # un dossier CET est au zip qui en livre l'`init.lua`
+        if m["genre"] != "retiré":
+            for e in m["entrees"]:
+                d = (e.get("d") or "").lower()
+                if d.startswith(_CET + "mods/") and d.count("/") == 6 and d.endswith("/init.lua"):
+                    cet[d.split("/")[5]].add(k)
+    globaux = {x: z for x, z in noms.items() if "." not in x}   # un nom déclaré dans un module ne se voit que par son import
+    qui = {k: qui_requiert(m["nom"]) for k, m in index.items()}
+    out = {}
+    for k, f in fiches.items():
+        liens = {}
+        importes = {u[1].split("|")[0] for u in f["usages"] if u[0] == "i"}   # `import A.B.*` : les noms de A.B viennent de là
+        siens = {x.lower() for x in f["modules"]}
+        for genre, cible, fichier, ligne, souple in f["usages"]:
+            if genre == "t" and any(f"{m}.{cible}" in noms for m in importes):
+                continue
+            if genre in ("i", "x") and any(s == x.lower() or s.startswith(x.lower() + ".") for x in cible.split("|") for s in siens):
+                continue                             # module qu'il déclare lui-même (deux mods peuvent partager un module)
+            if genre == "b" and cible in f["recs"]:
+                continue
+            if genre == "i":
+                par = set().union(*(modules.get(x.lower(), set()) for x in cible.split("|")))
+                cible = cible.split("|")[0]
+            elif genre == "x":
+                par = set(modules.get(cible.lower(), set()))
+            elif genre == "t":
+                if cible in noms_jeu:
+                    continue
+                par = set(globaux.get(cible, set()))
+            elif genre == "g":
+                par = set(cet.get(cible, set()))
+            elif genre in ("b", "r"):
+                if du_jeu and tdbid(cible) in du_jeu:
+                    continue
+                par = set(recs.get(cible, set()))
+                if not par and genre == "r":         # propriété retouchée : son enregistrement est une tête du chemin
+                    t = cible
+                    while "." in t and not par:
+                        t = t.rpartition(".")[0]
+                        par = set(recs.get(t, set())) if not (du_jeu and tdbid(t) in du_jeu) else set()
+                    cible = t if par else cible
+            else:
+                continue
+            par = {p for p in par if p != k and qui.get(p) != qui.get(k)}
+            if not par:
+                continue
+            l = liens.setdefault((genre if genre != "x" else "i", cible.lower() if genre in ("i", "x", "g") else cible),
+                                 {"cible": cible, "genre": genre, "par": set(), "preuves": [], "souple": True, "n": 0})
+            l["par"] |= par
+            l["n"] += 1
+            l["souple"] = l["souple"] and bool(souple)
+            if len(l["preuves"]) < DEPS_PREUVES:
+                l["preuves"].append({"fichier": fichier, "ligne": ligne, "genre": genre, "cible": cible, "souple": bool(souple)})
+        out[k] = [dict(l, par=sorted(l["par"])) for l in liens.values()]
+    return out
+
+
+def liens_du_depot(index, jeu, data, lire="auto"):
+    """(liens du code, zips dont le code n'est pas encore lu) ; les liens sont gardés dans `liens_code.json` tant que ni les
+    zips à code ni les scripts et TweakDB du jeu ne changent (la liste de la page les relit sans relire les fiches)"""
+    a_code = sorted((k, m["sig"]) for k, m in index.items() if m["genre"] != "retiré"
+                    and any((e.get("d") or "").lower().endswith((".reds", ".lua", ".yaml", ".yml")) for e in m["entrees"]))
+    stats = [Magasin.stat(jeu.path(x)) for x in (TWEAKDB, TWEAKDB_EP1, SCRIPTS_JEU)]
+    sig = hashlib.sha1(json.dumps([DEPS_V, LIENS_V, a_code, stats]).encode()).hexdigest()
+    path = os.path.join(data, "liens_code.json")
+    try:
+        c = json.load(open(path, encoding="utf-8"))
+        if c.get("sig") == sig and (lire != "tout" or not c.get("non_lus")):
+            return c["liens"], c.get("non_lus", [])
+    except (OSError, ValueError):
+        pass
+    fiches, non_lus = fiches_du_code(index, data, lire)
+    liens = liens_du_code(index, fiches, enregistrements_du_jeu(jeu.root), noms_du_jeu(jeu.root))
+    if lire != "cache":
+        ecrit_entier(path, {"sig": sig, "liens": liens, "non_lus": non_lus})
+    return liens, non_lus
+
+
+def prerequis(index, prof, jeu, data, ignores=None, lire="auto", sortie=None):
     """({clé: {nexus, requis: [...], requis_par: [clés], manque}}, [cadres]) pour tout zip qui n'est pas retiré. Lecture
     seule, sans réseau : Nexus est lu dans son cache. Un prérequis : {cadre, mod, nom, notes, url, sources, par, etat} ;
     `par` = les zips du dépôt qui le fournissent ; `etat` = actif, dans le jeu (posé hors Red Stack), coupé, rangé (parqué
@@ -3468,6 +3776,35 @@ def prerequis(index, prof, jeu, data, ignores=None):
         par = sorted(set(du_cadre[code]) | set(du_mod.get(mid, []) if mid else []))
         cadres[code] = {"cadre": code, "mod": mid, "nom": nom, "par": par, "etat": etat_de(par, temoin), "exige_par": 0}
     ep1 = os.path.isdir(jeu.path(EXTENSION_JEU))
+    liens, non_lus = liens_du_depot(index, jeu, data, lire)
+    if sortie is not None:
+        sortie["code_non_lus"] = len(non_lus)
+    qui = {k: qui_requiert(m["nom"]) for k, m in vivants.items()}
+
+    def du_code(k, req):
+        """les liens lus dans le code de `k`, rangés sous l'identité de ce qui les fournit (cadre, mod Nexus, autre zip)"""
+        for l in liens.get(k, []):
+            par = [p for p in l["par"] if p in vivants]
+            if not par:
+                continue
+            code = next((c[0] for c in CADRES if set(par) <= set(cadres[c[0]]["par"])), None)
+            idents = {qui[p] for p in par}
+            mid = ids[par[0]] if len(idents) == 1 else 0
+            ident = "c:" + code if code else f"m:{mid}" if mid else "r:" + next(iter(idents)) if len(idents) == 1 else "k:" + l["cible"]
+            if code and k in cadres[code]["par"]:
+                continue
+            nom = (next(n[1] for n in CADRES if n[0] == code) if code
+                   else (cache.get(str(mid)) or {}).get("titre") or nom_du_mod(index[par[0]]["nom"]) if len(idents) == 1 else l["cible"])
+            e = req.setdefault(ident, {"cadre": code, "mod": mid, "nom": nom, "notes": "", "url": "", "sources": []})
+            if ident[0] in "rk":
+                e["par"] = sorted(set(e.get("par", [])) | set(par))
+            if "code" not in e["sources"]:
+                e["sources"].append("code")
+                e["souple"], e["preuves"], e["usages"] = True, [], 0
+            e["souple"] = e["souple"] and l["souple"]
+            e["usages"] += l["n"]
+            e["preuves"] += [dict(p, zip=par[0] if len(par) == 1 else "") for p in l["preuves"]][:max(0, DEPS_PREUVES + 2 - len(e["preuves"]))]
+
     lignes, requis_par = {}, collections.defaultdict(set)
     for k, m in vivants.items():
         mid, req = ids[k], {}
@@ -3490,12 +3827,15 @@ def prerequis(index, prof, jeu, data, ignores=None):
             pl = "phantom" in x["nom"].lower()
             req["d:" + x["nom"].lower()] = {"cadre": None, "mod": 0, "nom": x["nom"], "notes": x.get("notes") or "", "url": "", "sources": ["nexus"],
                                             "par": [], "etat": ("dans le jeu" if ep1 else "absent") if pl else "externe", "extension": True}
+        du_code(k, req)
         for ident, e in req.items():
             if "etat" in e:
                 continue
             if e["cadre"]:
                 e["par"], e["etat"] = cadres[e["cadre"]]["par"], cadres[e["cadre"]]["etat"]
                 cadres[e["cadre"]]["exige_par"] += actif(k)
+            elif ident[0] in "rk":                   # lu dans le code : fourni par ces zips-là, sans numéro Nexus commun
+                e["etat"] = etat_de(e["par"])
             elif e["mod"]:
                 e["par"] = sorted(x for x in du_mod.get(e["mod"], []) if x != k)
                 e["etat"] = etat_de(e["par"])
@@ -3504,19 +3844,106 @@ def prerequis(index, prof, jeu, data, ignores=None):
             for p in e["par"]:
                 requis_par[p].add(k)
         tus = set((ignores or {}).get(qui_requiert(m["nom"]), ()))
-        for i, e in req.items():                     # Nexus ne dit pas « optionnel » : seule la note de l'auteur le dit
-            e["optionnel"] = not e["cadre"] and bool(RX_OPTIONNEL.search(e["notes"]))
+        for i, e in req.items():                     # Nexus ne dit pas « optionnel » : seule la note de l'auteur le dit ;
+            # lu dans le code seul, un usage toujours gardé (`@if`, `ModuleExists`, `GetMod` testé) : le mod s'en passe
+            e["optionnel"] = ((not e["cadre"] and bool(RX_OPTIONNEL.search(e["notes"])))
+                              or (e["sources"] == ["code"] and e.get("souple", False)))
             e["ident"], e["ignore"] = i, i in tus
         rq = sorted(req.values(), key=lambda e: (e["etat"] not in MANQUES, e["ignore"], e["optionnel"], not e["cadre"], e["nom"].lower()))
         absents = [e for e in rq if e["etat"] in MANQUES and not e["ignore"]] if actif(k) else []
         lignes[k] = {"nexus": "sans modId" if not mid else "jamais lu" if not c or ("requis" not in c) else "inconnu" if c["requis"] is None else "lu",
-                     "requis": rq, "manque": sum(1 for e in absents if e["cadre"]),
+                     "requis": rq, "manque": sum(1 for e in absents if e["cadre"] and not e["optionnel"]),
                      "a_voir": sum(1 for e in absents if not e["cadre"] and not e["optionnel"]),
                      "optionnels": sum(1 for e in absents if e["optionnel"])}
     for k, r in lignes.items():
         qui = sorted(requis_par.get(k, ()), key=str.lower)
         r["requis_par"], r["requis_par_actifs"] = qui, sum(1 for x in qui if actif(x))
     return lignes, list(cadres.values())
+
+
+def fournisseurs(e, cadres):
+    """ce qui tient un prérequis : ses zips, plus le cadre lui-même s'il est dans le jeu hors Red Stack (`c:<code>`)"""
+    f = set(e["par"])
+    if e["cadre"] and cadres[e["cadre"]]["etat"] == "dans le jeu":
+        f.add("c:" + e["cadre"])
+    return f
+
+
+def chaine(lignes, cadres, actifs, depart, sens="chute"):
+    """Chaîne des prérequis à partir de `depart` (clés de zips, ou `c:<code>` d'un cadre). `sens` « chute » : ce qui ne
+    se charge plus si `depart` part, palier par palier (palier 1 : ce qui l'exige ; palier 2 : ce qui exige un mod du
+    palier 1…) ; un mod tombe quand TOUS les fournisseurs actifs d'un de ses prérequis fermes sont tombés. Un prérequis
+    optionnel ou ignoré ne fait pas tomber : le mod est dit « amputé ». `sens` « besoin » : tout ce qu'il faut à
+    `depart`, de proche en proche. Seuls comptent les mods actifs (un mod coupé ne tourne pas déjà).
+    Rend {noeuds: {id: {palier, via}}, liens: [{de, vers, requis, ferme}], amputes: {id: [fournisseurs]}}."""
+    noeuds, liens, amputes = {}, [], {}
+    depart = list(dict.fromkeys(depart))
+    for d in list(depart):
+        if d.startswith("c:") and d[2:] in {c["cadre"] for c in cadres.values()}:
+            depart += [k for k in cadres[d[2:]]["par"] if k not in depart]
+    for d in depart:
+        noeuds[d] = {"palier": 0, "via": []}
+    tient = lambda x: x.startswith("c:") or x in actifs
+    if sens == "chute":
+        tombes, palier, front = set(depart), 0, set(depart)
+        while front:
+            palier += 1
+            neufs = {}
+            for k, r in lignes.items():
+                if k in tombes or k not in actifs:
+                    continue
+                for e in r["requis"]:
+                    f = {x for x in fournisseurs(e, cadres) if tient(x)}
+                    if not f or not f <= tombes or not f & front:
+                        continue                     # déjà sans lui avant la coupe, ou encore tenu par un autre
+                    if e["optionnel"] or e["ignore"]:
+                        continue
+                    neufs.setdefault(k, []).append((e, sorted(f)))
+            for k, es in neufs.items():
+                noeuds[k] = {"palier": palier, "via": sorted({x for _, f in es for x in f})}
+                liens += [{"de": x, "vers": k, "requis": e["nom"], "ferme": True} for e, f in es for x in f]
+            tombes |= set(neufs)
+            front = set(neufs)
+        for k, r in lignes.items():                  # ce qui perd un prérequis optionnel sans tomber
+            if k in tombes or k not in actifs:
+                continue
+            for e in r["requis"]:
+                f = {x for x in fournisseurs(e, cadres) if tient(x)}
+                if f and f <= tombes:
+                    amputes.setdefault(k, set()).update(f)
+                    liens.append({"de": sorted(f)[0], "vers": k, "requis": e["nom"], "ferme": False})
+    else:
+        palier, front, vus = 0, list(depart), set(depart)
+        while front:
+            palier += 1
+            suivants = []
+            for k in front:
+                for e in (lignes.get(k) or {}).get("requis", []):
+                    f = sorted(fournisseurs(e, cadres))
+                    actifs_f = [x for x in f if tient(x)] or f
+                    ferme = not (e["optionnel"] or e["ignore"])
+                    if not actifs_f:                 # rien dans le dépôt ne le fournit : une feuille, nommée par le prérequis
+                        x = "x:" + e["ident"]
+                        noeuds.setdefault(x, {"palier": palier, "via": [], "nom": e["nom"], "etat": e["etat"]})["via"].append(k)
+                        liens.append({"de": x, "vers": k, "requis": e["nom"], "ferme": ferme})
+                        continue
+                    for x in actifs_f:
+                        liens.append({"de": x, "vers": k, "requis": e["nom"], "ferme": ferme})
+                        if x not in vus:
+                            vus.add(x)
+                            noeuds[x] = {"palier": palier, "via": [k]}
+                            if ferme:
+                                suivants.append(x)
+                        else:
+                            noeuds[x]["via"] = sorted(set(noeuds[x]["via"]) | {k})
+            front = suivants
+    vus_l, uniques = set(), []
+    for l in liens:
+        cle = (l["de"], l["vers"], l["requis"], l["ferme"])
+        if cle not in vus_l:
+            vus_l.add(cle)
+            uniques.append(l)
+    return {"noeuds": noeuds, "liens": uniques, "amputes": {k: sorted(v) for k, v in amputes.items()}}
 
 
 def mots(s):
@@ -4551,6 +4978,12 @@ def main():
                     "ce prérequis pour ce mod ; IDENT est l'`ident` rendu par `prerequis --mod`")
     ap.add_argument("--nexus", action="store_true", help="prerequis : lit d'abord sur Nexus les prérequis des mods qui ne sont pas "
                     "au cache (--mod : de ce mod seul ; --force : de tous, même lus il y a peu)")
+    ap.add_argument("--code", action="store_true", help="prerequis : lit d'abord le code de tous les zips qui n'ont pas de fiche à jour "
+                    "(sinon au plus quelques-uns par appel)")
+    ap.add_argument("--chute", action="store_true", help="prerequis --mod MOD (ou --cadre CODE) : ce qui ne se charge plus si ce mod part, "
+                    "palier par palier, et ce qui perd un prérequis optionnel")
+    ap.add_argument("--besoin", action="store_true", help="prerequis --mod MOD : tout ce qu'il faut à ce mod, de proche en proche")
+    ap.add_argument("--cadre", help="prerequis --chute : part d'un cadre (cet, red4ext, redscript, tweakxl, archivexl, codeware…)")
     ap.add_argument("--convertit", action="store_true", help="convention : change le .7z / .rar de --cle en .zip")
     ap.add_argument("valeur", nargs="?", choices=["on", "off"])
     ap.add_argument("--profil", default="actuel")
@@ -5244,8 +5677,51 @@ def main():
             mods = sorted({int(w["mod"]) for k, m in index.items() if m["genre"] != "retiré" and (not key or k == key)
                            and (w := RX_ZIP_NEXUS.match(m["nom"]))})
             err = nexus_fichiers(mods, data, a.force, True, True)[1] if mods else None
-        lignes, cadres = prerequis(index, prof, jeu, data, conf.get("requis_ignores"))
+        sortie = {}
+        lignes, cadres = prerequis(index, prof, jeu, data, conf.get("requis_ignores"), "tout" if a.code else "auto", sortie)
         jeu.save()
+        if a.chute or a.besoin:                      # la chaîne d'un mod (ou d'un cadre) : lecture seule
+            cd = {c["cadre"]: c for c in cadres}
+            if a.cadre and a.cadre not in cd:
+                sys.exit(T("prerequis --cadre : un de {0}", ", ".join(cd)))
+            if not key and not a.cadre:
+                sys.exit(T("prerequis --chute / --besoin : --mod MOD, ou --cadre CODE"))
+            if a.besoin and not key:
+                sys.exit(T("prerequis --besoin : --mod MOD"))
+            actifs = {k for k in lignes if not index[k]["lieu"] and (prof["mods"].get(k) or {}).get("actif")}
+            ch = chaine(lignes, cd, actifs, [key] if key else ["c:" + a.cadre], "besoin" if a.besoin else "chute")
+            def nom(x):
+                if x.startswith("c:") and x[2:] in cd:
+                    return cd[x[2:]]["nom"]
+                return ch["noeuds"].get(x, {}).get("nom") or (nom_du_mod(index[x]["nom"]).replace("_", " ") if x in index else x)
+            fermes = {l["de"] for l in ch["liens"] if l["ferme"]}
+            for x, n in ch["noeuds"].items():
+                n["nom"] = nom(x)
+                if x in index:
+                    n.update(actif=x in actifs, section=index[x]["section"], lieu=index[x]["lieu"])
+            paliers = collections.defaultdict(list)
+            for x, n in ch["noeuds"].items():
+                paliers[n["palier"]].append(x)
+            tete = nom(key or "c:" + a.cadre)
+            if a.besoin:
+                txt = [T("Ce qu'il faut à {0}, de proche en proche :", tete) if len(ch["noeuds"]) > 1 else T("{0} n'a besoin d'aucun mod du dépôt.", tete)]
+            else:
+                tombe = len(ch["noeuds"]) - sum(1 for n in ch["noeuds"].values() if n["palier"] == 0)
+                txt = [N(tombe, "Si {0} part, {n} mod actif ne se charge plus :", "Si {0} part, {n} mods actifs ne se chargent plus :", tete) if tombe
+                       else T("Si {0} part, aucun mod actif ne tombe.", tete)]
+            for p in sorted(paliers):
+                if p == 0:
+                    continue
+                txt.append(N(len(paliers[p]), "  palier {0} ({n} mod)", "  palier {0} ({n} mods)", p))
+                txt += [f"    {ch['noeuds'][x]['nom']}" + (T(" (optionnel)") if a.besoin and x not in fermes else "")
+                        + (f" [{dit_etat(ch['noeuds'][x]['etat'])}]" if "etat" in ch["noeuds"][x] else "")
+                        + ("  -> " if a.besoin else "  <- ") + T(", ").join(nom(v) for v in ch["noeuds"][x]["via"])
+                        for x in sorted(paliers[p], key=lambda x: ch["noeuds"][x]["nom"].lower())]
+            if ch["amputes"]:
+                txt.append(N(len(ch["amputes"]), "{n} mod perd un prérequis optionnel sans tomber :", "{n} mods perdent un prérequis optionnel sans tomber :"))
+                txt += [f"    {nom(x)}  <- " + T(", ").join(nom(v) for v in f) for x, f in sorted(ch["amputes"].items(), key=lambda i: nom(i[0]).lower())]
+            ch["amputes"] = [{"cle": x, "nom": nom(x), "via": f} for x, f in ch["amputes"].items()]
+            return out(dict(ch, depart=key or "c:" + a.cadre, sens="besoin" if a.besoin else "chute", code_non_lus=sortie["code_non_lus"]), "\n".join(txt))
         rows = [dict(r, cle=k, actif=bool((prof["mods"].get(k) or {}).get("actif")) and not index[k]["lieu"], lieu=index[k]["lieu"])
                 for k, r in lignes.items() if not key or k == key]
         c = collections.Counter(r["nexus"] for r in rows)
@@ -5253,6 +5729,8 @@ def main():
         dit = lambda e: f"{e['nom']} [{dit_etat(e['etat'])}]" + (f" ({e['notes']})" if e["notes"] else "")
         txt = [suite(N(len(rows), "{n} zip", "{n} zips"), T("prérequis lus sur Nexus pour {0}", c["lu"]), T("jamais lus : {0}", c["jamais lu"]),
                      T("sans modId : {0}", c["sans modId"]), T("inconnus de Nexus : {0}", c["inconnu"]))] + ([f"  ! {err}"] if err else [])
+        if sortie["code_non_lus"]:
+            txt.append(N(sortie["code_non_lus"], "  ! code de {n} zip pas encore lu : `prerequis --code` le lit", "  ! code de {n} zips pas encore lu : `prerequis --code` les lit"))
         txt += [suite(T("  cadre {0} : {1}", x["nom"], dit_etat(x["etat"])), N(x["exige_par"], "exigé par {n} mod actif", "exigé par {n} mods actifs") if x["exige_par"] else "", sep=T(", "))
                 for x in cadres if x["exige_par"] or x["etat"] in ("actif", "dans le jeu")]
         if key:
@@ -5263,7 +5741,8 @@ def main():
             txt += [f"  {r['cle']} : " + T(", ").join(dit(e) for e in r["requis"] if e["etat"] in MANQUES and not e["optionnel"] and not e["ignore"]) for r in manques]
             txt += [T("Prérequis optionnels (d'après la note de l'auteur) absents, non comptés : {0}", sum(r["optionnels"] for r in rows))]
         return out({"mods": rows, "cadres": cadres, "compte": dict(c), "manques": sum(1 for r in rows if r["manque"]),
-                    "a_voir": sum(1 for r in rows if r["a_voir"]), "optionnels": sum(r["optionnels"] for r in rows), "erreur": err}, "\n".join(txt))
+                    "a_voir": sum(1 for r in rows if r["a_voir"]), "optionnels": sum(r["optionnels"] for r in rows), "erreur": err,
+                    "code_non_lus": sortie["code_non_lus"]}, "\n".join(txt))
 
     if a.action == "detail":
         key = find_mod(index, prof, a.mod or "", partout=True)

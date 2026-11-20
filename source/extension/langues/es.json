@@ -1997,7 +1997,6 @@
   "other": "{n} mods que el autor declara requeridos en Nexus no están activos. Su detalle dice cuáles, con la nota del autor."
  },
  "prérequis ?": "¿requisito?",
- "déclaré sur Nexus, et déduit de ses fichiers": "declarado en Nexus y deducido de sus archivos",
  "déclaré sur Nexus": "declarado en Nexus",
  "déduit de ses fichiers": "deducido de sus archivos",
  "Ouvrir le détail du zip qui le fournit": "Abrir el detalle del zip que lo proporciona",
@@ -2178,5 +2177,110 @@
   "one": "Piezas montadas ilegibles en {n} objeto de esta partida guardada: no se cuentan.",
   "other": "Piezas montadas ilegibles en {n} objetos de esta partida guardada: no se cuentan."
  },
- "monté sur un objet": "montado en un objeto"
+ "monté sur un objet": "montado en un objeto",
+ "Red Stack · Dépendances": "Red Stack · Dependencias",
+ "Dépendances": "Dependencias",
+ "chaîne des prérequis": "cadena de requisitos",
+ "Ce qui ne se charge plus si un mod part, et tout ce qu'il lui faut : en liste ou en graphe": "Lo que deja de cargarse si se retira un mod, y todo lo que necesita: en lista o en grafo",
+ "Chaîne des prérequis d'un mod, en liste ou en graphe : ce qui ne se charge plus s'il part, et tout ce qu'il lui faut. S'ouvre dans un onglet à lui. Lecture seule.": "Cadena de requisitos de un mod, en lista o en grafo: lo que deja de cargarse si se retira, y todo lo que necesita. Se abre en su propia pestaña. Solo lectura.",
+ "Filtrer : mod…": "Filtrar: mod…",
+ "Filtrer par nom de mod": "Filtrar por nombre de mod",
+ "lu dans son code": "leído en su código",
+ "vu dans {0}, ligne {1} : {2}": "visto en {0}, línea {1}: {2}",
+ "{n} autre usage": {
+  "one": "{n} uso más",
+  "other": "{n} usos más"
+ },
+ "Les mods actifs qui ne se chargent plus si ce mod part, palier par palier, en liste ou en graphe": "Los mods activos que dejan de cargarse si se retira este mod, nivel por nivel, en lista o en grafo",
+ "Ce qui tombe sans lui…": "Lo que cae sin él…",
+ "Tout ce que ce mod exige, de proche en proche, en liste ou en graphe": "Todo lo que este mod requiere, paso a paso, en lista o en grafo",
+ "Tout ce qu'il lui faut…": "Todo lo que necesita…",
+ "La lecture des prérequis a échoué (message en haut de l'onglet).": "La lectura de los requisitos ha fallado (mensaje en la parte superior de la pestaña).",
+ "Lecture du code de tous les zips du dépôt… Une demi-minute à une minute la première fois.": "Leyendo el código de todos los zips del repositorio… La primera vez, de medio minuto a un minuto.",
+ "Lecture des prérequis du dépôt…": "Leyendo los requisitos del repositorio…",
+ "Le code de {n} zip n'est pas encore lu : ses prérequis lus dans le code manquent.": {
+  "one": "El código de {n} zip aún no se ha leído: faltan sus requisitos leídos en el código.",
+  "other": "El código de {n} zips aún no se ha leído: faltan sus requisitos leídos en el código."
+ },
+ "Lire le code": "Leer el código",
+ "Un prérequis vient de trois sources : déclaré sur Nexus, déduit de la place des fichiers (un script Redscript exige redscript), ou lu dans le code (un module importé, une classe d'un autre mod, un appel GetMod, un objet TweakXL bâti sur celui d'un autre).": "Un requisito viene de tres fuentes: declarado en Nexus, deducido del lugar de los archivos (un script de Redscript requiere redscript) o leído en el código (un módulo importado, una clase de otro mod, una llamada a GetMod, un objeto de TweakXL construido sobre el de otro mod).",
+ "Un prérequis est <b>ferme</b> si le mod ne se charge pas sans lui ; <b>optionnel</b> si l'auteur le dit facultatif, ou si le code s'en passe (usage gardé par ModuleExists, @if, GetMod testé). Lecture seule.": "Un requisito es <b>obligatorio</b> si el mod no se carga sin él; <b>opcional</b> si el autor lo declara opcional o si el código prescinde de él (uso protegido por ModuleExists, @if, GetMod comprobado). Solo lectura.",
+ "Choisissez un mod : sa chaîne dit ce qui ne se charge plus s'il part, palier par palier, ou tout ce qu'il lui faut. Ici, les mods dont dépendent le plus de mods actifs.": "Elija un mod: su cadena indica lo que deja de cargarse si se retira, nivel por nivel, o todo lo que necesita. Aquí, los mods de los que dependen más mods activos.",
+ "{n} mod exigé par d'autres, {0} montrés : affinez par le champ de filtre.": {
+  "one": "{n} mod requerido por otros, {0} mostrados: afine con el campo de filtro.",
+  "other": "{n} mods requeridos por otros, {0} mostrados: afine con el campo de filtro."
+ },
+ "{n} mod exigé par d'autres mods actifs.": {
+  "one": "{n} mod requerido por otros mods activos.",
+  "other": "{n} mods requeridos por otros mods activos."
+ },
+ "Montrer sa chaîne": "Mostrar su cadena",
+ "Revenir à la liste des mods dont d'autres dépendent": "Volver a la lista de los mods de los que dependen otros",
+ "← Socles": "← Bases",
+ "Chaîne": "Cadena",
+ "Ce qui tombe sans lui": "Lo que cae sin él",
+ "Les mods actifs qui ne se chargent plus si ce mod part : ceux qui l'exigent, puis ceux qui exigent ceux-là, jusqu'au bout.": "Los mods activos que dejan de cargarse si se retira este mod: los que lo requieren, luego los que requieren a estos, hasta el final.",
+ "Ce qu'il lui faut": "Lo que necesita",
+ "Tout ce que ce mod exige, puis ce que ses prérequis exigent, jusqu'au bout.": "Todo lo que este mod requiere, luego lo que requieren sus requisitos, hasta el final.",
+ "Vue": "Vista",
+ "Liste": "Lista",
+ "Graphe": "Grafo",
+ "Réduire": "Reducir",
+ "Agrandir": "Ampliar",
+ "La lecture de la chaîne a échoué (message en haut de l'onglet).": "La lectura de la cadena ha fallado (mensaje en la parte superior de la pestaña).",
+ "Lecture de la chaîne…": "Leyendo la cadena…",
+ "Si {0} part, aucun mod actif ne tombe.": "Si se retira {0}, no cae ningún mod activo.",
+ "{0} n'a besoin d'aucun mod du dépôt.": "{0} no necesita ningún mod del repositorio.",
+ "Si {0} part, {n} mod actif ne se charge plus.": {
+  "one": "Si se retira {0}, {n} mod activo deja de cargarse.",
+  "other": "Si se retira {0}, {n} mods activos dejan de cargarse."
+ },
+ "{n} autre perd un prérequis optionnel.": {
+  "one": "{n} otro pierde un requisito opcional.",
+  "other": "{n} otros pierden un requisito opcional."
+ },
+ "{0} a besoin de {n} mod, de proche en proche.": {
+  "one": "{0} necesita {n} mod, paso a paso.",
+  "other": "{0} necesita {n} mods, paso a paso."
+ },
+ "Montrer la chaîne de ce mod": "Mostrar la cadena de este mod",
+ "Sa chaîne": "Su cadena",
+ "perd : {0}": "pierde: {0}",
+ "tombe avec : {0}": "cae con: {0}",
+ "exigé par : {0}": "requerido por: {0}",
+ "prérequis : {0}": "requisitos: {0}",
+ "Palier {0}": "Nivel {0}",
+ "Amputés, sans tomber": "Debilitados, sin caer",
+ "{n} mod perd un prérequis optionnel": {
+  "one": "{n} mod pierde un requisito opcional",
+  "other": "{n} mods pierden un requisito opcional"
+ },
+ "Départ": "Inicio",
+ "clic : la chaîne de ce mod": "clic: la cadena de este mod",
+ "Graphe de la chaîne des prérequis": "Grafo de la cadena de requisitos",
+ "{n} amputé": {
+  "one": "{n} debilitado",
+  "other": "{n} debilitados"
+ },
+ "  ! code de {n} zip pas encore lu : `prerequis --code` le lit": {
+  "one": "  ! código de {n} zip aún sin leer: `prerequis --code` lo lee",
+  "other": "  ! código de {n} zips aún sin leer: `prerequis --code` lo lee"
+ },
+ "prerequis --cadre : un de {0}": "prerequis --cadre: uno de {0}",
+ "prerequis --chute / --besoin : --mod MOD, ou --cadre CODE": "prerequis --chute / --besoin: --mod MOD o --cadre CODE",
+ "prerequis --besoin : --mod MOD": "prerequis --besoin: --mod MOD",
+ "  palier {0} ({n} mod)": {
+  "one": "  nivel {0} ({n} mod)",
+  "other": "  nivel {0} ({n} mods)"
+ },
+ "{n} mod perd un prérequis optionnel sans tomber :": {
+  "one": "{n} mod pierde un requisito opcional sin caer:",
+  "other": "{n} mods pierden un requisito opcional sin caer:"
+ },
+ "Ce qu'il faut à {0}, de proche en proche :": "Lo que necesita {0}, paso a paso:",
+ "Si {0} part, {n} mod actif ne se charge plus :": {
+  "one": "Si se retira {0}, {n} mod activo deja de cargarse:",
+  "other": "Si se retira {0}, {n} mods activos dejan de cargarse:"
+ },
+ " (optionnel)": " (opcional)"
 }

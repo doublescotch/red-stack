@@ -43,7 +43,7 @@ const faux = {
     createStatusBarItem: () => ({ show() { etat.barre = true; }, hide() { etat.barre = false; }, dispose() {} }),
     createTreeView: (id, o) => { etat.arbre = o.treeDataProvider; return { onDidChangeVisibility: (f) => { etat.vue = f; }, dispose() {} }; },
     createWebviewPanel: (type) => { etat.crees = (etat.crees || 0) + 1; etat.dernier = fauxPanneau(); etat.dernier.type = type; return etat.dernier; },
-    registerWebviewPanelSerializer: (type, s) => { if (type === 'redStack') etat.serialiseur = s; else if (type === 'redStackCode') etat.serialiseurCode = s; else if (type === 'redStackAide') etat.serialiseurAide = s; else if (type === 'redStackObjets') etat.serialiseurObjets = s; else etat.serialiseurAnalyse = s; return { dispose() {} }; },
+    registerWebviewPanelSerializer: (type, s) => { if (type === 'redStack') etat.serialiseur = s; else if (type === 'redStackCode') etat.serialiseurCode = s; else if (type === 'redStackAide') etat.serialiseurAide = s; else if (type === 'redStackObjets') etat.serialiseurObjets = s; else if (type === 'redStackDependances') etat.serialiseurDeps = s; else etat.serialiseurAnalyse = s; return { dispose() {} }; },
     onDidChangeWindowState: (f) => { etat.fenetre = f; return { dispose() {} }; },
     registerUriHandler: (g) => { etat.adresse = g.handleUri; return { dispose() {} }; },
     showWarningMessage: async (texte, opt) => { modales.push({ texte, detail: opt.detail }); return reponse; },
@@ -275,6 +275,27 @@ const instantane = () => {
     const ob3 = (await attend('objets', nr)).data;
     controle("« Objets » : le moteur répond, dossier des parties dit, liste des mods (rien n'est écrit)",
       ob3 && typeof ob3.dossier === 'string' && Array.isArray(ob3.mods) && Array.isArray(ob3.parties), ob3);
+    const dp = fauxPanneau(), dp2 = fauxPanneau();       // l'onglet « Dépendances » rouvert : la même page, corps marqué « dependances »
+    await etat.serialiseurDeps.deserializeWebviewPanel(dp, undefined);
+    await etat.serialiseurDeps.deserializeWebviewPanel(dp2, undefined);
+    controle("onglet « Dépendances » rouvert par VS Code : page d'analyse « dependances », un doublon est fermé",
+      /class="analyse dependances"/.test(dp.webview.html) && dp2.jete === true);
+    dp.ferme();
+    versPage = pagePrincipale;
+    nr = recus.length;
+    await pagePrincipale({ t: 'dependances' });
+    const dep = (await attend('dependances', nr)).data;
+    const socle = dep && dep.mods.find((r) => r.requis_par_actifs > 0);
+    controle("« Dépendances » : prérequis du dépôt, compte du code pas encore lu (rien n'est écrit)",
+      dep && Array.isArray(dep.mods) && Array.isArray(dep.cadres) && typeof dep.code_non_lus === 'number', dep && Object.keys(dep));
+    nr = recus.length;
+    await pagePrincipale({ t: 'chaine', depart: socle ? socle.cle : 'c:cet', sens: 'chute' });
+    const chn = (await attend('chaine', nr)).data;
+    nr = recus.length;
+    await pagePrincipale({ t: 'chaine', depart: 'c:cet', sens: 'besoin' });
+    const chc = (await attend('chaine', nr)).data;
+    controle("« Dépendances » : la chaîne d'un mod (ce qui tombe), celle d'un cadre (toujours « chute », même demandée « besoin »)",
+      chn && chn.sens === 'chute' && chn.noeuds[chn.depart].palier === 0 && chc && chc.depart === 'c:cet' && chc.sens === 'chute', [chn, chc]);
     const profilAvant = fs.readFileSync(path.join(DONNEES, 'profils', 't.json'), 'utf8'), jeuAvant = instantane();
     const alpha = cf.data.ordre.find((a) => a.genre === 'mod' && a.zip).zip;
     nr = recus.length;

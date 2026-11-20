@@ -137,11 +137,14 @@ TOOLS = [
     tool("red_stack_magasin", "State of the store (one tree per mod, linked to the game) for this profile, read only: number of game files "
                               "linked or copied, size that Explorer adds up against real size on the disk, free room, trees without an active "
                               "mod (what a purge would free), local edits. The purge is done in VS Code.", P_PROFIL),
-    tool("red_stack_prerequis", "Requirements of the mods (read only): what each mod needs, from two sources. `nexus` = the list the author "
+    tool("red_stack_prerequis", "Requirements of the mods (read only): what each mod needs, from three sources. `nexus` = the list the author "
                                 "declares on the mod's Nexus page (no minimum version, and authors also list what they merely recommend: only "
                                 "the free-text note tells, `optionnel` is a guess from that note). `fichiers` = a framework deduced from where "
                                 "the zip puts its files (CET, RED4ext, redscript, TweakXL, ArchiveXL, Input Loader, Audioware, REDmod), known "
-                                "without Nexus. `par` = the zips of the repository that provide it; `etat` (codes): actif = an active zip "
+                                "without Nexus. `code` = read in the zip's scripts: a Redscript module imported, a global class or function "
+                                "another zip declares, ModuleExists, a CET mod called by GetMod, a TweakXL record built ($base) on another "
+                                "zip's record; `preuves` = file of the zip and line; a use always guarded (@if, ModuleExists, GetMod tested) "
+                                "is `optionnel`. `par` = the zips of the repository that provide it; `etat` (codes): actif = an active zip "
                                 "provides it, dans le jeu = present in the game but not installed by Red Stack, coupé = its zip is disabled, "
                                 "rangé = its zip is only parked or in an arrivals folder, absent = nowhere, externe = outside Nexus, not "
                                 "checkable. Without `mod`: the frameworks, and the ACTIVE mods missing something (`manque` = frameworks, the mod "
@@ -152,6 +155,17 @@ TOOLS = [
           "requis": {"type": "string", "description": "With `mod` and `ignore`: the `ident` of ONE requirement of that mod (as returned in its list)"},
           "ignore": {"type": "boolean", "description": "With `mod` and `requis`: true = stop counting this requirement for this mod (not needed, or held "
                                                        "under another zip), false = count it again. Noted in the settings, reversible; the game is not touched."}}),
+    tool("red_stack_dependances", "Chain of requirements of ONE mod or framework (read only). `sens` chute (default): the ACTIVE mods that "
+                                  "would no longer load if it went away, tier by tier (`palier` 1 = those requiring it, 2 = those requiring a "
+                                  "tier-1 mod, and so on; a mod falls when ALL active providers of one of its firm requirements fell); "
+                                  "`amputes` = mods that only lose an optional requirement. `sens` besoin: everything it needs, step by step. "
+                                  "`noeuds` = {key: {palier, via, nom}}, `liens` = [{de, vers, requis, ferme}]. `code` true reads the code of "
+                                  "every zip not read yet first (half a minute to a minute the first time).",
+         {**P_PROFIL, "mod": {"type": "string", "description": "Text that designates ONE zip, or its exact key (stack/[folder/]name.zip)"},
+          "cadre": {"type": "string", "description": "Instead of `mod`: a framework code (cet, red4ext, redscript, tweakxl, archivexl, codeware, "
+                                                     "input_loader, audioware, mod_settings, native_settings, redmod); `sens` chute only"},
+          "sens": {"type": "string", "enum": ["chute", "besoin"], "description": "chute = what falls without it; besoin = what it needs"},
+          "code": {"type": "boolean", "description": "Read the code of all zips not read yet first"}}),
     tool("red_stack_objets", "Items of the mods against a game save (read only, the save is never written): the weapons, clothing, "
                              "cyberware, weapon attachments (scopes, muzzles) and equipment mods (weapon, clothing and cyberware mods) "
                              "that the profile's TweakXL tweaks create, and for each one where the save holds it: `v` (on V), "
@@ -492,6 +506,19 @@ class Serveur:
             c["par"] = c["par"][:5]
         return {"cadres": d["cadres"], "lus_sur_nexus": d["compte"], "mods_sans_un_cadre": d["manques"], "mods_a_voir": d["a_voir"],
                 "optionnels_absents": d["optionnels"], "mods": vus[:80], "mods_total": len(vus), "erreur": d["erreur"]}
+
+    def red_stack_dependances(self, p):
+        if bool(p.get("mod")) == bool(p.get("cadre")):
+            raise ValueError("one of `mod` or `cadre`")
+        besoin = p.get("sens") == "besoin"
+        d = self.rs("prerequis", "--profil", p.get("profil") or "actuel", *(["--mod", p["mod"]] if p.get("mod") else ["--cadre", p["cadre"]]),
+                    "--besoin" if besoin else "--chute", *(["--code"] if p.get("code") else []))
+        noeuds = d["noeuds"]
+        if len(noeuds) > 400:                        # une chaîne énorme (CET) : les 400 premiers par palier, le reste compté
+            garde = dict(sorted(noeuds.items(), key=lambda i: i[1]["palier"])[:400])
+            d["noeuds_total"], d["noeuds"] = len(noeuds), garde
+            d["liens"] = [l for l in d["liens"] if l["de"] in garde and l["vers"] in garde]
+        return d
 
     def red_stack_sauvegardes(self, p):
         if p.get("cree"):

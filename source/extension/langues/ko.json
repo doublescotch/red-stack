@@ -1822,7 +1822,6 @@
   "other": "제작자가 Nexus에서 필수로 지정한 mod {n}개가 활성화되지 않았습니다. 세부 정보에서 제작자 메모와 함께 확인할 수 있습니다."
  },
  "prérequis ?": "필수 항목?",
- "déclaré sur Nexus, et déduit de ses fichiers": "Nexus에 명시되고 파일에서도 추론됨",
  "déclaré sur Nexus": "Nexus에 명시됨",
  "déduit de ses fichiers": "파일에서 추론됨",
  "Ouvrir le détail du zip qui le fournit": "이를 제공하는 zip의 세부 정보 열기",
@@ -1982,5 +1981,97 @@
  "Pièces montées illisibles sur {n} objet de cette sauvegarde : elles ne sont pas comptées.": {
   "other": "이 저장 파일의 아이템 {n}개에서 장착된 부품을 읽을 수 없습니다: 집계되지 않습니다."
  },
- "monté sur un objet": "아이템에 장착됨"
+ "monté sur un objet": "아이템에 장착됨",
+ "Red Stack · Dépendances": "Red Stack · 의존성",
+ "Dépendances": "의존성",
+ "chaîne des prérequis": "필수 항목 체인",
+ "Ce qui ne se charge plus si un mod part, et tout ce qu'il lui faut : en liste ou en graphe": "mod를 빼면 더 이상 로드되지 않는 것과 그 mod에 필요한 모든 것: 목록 또는 그래프로 표시",
+ "Chaîne des prérequis d'un mod, en liste ou en graphe : ce qui ne se charge plus s'il part, et tout ce qu'il lui faut. S'ouvre dans un onglet à lui. Lecture seule.": "mod의 필수 항목 체인을 목록 또는 그래프로 표시: 빼면 더 이상 로드되지 않는 것과 그 mod에 필요한 모든 것. 별도 탭에서 열립니다. 읽기 전용.",
+ "Filtrer : mod…": "필터: mod…",
+ "Filtrer par nom de mod": "mod 이름으로 필터링",
+ "lu dans son code": "코드에서 읽음",
+ "vu dans {0}, ligne {1} : {2}": "{0}의 {1}번째 줄에서 발견: {2}",
+ "{n} autre usage": {
+  "other": "그 외 사용 {n}건"
+ },
+ "Les mods actifs qui ne se chargent plus si ce mod part, palier par palier, en liste ou en graphe": "이 mod를 빼면 더 이상 로드되지 않는 활성 mod를 단계별로, 목록 또는 그래프로 표시",
+ "Ce qui tombe sans lui…": "이것 없이 탈락하는 것…",
+ "Tout ce que ce mod exige, de proche en proche, en liste ou en graphe": "이 mod가 요구하는 모든 것을 단계적으로 따라가며 목록 또는 그래프로 표시",
+ "Tout ce qu'il lui faut…": "필요한 모든 것…",
+ "La lecture des prérequis a échoué (message en haut de l'onglet).": "필수 항목을 읽지 못했습니다(탭 상단의 메시지 참조).",
+ "Lecture du code de tous les zips du dépôt… Une demi-minute à une minute la première fois.": "저장소의 모든 zip 코드를 읽는 중… 처음에는 30초에서 1분이 걸립니다.",
+ "Lecture des prérequis du dépôt…": "저장소의 필수 항목을 읽는 중…",
+ "Le code de {n} zip n'est pas encore lu : ses prérequis lus dans le code manquent.": {
+  "other": "zip {n}개의 코드를 아직 읽지 않았습니다. 코드에서 읽은 필수 항목이 빠져 있습니다."
+ },
+ "Lire le code": "코드 읽기",
+ "Un prérequis vient de trois sources : déclaré sur Nexus, déduit de la place des fichiers (un script Redscript exige redscript), ou lu dans le code (un module importé, une classe d'un autre mod, un appel GetMod, un objet TweakXL bâti sur celui d'un autre).": "필수 항목의 출처는 세 가지입니다: Nexus에 명시된 것, 파일 위치에서 추론한 것(Redscript 스크립트에는 redscript가 필요), 코드에서 읽은 것(가져온 모듈, 다른 mod의 클래스, GetMod 호출, 다른 mod의 아이템을 바탕으로 만든 TweakXL 아이템).",
+ "Un prérequis est <b>ferme</b> si le mod ne se charge pas sans lui ; <b>optionnel</b> si l'auteur le dit facultatif, ou si le code s'en passe (usage gardé par ModuleExists, @if, GetMod testé). Lecture seule.": "mod가 그것 없이 로드되지 않으면 그 필수 항목은 <b>필수</b>입니다. 제작자가 선택 사항이라고 밝혔거나 코드가 그것 없이도 동작하면(ModuleExists, @if, 검사된 GetMod로 보호된 사용) <b>선택 사항</b>입니다. 읽기 전용.",
+ "Choisissez un mod : sa chaîne dit ce qui ne se charge plus s'il part, palier par palier, ou tout ce qu'il lui faut. Ici, les mods dont dépendent le plus de mods actifs.": "mod를 선택하십시오. 그 체인은 빼면 더 이상 로드되지 않는 것(단계별) 또는 필요한 모든 것을 보여 줍니다. 여기에는 가장 많은 활성 mod가 의존하는 mod가 표시됩니다.",
+ "{n} mod exigé par d'autres, {0} montrés : affinez par le champ de filtre.": {
+  "other": "다른 mod가 필요로 하는 mod {n}개, {0}개 표시: 필터 필드로 범위를 좁히십시오."
+ },
+ "{n} mod exigé par d'autres mods actifs.": {
+  "other": "다른 활성 mod가 필요로 하는 mod {n}개."
+ },
+ "Montrer sa chaîne": "체인 표시",
+ "Revenir à la liste des mods dont d'autres dépendent": "다른 mod가 의존하는 mod 목록으로 돌아가기",
+ "← Socles": "← 기반 mod",
+ "Chaîne": "체인",
+ "Ce qui tombe sans lui": "이것 없이 탈락하는 것",
+ "Les mods actifs qui ne se chargent plus si ce mod part : ceux qui l'exigent, puis ceux qui exigent ceux-là, jusqu'au bout.": "이 mod를 빼면 더 이상 로드되지 않는 활성 mod: 이 mod를 요구하는 mod, 다시 그 mod들을 요구하는 mod를 끝까지 따라갑니다.",
+ "Ce qu'il lui faut": "필요한 것",
+ "Tout ce que ce mod exige, puis ce que ses prérequis exigent, jusqu'au bout.": "이 mod가 요구하는 모든 것, 다시 그 필수 항목이 요구하는 것을 끝까지 따라갑니다.",
+ "Vue": "보기",
+ "Liste": "목록",
+ "Graphe": "그래프",
+ "Réduire": "축소",
+ "Agrandir": "확대",
+ "La lecture de la chaîne a échoué (message en haut de l'onglet).": "체인을 읽지 못했습니다(탭 상단의 메시지 참조).",
+ "Lecture de la chaîne…": "체인을 읽는 중…",
+ "Si {0} part, aucun mod actif ne tombe.": "{0}을(를) 빼도 탈락하는 활성 mod는 없습니다.",
+ "{0} n'a besoin d'aucun mod du dépôt.": "{0}은(는) 저장소의 어떤 mod도 필요로 하지 않습니다.",
+ "Si {0} part, {n} mod actif ne se charge plus.": {
+  "other": "{0}을(를) 빼면 활성 mod {n}개가 더 이상 로드되지 않습니다."
+ },
+ "{n} autre perd un prérequis optionnel.": {
+  "other": "그 외 {n}개는 선택 필수 항목을 잃습니다."
+ },
+ "{0} a besoin de {n} mod, de proche en proche.": {
+  "other": "{0}은(는) 단계적으로 mod {n}개를 필요로 합니다."
+ },
+ "Montrer la chaîne de ce mod": "이 mod의 체인 표시",
+ "Sa chaîne": "해당 체인",
+ "perd : {0}": "잃음: {0}",
+ "tombe avec : {0}": "함께 탈락: {0}",
+ "exigé par : {0}": "필요로 하는 mod: {0}",
+ "prérequis : {0}": "필수 항목: {0}",
+ "Palier {0}": "{0}단계",
+ "Amputés, sans tomber": "기능 축소, 탈락 없음",
+ "{n} mod perd un prérequis optionnel": {
+  "other": "mod {n}개가 선택 필수 항목을 잃음"
+ },
+ "Départ": "시작점",
+ "clic : la chaîne de ce mod": "클릭: 이 mod의 체인",
+ "Graphe de la chaîne des prérequis": "필수 항목 체인 그래프",
+ "{n} amputé": {
+  "other": "기능 축소 {n}개"
+ },
+ "  ! code de {n} zip pas encore lu : `prerequis --code` le lit": {
+  "other": "  ! zip {n}개의 코드를 아직 읽지 않음: `prerequis --code`로 읽습니다"
+ },
+ "prerequis --cadre : un de {0}": "prerequis --cadre: {0} 중 하나",
+ "prerequis --chute / --besoin : --mod MOD, ou --cadre CODE": "prerequis --chute / --besoin: --mod MOD 또는 --cadre CODE",
+ "prerequis --besoin : --mod MOD": "prerequis --besoin: --mod MOD",
+ "  palier {0} ({n} mod)": {
+  "other": "  {0}단계(mod {n}개)"
+ },
+ "{n} mod perd un prérequis optionnel sans tomber :": {
+  "other": "mod {n}개가 선택 필수 항목을 잃지만 탈락하지 않음:"
+ },
+ "Ce qu'il faut à {0}, de proche en proche :": "{0}에 단계적으로 필요한 것:",
+ "Si {0} part, {n} mod actif ne se charge plus :": {
+  "other": "{0}을(를) 빼면 활성 mod {n}개가 더 이상 로드되지 않습니다:"
+ },
+ " (optionnel)": " (선택 사항)"
 }

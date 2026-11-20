@@ -1997,7 +1997,6 @@
   "other": "{n} mods the author lists as required on Nexus are not active. Its detail says which, with the author's note."
  },
  "prérequis ?": "requirement?",
- "déclaré sur Nexus, et déduit de ses fichiers": "listed on Nexus, and deduced from its files",
  "déclaré sur Nexus": "listed on Nexus",
  "déduit de ses fichiers": "deduced from its files",
  "Ouvrir le détail du zip qui le fournit": "Open the detail of the zip that provides it",
@@ -2178,5 +2177,110 @@
   "one": "Installed parts unreadable on {n} item of this save: they are not counted.",
   "other": "Installed parts unreadable on {n} items of this save: they are not counted."
  },
- "monté sur un objet": "installed on an item"
+ "monté sur un objet": "installed on an item",
+ "Red Stack · Dépendances": "Red Stack · Dependencies",
+ "Dépendances": "Dependencies",
+ "chaîne des prérequis": "chain of requirements",
+ "Ce qui ne se charge plus si un mod part, et tout ce qu'il lui faut : en liste ou en graphe": "What no longer loads if a mod goes away, and everything it needs: as a list or as a graph",
+ "Chaîne des prérequis d'un mod, en liste ou en graphe : ce qui ne se charge plus s'il part, et tout ce qu'il lui faut. S'ouvre dans un onglet à lui. Lecture seule.": "Chain of requirements of a mod, as a list or as a graph: what no longer loads if it goes away, and everything it needs. Opens in a tab of its own. Read only.",
+ "Filtrer : mod…": "Filter: mod…",
+ "Filtrer par nom de mod": "Filter by mod name",
+ "lu dans son code": "read in its code",
+ "vu dans {0}, ligne {1} : {2}": "seen in {0}, line {1}: {2}",
+ "{n} autre usage": {
+  "one": "{n} more use",
+  "other": "{n} more uses"
+ },
+ "Les mods actifs qui ne se chargent plus si ce mod part, palier par palier, en liste ou en graphe": "The active mods that no longer load if this mod goes away, tier by tier, as a list or as a graph",
+ "Ce qui tombe sans lui…": "What falls without it…",
+ "Tout ce que ce mod exige, de proche en proche, en liste ou en graphe": "Everything this mod requires, step by step, as a list or as a graph",
+ "Tout ce qu'il lui faut…": "Everything it needs…",
+ "La lecture des prérequis a échoué (message en haut de l'onglet).": "Reading the requirements failed (message at the top of the tab).",
+ "Lecture du code de tous les zips du dépôt… Une demi-minute à une minute la première fois.": "Reading the code of every zip of the repository… Half a minute to a minute the first time.",
+ "Lecture des prérequis du dépôt…": "Reading the requirements of the repository…",
+ "Le code de {n} zip n'est pas encore lu : ses prérequis lus dans le code manquent.": {
+  "one": "The code of {n} zip is not read yet: its requirements read in the code are missing.",
+  "other": "The code of {n} zips is not read yet: their requirements read in the code are missing."
+ },
+ "Lire le code": "Read the code",
+ "Un prérequis vient de trois sources : déclaré sur Nexus, déduit de la place des fichiers (un script Redscript exige redscript), ou lu dans le code (un module importé, une classe d'un autre mod, un appel GetMod, un objet TweakXL bâti sur celui d'un autre).": "A requirement comes from three sources: declared on Nexus, deduced from where the files go (a Redscript script requires redscript), or read in the code (an imported module, a class of another mod, a GetMod call, a TweakXL item built on another mod's item).",
+ "Un prérequis est <b>ferme</b> si le mod ne se charge pas sans lui ; <b>optionnel</b> si l'auteur le dit facultatif, ou si le code s'en passe (usage gardé par ModuleExists, @if, GetMod testé). Lecture seule.": "A requirement is <b>firm</b> if the mod does not load without it; <b>optional</b> if the author says it is optional, or if the code does without it (use guarded by ModuleExists, @if, GetMod tested). Read only.",
+ "Choisissez un mod : sa chaîne dit ce qui ne se charge plus s'il part, palier par palier, ou tout ce qu'il lui faut. Ici, les mods dont dépendent le plus de mods actifs.": "Choose a mod: its chain tells what no longer loads if it goes away, tier by tier, or everything it needs. Here, the mods that the most active mods depend on.",
+ "{n} mod exigé par d'autres, {0} montrés : affinez par le champ de filtre.": {
+  "one": "{n} mod required by others, {0} shown: narrow down with the filter field.",
+  "other": "{n} mods required by others, {0} shown: narrow down with the filter field."
+ },
+ "{n} mod exigé par d'autres mods actifs.": {
+  "one": "{n} mod required by other active mods.",
+  "other": "{n} mods required by other active mods."
+ },
+ "Montrer sa chaîne": "Show its chain",
+ "Revenir à la liste des mods dont d'autres dépendent": "Back to the list of the mods that others depend on",
+ "← Socles": "← Foundations",
+ "Chaîne": "Chain",
+ "Ce qui tombe sans lui": "What falls without it",
+ "Les mods actifs qui ne se chargent plus si ce mod part : ceux qui l'exigent, puis ceux qui exigent ceux-là, jusqu'au bout.": "The active mods that no longer load if this mod goes away: those requiring it, then those requiring them, all the way down.",
+ "Ce qu'il lui faut": "What it needs",
+ "Tout ce que ce mod exige, puis ce que ses prérequis exigent, jusqu'au bout.": "Everything this mod requires, then what its requirements require, all the way down.",
+ "Vue": "View",
+ "Liste": "List",
+ "Graphe": "Graph",
+ "Réduire": "Zoom out",
+ "Agrandir": "Zoom in",
+ "La lecture de la chaîne a échoué (message en haut de l'onglet).": "Reading the chain failed (message at the top of the tab).",
+ "Lecture de la chaîne…": "Reading the chain…",
+ "Si {0} part, aucun mod actif ne tombe.": "If {0} goes away, no active mod falls.",
+ "{0} n'a besoin d'aucun mod du dépôt.": "{0} needs no mod of the repository.",
+ "Si {0} part, {n} mod actif ne se charge plus.": {
+  "one": "If {0} goes away, {n} active mod no longer loads.",
+  "other": "If {0} goes away, {n} active mods no longer load."
+ },
+ "{n} autre perd un prérequis optionnel.": {
+  "one": "{n} other loses an optional requirement.",
+  "other": "{n} others lose an optional requirement."
+ },
+ "{0} a besoin de {n} mod, de proche en proche.": {
+  "one": "{0} needs {n} mod, step by step.",
+  "other": "{0} needs {n} mods, step by step."
+ },
+ "Montrer la chaîne de ce mod": "Show the chain of this mod",
+ "Sa chaîne": "Its chain",
+ "perd : {0}": "loses: {0}",
+ "tombe avec : {0}": "falls with: {0}",
+ "exigé par : {0}": "required by: {0}",
+ "prérequis : {0}": "requirements: {0}",
+ "Palier {0}": "Tier {0}",
+ "Amputés, sans tomber": "Weakened, without falling",
+ "{n} mod perd un prérequis optionnel": {
+  "one": "{n} mod loses an optional requirement",
+  "other": "{n} mods lose an optional requirement"
+ },
+ "Départ": "Start",
+ "clic : la chaîne de ce mod": "click: the chain of this mod",
+ "Graphe de la chaîne des prérequis": "Graph of the chain of requirements",
+ "{n} amputé": {
+  "one": "{n} weakened",
+  "other": "{n} weakened"
+ },
+ "  ! code de {n} zip pas encore lu : `prerequis --code` le lit": {
+  "one": "  ! code of {n} zip not read yet: `prerequis --code` reads it",
+  "other": "  ! code of {n} zips not read yet: `prerequis --code` reads them"
+ },
+ "prerequis --cadre : un de {0}": "prerequis --cadre: one of {0}",
+ "prerequis --chute / --besoin : --mod MOD, ou --cadre CODE": "prerequis --chute / --besoin: --mod MOD, or --cadre CODE",
+ "prerequis --besoin : --mod MOD": "prerequis --besoin: --mod MOD",
+ "  palier {0} ({n} mod)": {
+  "one": "  tier {0} ({n} mod)",
+  "other": "  tier {0} ({n} mods)"
+ },
+ "{n} mod perd un prérequis optionnel sans tomber :": {
+  "one": "{n} mod loses an optional requirement without falling:",
+  "other": "{n} mods lose an optional requirement without falling:"
+ },
+ "Ce qu'il faut à {0}, de proche en proche :": "What {0} needs, step by step:",
+ "Si {0} part, {n} mod actif ne se charge plus :": {
+  "one": "If {0} goes away, {n} active mod no longer loads:",
+  "other": "If {0} goes away, {n} active mods no longer load:"
+ },
+ " (optionnel)": " (optional)"
 }

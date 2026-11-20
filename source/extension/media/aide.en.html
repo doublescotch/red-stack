@@ -113,10 +113,11 @@
 <li><b>Priority between two mods</b>: when two enabled mods want the same file with a different content, the plan stops on a conflict to settle. You say which one wins, file by file or for the whole mod; the profile remembers.</li>
 </ul>
 <h3 id="prerequis">Requirements</h3>
-<p>The detail says what the mod needs to work, which zip of your repository provides it, and in what state. Two sources:</p>
+<p>The detail says what the mod needs to work, which zip of your repository provides it, and in what state. Three sources:</p>
 <ul>
 <li><b>Listed on Nexus</b>: the list the author gives on the mod page. It is read along with the updates (“Updates” view), or for a single mod with <b class="b">Read on Nexus</b>; no API key is asked for. Nexus gives no minimum version, and authors also file there what they merely recommend: only their note tells. Red Stack marks as “optional” a requirement whose note suggests so, and never counts it as a fault.</li>
 <li><b>Deduced from its files</b>: a framework is recognised by where the zip puts its files (a Lua script in the mods folder of Cyber Engine Tweaks, a <code>.reds</code> under <code>r6/scripts</code>, a tweak under <code>r6/tweaks</code>, an <code>.xl</code>, a plugin under <code>red4ext/plugins</code>, an entry under <code>r6/input</code>, a sound under <code>r6/audioware</code>, a REDmod). This reading does without Nexus: it also holds for a mod with no number.</li>
+<li><b>Read in its code</b>: what the zip's scripts call from another zip of the repository. A Redscript module imported (<code>import Module.*</code>), a global class or function another zip declares, a <code>ModuleExists("…")</code>, a CET mod called by <code>GetMod("…")</code>, a TweakXL item built (<code>$base</code>) on another mod's item or citing it. The line says where it is seen: file of the zip, line, name called. A use that is always guarded (<code>@if(ModuleExists(…))</code>, <code>ModuleExists</code>, a <code>GetMod</code> tested before use) makes the requirement optional: the mod does without it. What the base game already carries (its scripts, its database, Phantom Liberty included) is nobody's requirement.</li>
 </ul>
 <table>
 <tr><th>active</th><td>An active zip of the profile provides it.</td></tr>
@@ -127,6 +128,7 @@
 <tr><th>outside Nexus</th><td>A requirement from outside Nexus (ReShade…) or from another game: Red Stack cannot check it.</td></tr>
 </table>
 <p>“Required by” lists, the other way round, the mods of the repository that need this one; a disabled mod that active mods require says so in red. A requirement you hold under another zip (a pack, an edited version with no Nexus number) is still shown as “missing”: Red Stack recognises a Nexus mod only by the number carried in the zip name. In that case, or if you do not want it, <b class="b">Ignore</b> on its line silences it for this mod: it stays listed, marked “ignored”, raises no chip and no warning in the plan any more, and the choice follows the mod from one version to the next; <b class="b">Stop ignoring</b> brings it back.</p>
+<p><b class="b">What falls without it…</b> and <b class="b">Everything it needs…</b> open the <a href="#dependances">chain of requirements</a> of this mod, as a list or as a graph.</p>
 <h3>The buttons of the detail</h3>
 <ul>
 <li><b class="b">Installer…</b>: the choice pages of a <a href="#fomod">FOMOD</a>.</li>
@@ -333,6 +335,19 @@
 <li>An unfolded row lists the items of the mod, each with where the save holds it. A click on <code>file:line</code> opens the tweak that creates it; “Mod detail” opens its detail.</li>
 </ul>
 <div class="note garde">Items are read from the profile's TweakXL tweaks (<code>.yaml</code>). Not seen: items created by a <code>.tweak</code> file of the old format, by CET Lua or by Redscript. The kind of an item is deduced from what its record says about itself; if it is built on a game item, from what the game's database (<code>r6/cache/tweakdb.bin</code>) says about that one. Without it, the name of the game item serves as a clue, and a rare name can leave the item out of the list; the tab says so. The save is read after the format described by WolvenKit (MIT licence), for game 2.0 and later.</div>
+</section>
+
+<section id="dependances" data-groupe="Analyses">
+<h2>Dependencies: the chain of requirements</h2>
+<p><b class="b">Dependencies</b> opens an analysis of its own: the chain of <a href="#prerequis">requirements</a> of a mod, all the way down. It answers “if I remove this mod, what no longer loads?”, and “what does this mod need, step by step?”. Read only.</p>
+<ul>
+<li>When it opens, the list of <b>foundations</b>: the mods other active mods depend on, from the most required to the least. A click on a name shows its chain; <b class="b">← Foundations</b> comes back to the list. From the detail of a mod, <b class="b">What falls without it…</b> and <b class="b">Everything it needs…</b> open its chain directly.</li>
+<li><b class="b">What falls without it</b>: tier 1, the active mods that require it; tier 2, those that require a tier-1 mod; and so on. A mod falls when <b>all</b> the active zips holding one of its firm requirements have fallen: if another active zip provides the same thing, it stays. The <b>weakened</b> ones only lose an optional requirement: they load, without the part that uses it.</li>
+<li><b class="b">What it needs</b>: what the mod requires, then what its requirements require. A requirement that nothing in the repository provides is a leaf, with its state (missing, disabled, outside Nexus).</li>
+<li><b class="b">List</b>: one block per tier, each mod with what it falls with (or who requires it) and the name of the requirement; <b class="b">Its chain</b> starts again from it. <b class="b">Graph</b>: one column per tier, the starting mod on the left; a solid line is a firm requirement, a dotted line an optional one. Hovering a mod brings out its lines, a click starts again from it; <b>−</b> and <b>+</b> set the size.</li>
+<li>Only the active mods of the profile count: a disabled mod does not run already, losing it changes nothing.</li>
+</ul>
+<div class="note garde">The chain is only as good as its three sources. Nexus files under the same word what is required and what is recommended; only the author's note tells. The code is read without compiling it: two mods that declare the same name are both named, and a name cited without being used counts. Not read: <code>.tweak</code> files of the old format, ArchiveXL <code>.xl</code> files, resources of an archive taken from another, Lua that calls Redscript by a name written as text. The first reading of the code of the whole repository takes half a minute to a minute (<b class="b">Read the code</b>); after that only new or changed zips are read again.</div>
 </section>
 
 <section id="historique" data-groupe="Tracking">

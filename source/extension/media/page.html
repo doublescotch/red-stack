@@ -300,6 +300,22 @@ body.conf main, body.conf #puces { display: none; }
 #conflits li.ress div b { color: var(--texte, inherit); font-weight: 600; }
 #conflits .chiffres .pousse { flex: 1 1 0; }
 #conflits p.compte { margin: 0; padding: 6px 12px; color: var(--pale); }
+#conflits ul.socles { padding: 0 12px; list-style: none; }
+#conflits .intro p.avis { color: var(--texte); }
+#conflits .graphe { overflow: auto; padding: 6px 12px 16px; }
+#conflits .graphe svg { display: block; }
+#conflits .graphe text { fill: var(--texte); font-size: 12px; }
+#conflits .graphe text.palier { fill: var(--pale); font-weight: 600; }
+#conflits .graphe path.lien { fill: none; stroke: var(--pale); stroke-opacity: .45; stroke-width: 1.2; }
+#conflits .graphe path.lien.souple { stroke-dasharray: 4 3; }
+#conflits .graphe path.lien.lit { stroke: var(--accent); stroke-opacity: 1; stroke-width: 2.2; }
+#conflits .graphe g.noeud rect { fill: var(--bande); stroke: var(--trait); }
+#conflits .graphe g.noeud[data-ddepart] { cursor: pointer; }
+#conflits .graphe g.noeud.lit rect, #conflits .graphe g.noeud:hover rect { fill: var(--survol); stroke: var(--accent); }
+#conflits .graphe g.noeud.depart rect { stroke: var(--accent); stroke-width: 2; }
+#conflits .graphe g.noeud.ampute rect { stroke: var(--ambre); stroke-dasharray: 4 3; }
+#conflits .graphe g.noeud.feuille rect { stroke: var(--rouge); stroke-dasharray: 3 2; }
+#conflits .graphe g.noeud.coupe text { fill: var(--pale); }
 #conflits .verbe { color: var(--pale); font-weight: 400; margin: 0 6px; }
 #conflits .grille .pousse { flex: 1 1 0; }
 #conflits .grille button small { color: var(--pale); margin-left: 4px; }
@@ -347,6 +363,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     <button id="conf" title="Analyse des conflits dans les archives : ordre de chargement, qui gagne sur qui. S'ouvre dans un onglet à côté. Lecture seule.">Conflits</button>
     <button id="scripts" title="Conflits de code entre mods : méthodes Redscript, propriétés TweakXL. S'ouvre dans un onglet à lui. Lecture seule ; la première fois, quelques dizaines de secondes.">Scripts</button>
     <button id="objets" title="Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement), face à une sauvegarde de partie : ce qui est sur V, dans la planque, la garde-robe ou monté sur un objet, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.">Objets</button>
+    <button id="deps" title="Chaîne des prérequis d'un mod, en liste ou en graphe : ce qui ne se charge plus s'il part, et tout ce qu'il lui faut. S'ouvre dans un onglet à lui. Lecture seule.">Dépendances</button>
   </span>
   <span class="sep"></span>
   <button id="regle" title="Dossiers du dépôt, du jeu et du magasin, convention, réglages, hors Red Stack, référence du jeu" aria-pressed="false">Réglages</button>
@@ -393,6 +410,8 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
   const OBJ = document.body.classList.contains('objets');      // onglet « Objets » : la même page, réduite aux objets des mods face à une sauvegarde
   if (SEULE) { document.getElementById('cherche').placeholder = T('Filtrer : mod, archive ou ressource…'); document.getElementById('cherche').setAttribute('aria-label', T("Filtrer par mod, par nom d'archive ou par chemin de ressource")); }
   if (OBJ) { document.getElementById('cherche').placeholder = T('Filtrer : mod ou objet…'); document.getElementById('cherche').setAttribute('aria-label', T("Filtrer par mod ou par nom d'objet")); }
+  const DEP = document.body.classList.contains('dependances');   // onglet « Dépendances » : la chaîne des prérequis, en liste ou en graphe
+  if (DEP) { document.getElementById('cherche').placeholder = T('Filtrer : mod…'); document.getElementById('cherche').setAttribute('aria-label', T('Filtrer par nom de mod')); }
   if (CODE) { document.getElementById('cherche').placeholder = T('Filtrer : mod, méthode, propriété ou fichier…'); document.getElementById('cherche').setAttribute('aria-label', T('Filtrer par mod, par méthode, par propriété ou par fichier')); }
   const E = { profil: '', profils: [], data: null, plies: new Set(), choisi: '', volet: null, sauve: vscode.getState() || {}, filtre: 'tous', tri: { col: '', sens: 1 }, nature: '', lot: new Set(), attente: new Map(), vol: new Map() };
   if (E.sauve.tri && E.sauve.tri.col) E.tri = E.sauve.tri;
@@ -608,13 +627,19 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     // un prérequis qui n'est pas là se tait d'un clic (inutile chez vous, ou tenu sous un autre zip) ; réversible
     const geste = (e) => (!absent(e) ? '' : e.ignore ? ` <button class="mini" data-reqreprend="${h(e.ident)}" title="${T`Compter de nouveau ce prérequis pour ce mod`}">${T`Ne plus ignorer`}</button>`
       : ` <button class="mini" data-reqignore="${h(e.ident)}" title="${T`Ne plus compter ce prérequis pour ce mod : vous n'en avez pas besoin, ou vous l'avez sous un autre zip. Réversible.`}">${T`Ignorer`}</button>`);
-    const source = (e) => (e.sources.length > 1 ? T('déclaré sur Nexus, et déduit de ses fichiers') : e.sources[0] === 'nexus' ? T('déclaré sur Nexus') : T('déduit de ses fichiers'));
+    const SRC = { nexus: T('déclaré sur Nexus'), fichiers: T('déduit de ses fichiers'), code: T('lu dans son code') };
+    const source = (e) => e.sources.map((s) => SRC[s] || s).join(T(', '));
+    // lu dans le code : où (fichier du zip, ligne), et ce qui y est appelé
+    const preuves = (e) => (!e.preuves || !e.preuves.length ? '' : `<div class="faits">${e.preuves.map((p) => T`vu dans ${h(p.fichier)}, ligne ${p.ligne} : ${h(p.cible)}`).join(' · ')}`
+      + (e.usages > e.preuves.length ? ` · ${N(e.usages - e.preuves.length, '{n} autre usage', '{n} autres usages')}` : '') + '</div>');
     const nom = (e) => (e.par.length ? `<button class="lien" data-va="${h(e.par[0])}" title="${T`Ouvrir le détail du zip qui le fournit`}">${h(e.nom)}</button>`
       : e.mod ? `<button class="lien" data-nexus="${e.mod}" title="${T`Ouvrir sa page Nexus`}">${h(e.nom)}</button>` : `<b>${h(e.nom)}</b>`);
-    let c = `<h3>${T`Prérequis`}</h3>`;
+    let c = `<h3>${T`Prérequis`}</h3>`
+      + `<p><button class="mini" data-depfen="${h(d.cle)}|chute" title="${T`Les mods actifs qui ne se chargent plus si ce mod part, palier par palier, en liste ou en graphe`}">${T`Ce qui tombe sans lui…`}</button> `
+      + `<button class="mini" data-depfen="${h(d.cle)}|besoin" title="${T`Tout ce que ce mod exige, de proche en proche, en liste ou en graphe`}">${T`Tout ce qu'il lui faut…`}</button></p>`;
     if (!d.actif && q.requis_par_actifs) c += `<p class="avis"><span class="pastille rouge"></span>${N(q.requis_par_actifs, '{n} mod actif exige ce mod, qui n\'est pas actif.', '{n} mods actifs exigent ce mod, qui n\'est pas actif.')}</p>`;
     if (q.requis.length) c += '<ul class="req">' + q.requis.map((e) => `<li><span class="etatf"><span class="pastille ${ton(e)}"></span><b class="mot ${ton(e)}">${h(dit(e.etat))}</b>${e.optionnel ? ` · ${T('optionnel')}` : ''}${e.ignore ? ` · ${T('ignoré')}` : ''}${geste(e)}</span>`
-      + `${nom(e)} <small>· ${source(e)}</small>${e.notes ? `<div class="faits">${T`Note de l'auteur : ${h(e.notes)}`}</div>` : ''}</li>`).join('') + '</ul>';
+      + `${nom(e)} <small>· ${source(e)}</small>${e.notes ? `<div class="faits">${T`Note de l'auteur : ${h(e.notes)}`}</div>` : ''}${preuves(e)}</li>`).join('') + '</ul>';
     else if (q.nexus === 'lu') c += `<p class="vide">${T`Aucun prérequis connu : rien de déclaré sur Nexus, et ses fichiers ne demandent aucun cadre.`}</p>`;
     if (q.nexus === 'jamais lu') c += `<p class="aide">${T`Les prérequis déclarés sur Nexus n'ont pas encore été lus pour ce mod.`} <button class="mini" data-reqlit="${h(d.cle)}">${T`Lire sur Nexus`}</button></p>`;
     else if (q.nexus === 'sans modId') c += `<p class="aide">${T`Ce zip ne porte pas de numéro Nexus : seuls les cadres déduits de ses fichiers sont connus.`}</p>`;
@@ -1121,11 +1146,137 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       }).join('') + (lues.length ? '' : `<p class="vide">${T('Rien ne correspond à ces filtres.')}</p>`));
   }
 
+  // ---- Dépendances : la chaîne des prérequis d'un mod (ce qui tombe s'il part, ce qu'il lui faut), en liste ou en graphe.
+  // E.conf.dep = prérequis de tout le dépôt (moteur `prerequis`) ; E.conf.ch = la chaîne demandée (`prerequis --chute / --besoin`).
+  const nomDep = (id, n) => (id.startsWith('c:') || id.startsWith('x:') || !E.data ? (n && n.nom) || id : titreZip(id));
+  function dessineDependances() {
+    const C = E.conf, d = C.dep, t = $('cherche').value.trim().toLowerCase();
+    if (!d) {
+      if (!C.depDemande && !C.depEchec) { C.depDemande = true; vscode.postMessage({ t: 'dependances' }); }
+      $('conflits').innerHTML = `<p class="vide">${C.depEchec
+        ? `${T`La lecture des prérequis a échoué (message en haut de l\'onglet).`} <button class="lien" data-dlit="1">${T`Relire`}</button>`
+        : C.depLecture ? T('Lecture du code de tous les zips du dépôt… Une demi-minute à une minute la première fois.') : T('Lecture des prérequis du dépôt…')}</p>`;
+      return;
+    }
+    C.depLecture = false;
+    const sens = C.dDepart.startsWith('c:') ? 'chute' : C.dSens;
+    const nonLus = d.code_non_lus ? `<p class="avis"><span class="pastille ambre"></span>${N(d.code_non_lus, 'Le code de {n} zip n\'est pas encore lu : ses prérequis lus dans le code manquent.', 'Le code de {n} zips n\'est pas encore lu : leurs prérequis lus dans le code manquent.')} <button class="mini" data-dlit="1">${T`Lire le code`}</button></p>` : '';
+    const aide = `<p>${T`Un prérequis vient de trois sources : déclaré sur Nexus, déduit de la place des fichiers (un script Redscript exige redscript), ou lu dans le code (un module importé, une classe d\'un autre mod, un appel GetMod, un objet TweakXL bâti sur celui d\'un autre).`} `
+      + `${T`Un prérequis est <b>ferme</b> si le mod ne se charge pas sans lui ; <b>optionnel</b> si l\'auteur le dit facultatif, ou si le code s\'en passe (usage gardé par ModuleExists, @if, GetMod testé). Lecture seule.`}</p>`;
+    if (!C.dDepart) {                                 // la liste des socles : les mods dont dépendent le plus de mods actifs
+      const rows = d.mods.filter((r) => r.requis_par_actifs > 0).map((r) => ({ id: r.cle, n: r.requis_par_actifs, actif: r.actif, pile: r.cle.split('/')[0] }))
+        .concat(d.cadres.filter((c) => c.etat === 'dans le jeu' && c.exige_par).map((c) => ({ id: 'c:' + c.cadre, n: c.exige_par, actif: true, pile: T('hors Red Stack'), nom: c.nom })))
+        .filter((r) => !t || nomDep(r.id, r).toLowerCase().includes(t) || r.id.toLowerCase().includes(t))
+        .sort((a, b) => b.n - a.n || nomDep(a.id, a).localeCompare(nomDep(b.id, b), LANGUE));
+      const MAX = 300;
+      $('conflits').innerHTML = `<div class="intro"><p>${T`Choisissez un mod : sa chaîne dit ce qui ne se charge plus s\'il part, palier par palier, ou tout ce qu\'il lui faut. Ici, les mods dont dépendent le plus de mods actifs.`}</p>${aide}${nonLus}</div>`
+        + `<p class="compte">${rows.length > MAX ? N(rows.length, '{n} mod exigé par d\'autres, {0} montrés : affinez par le champ de filtre.', '{n} mods exigés par d\'autres, {0} montrés : affinez par le champ de filtre.', MAX) : N(rows.length, '{n} mod exigé par d\'autres mods actifs.', '{n} mods exigés par d\'autres mods actifs.')}</p>`
+        + '<ul class="socles">' + rows.slice(0, MAX).map((r) => `<li class="site${r.actif ? ' gagne' : ''}"><button class="lien" data-ddepart="${h(r.id)}" title="${T`Montrer sa chaîne`}">${h(nomDep(r.id, r))}</button>`
+          + `<small>${h(nomPile(r.pile))}</small> · ${N(r.n, 'exigé par {n} mod actif', 'exigé par {n} mods actifs')}${r.actif ? '' : ` · <b class="mot rouge">${T`coupé`}</b>`}</li>`).join('') + '</ul>';
+      return;
+    }
+    const ch = C.ch, cle = C.dDepart + '|' + sens;
+    if ((!ch || ch.depart !== C.dDepart || ch.sens !== sens) && C.chDemande !== cle && !C.chEchec) { C.chDemande = cle; vscode.postMessage({ t: 'chaine', depart: C.dDepart, sens }); }
+    const bouton = (k, v, txt, titre) => `<button data-${k}="${v}" class="${(k === 'dsens' ? sens : C.dVue) === v ? 'on' : ''}" aria-pressed="${(k === 'dsens' ? sens : C.dVue) === v}"${titre ? ` title="${h(titre)}"` : ''}>${txt}</button>`;
+    const pret = ch && ch.depart === C.dDepart && ch.sens === sens;
+    const nom0 = pret ? nomDep(C.dDepart, ch.noeuds[C.dDepart]) : C.dDepart.startsWith('c:') ? C.dDepart.slice(2) : nomDep(C.dDepart);
+    let html = `<div class="intro"><div class="grille"><button data-ddepart="" title="${T`Revenir à la liste des mods dont d\'autres dépendent`}">${T`← Socles`}</button><b>${h(nom0)}</b>`
+      + (C.dDepart.startsWith('c:') ? '' : `<button class="lien" data-va="${h(C.dDepart)}">${T`Détail du mod`}</button>`) + '</div>'
+      + `<div class="grille"><span>${T`Chaîne`}</span>${bouton('dsens', 'chute', T('Ce qui tombe sans lui'), T('Les mods actifs qui ne se chargent plus si ce mod part : ceux qui l\'exigent, puis ceux qui exigent ceux-là, jusqu\'au bout.'))}`
+      + (C.dDepart.startsWith('c:') ? '' : bouton('dsens', 'besoin', T('Ce qu\'il lui faut'), T('Tout ce que ce mod exige, puis ce que ses prérequis exigent, jusqu\'au bout.')))
+      + `<span>${T`Vue`}</span>${bouton('dvue', 'liste', T('Liste'))}${bouton('dvue', 'graphe', T('Graphe'))}`
+      + (C.dVue === 'graphe' ? `<button data-dzoom="0.8" title="${T`Réduire`}" aria-label="${T`Réduire`}">−</button><button data-dzoom="1.25" title="${T`Agrandir`}" aria-label="${T`Agrandir`}">+</button>` : '') + '</div>'
+      + `${aide}${nonLus}</div>`;
+    if (!pret) {
+      $('conflits').innerHTML = html + `<p class="vide">${C.chEchec ? `${T`La lecture de la chaîne a échoué (message en haut de l\'onglet).`} <button class="lien" data-ddepart="${h(C.dDepart)}">${T`Relire`}</button>` : T('Lecture de la chaîne…')}</p>`;
+      return;
+    }
+    const ids = Object.keys(ch.noeuds), tombes = ids.filter((x) => ch.noeuds[x].palier > 0);
+    html += `<p class="compte">${sens === 'chute'
+      ? (tombes.length ? N(tombes.length, 'Si {0} part, {n} mod actif ne se charge plus.', 'Si {0} part, {n} mods actifs ne se chargent plus.', nom0) : T('Si {0} part, aucun mod actif ne tombe.', nom0))
+        + (ch.amputes.length ? ' ' + N(ch.amputes.length, '{n} autre perd un prérequis optionnel.', '{n} autres perdent un prérequis optionnel.') : '')
+      : (tombes.length ? N(tombes.length, '{0} a besoin de {n} mod, de proche en proche.', '{0} a besoin de {n} mods, de proche en proche.', nom0) : T('{0} n\'a besoin d\'aucun mod du dépôt.', nom0))}</p>`;
+    $('conflits').innerHTML = html + (C.dVue === 'graphe' ? grapheDep(ch, sens) : listeDep(ch, sens, t));
+  }
+
+  /** La chaîne en liste : un bloc par palier, chaque mod dit par qui il tombe (ou pour qui il est exigé) et à quel titre. */
+  function listeDep(ch, sens, t) {
+    const fermes = new Set(ch.liens.filter((l) => l.ferme).map((l) => (sens === 'chute' ? l.vers : l.de)));
+    const requis = {};
+    for (const l of ch.liens) (requis[sens === 'chute' ? l.vers : l.de] = requis[sens === 'chute' ? l.vers : l.de] || new Set()).add(l.requis);
+    const paliers = {};
+    for (const [id, n] of Object.entries(ch.noeuds)) if (n.palier > 0) (paliers[n.palier] = paliers[n.palier] || []).push(id);
+    const ligne = (id, n, via, ampute) => {
+      const zip = !id.startsWith('c:') && !id.startsWith('x:');
+      const etat = n.etat ? `<span class="pastille ${n.etat === 'externe' ? 'gris' : 'rouge'}"></span><b class="mot ${n.etat === 'externe' ? 'gris' : 'rouge'}">${h(dit(n.etat))}</b> ` : zip && n.actif === false ? `<b class="mot rouge">${T`coupé`}</b> ` : '';
+      const opt = ampute || (sens === 'besoin' && !fermes.has(id)) ? ` · ${T('optionnel')}` : '';
+      return `<li class="site${ampute ? '' : ' gagne'}">${etat}${zip ? `<button class="lien" data-va="${h(id)}" title="${T`Ouvrir le détail de ce mod`}">${h(nomDep(id, n))}</button>` : `<b>${h(nomDep(id, n))}</b>`}`
+        + `${zip && n.section ? `<small>${h(nomPile(n.section))}</small>` : ''}${opt}`
+        + (zip || id.startsWith('c:') ? ` <button class="mini" data-ddepart="${h(id)}" title="${T`Montrer la chaîne de ce mod`}">${T`Sa chaîne`}</button>` : '')
+        + `<div><small>${(() => { const qui = via.map((v) => h(nomDep(v, ch.noeuds[v]))).join(', ');
+          return ampute ? T`perd : ${qui}` : sens === 'chute' ? T`tombe avec : ${qui}` : T`exigé par : ${qui}`; })()}`
+        + (requis[id] && !ampute ? ` · ${T`prérequis : ${[...requis[id]].map(h).join(', ')}`}` : '') + '</small></div></li>';
+    };
+    const garde = (id, n) => !t || nomDep(id, n).toLowerCase().includes(t);
+    let html = Object.keys(paliers).sort((a, b) => a - b).map((p) => {
+      const l = paliers[p].filter((id) => garde(id, ch.noeuds[id])).sort((a, b) => nomDep(a, ch.noeuds[a]).localeCompare(nomDep(b, ch.noeuds[b]), LANGUE));
+      return `<details class="arch code" open><summary><b>${T`Palier ${p}`}</b><span class="bilan">${N(paliers[p].length, '{n} mod', '{n} mods')}</span></summary><div class="corps"><ul>`
+        + l.map((id) => ligne(id, ch.noeuds[id], ch.noeuds[id].via, false)).join('') + '</ul></div></details>';
+    }).join('');
+    if (ch.amputes.length) {
+      html += `<details class="arch code" open><summary><b>${T`Amputés, sans tomber`}</b><span class="bilan">${N(ch.amputes.length, '{n} mod perd un prérequis optionnel', '{n} mods perdent un prérequis optionnel')}</span></summary><div class="corps"><ul>`
+        + ch.amputes.filter((a) => garde(a.cle, a)).sort((a, b) => nomDep(a.cle, a).localeCompare(nomDep(b.cle, b), LANGUE)).map((a) => ligne(a.cle, a, a.via, true)).join('') + '</ul></div></details>';
+    }
+    return html || `<p class="vide">${T('Rien ne correspond à ces filtres.')}</p>`;
+  }
+
+  /** La chaîne en graphe : une colonne par palier (le mod de départ à gauche), un trait par prérequis ; trait plein =
+   *  ferme, pointillé = optionnel. Survol d'un mod : ses traits ressortent. Clic : la chaîne de ce mod. */
+  function grapheDep(ch, sens) {
+    const noeuds = Object.entries(ch.noeuds).map(([id, n]) => ({ id, n, p: n.palier, ampute: false }));
+    const ou = new Map(noeuds.map((x) => [x.id, x]));
+    for (const a of ch.amputes) {                     // un amputé se range après le plus lointain de ceux qui lui manquent
+      const x = { id: a.cle, n: a, p: 1 + Math.max(0, ...a.via.map((v) => (ou.get(v) || { p: 0 }).p)), ampute: true };
+      noeuds.push(x); ou.set(a.cle, x);
+    }
+    const cols = [];
+    for (const x of noeuds) (cols[x.p] = cols[x.p] || []).push(x);
+    const NW = 230, NH = 22, GX = 90, GY = 6, HAUT = 30;
+    cols.forEach((c, p) => {                          // ordre d'une colonne : près de ceux qui la relient à la précédente
+      if (!c) return;
+      const rang = (x) => { const v = (x.n.via || []).map((y) => ou.get(y)).filter((y) => y && y.p < p && y.y !== undefined); return v.length ? v.reduce((s, y) => s + y.y, 0) / v.length : 0; };
+      c.sort((a, b) => (p ? rang(a) - rang(b) : 0) || nomDep(a.id, a.n).localeCompare(nomDep(b.id, b.n), LANGUE));
+      c.forEach((x, i) => { x.x = 10 + p * (NW + GX); x.y = HAUT + i * (NH + GY); });
+    });
+    const W = 20 + cols.length * (NW + GX) - GX, H = HAUT + 10 + Math.max(...cols.map((c) => (c ? c.length : 0))) * (NH + GY);
+    const num = new Map(noeuds.map((x, i) => [x.id, i]));
+    const traits = ch.liens.map((l) => {
+      let a = ou.get(l.de), b = ou.get(l.vers);
+      if (!a || !b) return '';
+      if (a.p > b.p) [a, b] = [b, a];
+      const x1 = a.x + NW, y1 = a.y + NH / 2, x2 = b.x, y2 = b.y + NH / 2, m = Math.max(30, (x2 - x1) / 2);
+      return `<path class="lien ${l.ferme ? 'ferme' : 'souple'}" data-a="${num.get(a.id)}" data-b="${num.get(b.id)}" d="M${x1} ${y1}C${x1 + m} ${y1} ${x2 - m} ${y2} ${x2} ${y2}"><title>${h(nomDep(l.de, ou.get(l.de).n))} → ${h(nomDep(l.vers, ou.get(l.vers).n))} · ${h(l.requis)}${l.ferme ? '' : ` · ${h(T('optionnel'))}`}</title></path>`;
+    }).join('');
+    const titre = (c, p) => { const a = c.filter((x) => x.ampute).length, n = c.length - a;
+      return [T('Palier {0}', p), n ? N(n, '{n} mod', '{n} mods') : '', a ? N(a, '{n} amputé', '{n} amputés') : ''].filter(Boolean).join(' · '); };
+    const titres = cols.map((c, p) => (c ? `<text class="palier" x="${10 + p * (NW + GX)}" y="18">${h(p ? titre(c, p) : T('Départ'))}</text>` : '')).join('');
+    const boites = noeuds.map((x) => {
+      const nom = nomDep(x.id, x.n), court = nom.length > 32 ? nom.slice(0, 31) + '…' : nom;
+      const cls = ['noeud', x.p === 0 ? 'depart' : '', x.ampute ? 'ampute' : '', x.id.startsWith('x:') ? 'feuille' : '', x.n.actif === false ? 'coupe' : ''].filter(Boolean).join(' ');
+      const clic = x.p > 0 && !x.id.startsWith('x:');
+      return `<g class="${cls}" data-n="${num.get(x.id)}"${clic ? ` data-ddepart="${h(x.id)}"` : ''}><title>${h(nom)}${x.n.section ? ' · ' + h(nomPile(x.n.section)) : ''}${x.n.etat ? ' · ' + h(dit(x.n.etat)) : ''}${clic ? ' · ' + h(T('clic : la chaîne de ce mod')) : ''}</title>`
+        + `<rect x="${x.x}" y="${x.y}" width="${NW}" height="${NH}" rx="3"/><text x="${x.x + 7}" y="${x.y + 15}">${h(court)}</text></g>`;
+    }).join('');
+    const z = E.conf.dZoom || 1;
+    return `<div class="graphe"><svg viewBox="0 0 ${W} ${H}" width="${Math.round(W * z)}" height="${Math.round(H * z)}" role="img" aria-label="${h(T('Graphe de la chaîne des prérequis'))}">${titres}${traits}${boites}</svg></div>`;
+  }
+
   function dessineConflits() {
     const C = E.conf, d = E.cf;
     if (!C) return;
     if (C.grille === 'code') return dessineCode();
     if (C.grille === 'objets') return dessineObjets();
+    if (C.grille === 'dependances') return dessineDependances();
     if (!d) { $('conflits').innerHTML = `<p class="vide">${T`Lecture des archives du profil…`}</p>`; return; }
     const o = d.ordre, c = d.compte, t = $('cherche').value.trim().toLowerCase();
     // filtre par ressource : les archives qui portent une ressource (en conflit ou en copie identique) dont le chemin contient le texte
@@ -1819,8 +1970,13 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     if (E.regle) fermeReglages();
     if (E.arr) fermeArrivages();
     if (E.maj) fermeMaj();
-    E.conf = { details: {}, toutes: {}, ouverts: new Set(), deplies: new Set(cle ? [cle] : []), egaux: false, internes: true, grille: CODE ? 'code' : OBJ ? 'objets' : cle ? 'mod' : 'archive', montre: 'tous', tri: 'charge' };
-    if (cle && !CODE && !OBJ) $('cherche').value = titreZip(cle);
+    const garde = DEP && E.conf ? E.conf : null;      // onglet « Dépendances » : le dépôt lu reste, seul le départ change
+    E.conf = { details: {}, toutes: {}, ouverts: new Set(), deplies: new Set(cle && !DEP ? [cle] : []), egaux: false, internes: true, grille: CODE ? 'code' : OBJ ? 'objets' : DEP ? 'dependances' : cle ? 'mod' : 'archive', montre: 'tous', tri: 'charge' };
+    if (DEP) {
+      const [depart, sens] = (cle || '').split('|');
+      Object.assign(E.conf, { dep: garde && garde.dep, dDepart: depart || '', dSens: sens || (garde && garde.dSens) || 'chute', dVue: (garde && garde.dVue) || 'liste', dZoom: (garde && garde.dZoom) || 1 });
+    }
+    if (cle && !CODE && !OBJ && !DEP) $('cherche').value = titreZip(cle);
     document.body.classList.add('conf');
     dessineConflits();
     if (!E.cf) vscode.postMessage({ t: 'conflits' });
@@ -1834,9 +1990,19 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
   $('conf').addEventListener('click', () => vscode.postMessage({ t: 'conflitsFenetre' }));
   $('scripts').addEventListener('click', () => vscode.postMessage({ t: 'codeFenetre' }));
   $('objets').addEventListener('click', () => vscode.postMessage({ t: 'objetsFenetre' }));
+  $('deps').addEventListener('click', () => vscode.postMessage({ t: 'dependancesFenetre' }));
   $('histo').addEventListener('click', () => vscode.postMessage({ t: 'journal' }));
   $('aide').addEventListener('click', () => vscode.postMessage({ t: 'aide', section: E.regle ? 'reglages' : E.arr ? 'arrivages' : E.maj ? 'maj' : '' }));
   $('magasin').addEventListener('click', () => { E.volet = { t: 'magasin' }; ouvre(T('Magasin'), `<p class="vide">${T`Lecture du magasin et du jeu…`}</p>`); vscode.postMessage({ t: 'magasin' }); });
+  // graphe des dépendances : le survol d'un mod fait ressortir ses traits
+  const eclaire = (e, on) => {
+    const g = e.target.closest && e.target.closest('g.noeud');
+    if (!g) return;
+    g.classList.toggle('lit', on);
+    for (const p of $('conflits').querySelectorAll(`path[data-a="${g.dataset.n}"], path[data-b="${g.dataset.n}"]`)) p.classList.toggle('lit', on);
+  };
+  $('conflits').addEventListener('mouseover', (e) => eclaire(e, true));
+  $('conflits').addEventListener('mouseout', (e) => eclaire(e, false));
   $('conflits').addEventListener('toggle', (e) => {
     const id = e.target.dataset && e.target.dataset.groupe;
     if (id === undefined || !E.conf) return;
@@ -1876,6 +2042,14 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       const k = e.target.closest('[data-csorte]').dataset.csorte;
       C.cSorte = C.cSorte === k ? '' : k; C.deplies.clear();
     }
+    else if (e.target.closest('[data-ddepart]')) {    // « Dépendances » : partir de ce mod (ou de ce cadre) ; vide = revenir aux socles
+      C.dDepart = e.target.closest('[data-ddepart]').dataset.ddepart; C.ch = null; C.chEchec = false;
+      $('conflits').scrollTop = 0;
+    }
+    else if (d.dsens) { C.dSens = d.dsens; C.ch = null; C.chEchec = false; }
+    else if (d.dvue) C.dVue = d.dvue;
+    else if (d.dzoom) C.dZoom = Math.min(2, Math.max(0.4, Math.round((C.dZoom * (+d.dzoom)) * 10) / 10));
+    else if (d.dlit) { C.dep = null; C.depDemande = true; C.depLecture = true; C.ch = null; dessineConflits(); return vscode.postMessage({ t: 'dependances', code: true }); }
     else if (d.resmode) C.resMode = d.resmode;
     else if (e.target.closest('[data-puce]')) {       // une puce de chiffres montre ce qu'elle compte
       const p = e.target.closest('[data-puce]').dataset.puce;
@@ -2284,6 +2458,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       if (suite) voletContenu(suite); else { E.choisi = E.volet.K.cle; vscode.postMessage({ t: 'detail', cle: E.volet.K.cle }); }
     }
     else if (d.purge) vscode.postMessage({ t: 'purge' });
+    else if (d.depfen) vscode.postMessage({ t: 'dependancesFenetre', cle: d.depfen });
     else if (d.retouche) vscode.postMessage({ t: 'retoucheAnnule', cle: d.retouche });
     else if (d.montre) vscode.postMessage({ t: 'montre', chemin: d.montre });
     else if (d.nexus) vscode.postMessage({ t: 'nexus', id: d.nexus });
@@ -2372,7 +2547,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
   window.addEventListener('message', (e) => {
     const m = e.data;
     // fenêtre d'analyse : elle ne garde que l'état, les conflits et les signaux du moteur
-    if (SEULE && !['etat', 'conflits', 'conflitsDetail', 'conflitsToutes', 'conflitsRessources', 'conflitsCode', 'objets', 'conflitsCible', 'occupe', 'verrou', 'erreur'].includes(m.t)) return;
+    if (SEULE && !['etat', 'conflits', 'conflitsDetail', 'conflitsToutes', 'conflitsRessources', 'conflitsCode', 'objets', 'dependances', 'chaine', 'conflitsCible', 'occupe', 'verrou', 'erreur'].includes(m.t)) return;
     if (m.t === 'conflitsCible') { if (SEULE && E.data) ouvreConflits(m.cle || ''); return; }
     if (m.t === 'reglages') {
       if (m.premier) $('chiffres').textContent = T('À régler : le dépôt de zips et le dossier du jeu.');
@@ -2392,6 +2567,11 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       if (m.auto && E.volet && E.volet.t === 'journal') vscode.postMessage({ t: 'journal' });
       dessine();
       if (SEULE && !E.conf) ouvreConflits(document.body.dataset.cle || '');
+      if (DEP && E.conf) {                            // un mod coché ou coupé dans la page : les chaînes ne sont plus celles-là, relues
+        const actifs = E.profil + '|' + E.data.mods.map((r) => (r.actif && !r.lieu ? 1 : 0)).join('');
+        if (E.conf.dActifs !== undefined && E.conf.dActifs !== actifs && E.conf.dep && !E.conf.depDemande) { E.conf.depDemande = true; vscode.postMessage({ t: 'dependances' }); }
+        E.conf.dActifs = actifs;
+      }
       // le plan ouvert suit le profil : une case cochée ou « Actualiser » le refait (sauf s'il vient d'arriver)
       if (E.volet && E.volet.t === 'plan' && Date.now() - (E.planRecu || 0) > 1500) vscode.postMessage({ t: 'plan' });
     } else if (m.t === 'python') {                  // aucun Python pour lancer le moteur : dire quoi faire, sans bandeau d'erreur
@@ -2432,6 +2612,10 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       if (E.conf) { E.conf.code = m.data; E.conf.codeDemande = false; E.conf.codeEchec = false; if (E.conf.grille === 'code') dessineConflits(); }
     } else if (m.t === 'objets') {
       if (E.conf) { E.conf.obj = m.data; E.conf.objDemande = false; E.conf.objEchec = false; if (E.conf.grille === 'objets') dessineConflits(); }
+    } else if (m.t === 'dependances') {             // prérequis de tout le dépôt (liste des socles) ; une chaîne déjà lue est relue
+      if (E.conf && DEP) { E.conf.dep = m.data; E.conf.depDemande = false; E.conf.depEchec = false; E.conf.ch = null; E.conf.chDemande = ''; dessineConflits(); }
+    } else if (m.t === 'chaine') {
+      if (E.conf && DEP) { E.conf.ch = m.data; E.conf.chDemande = ''; dessineConflits(); }
     } else if (m.t === 'conflitsRessources') {
       if (E.conf) { E.conf.res = m.data; dessineConflits(); }
     } else if (m.t === 'convention') {
@@ -2488,6 +2672,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     } else if (m.t === 'erreur') {
       if (E.conf && E.conf.codeDemande && !E.conf.code) { E.conf.codeDemande = false; E.conf.codeEchec = true; if (E.conf.grille === 'code') dessineConflits(); }
       if (E.conf && E.conf.objDemande && !E.conf.obj) { E.conf.objDemande = false; E.conf.objEchec = true; if (E.conf.grille === 'objets') dessineConflits(); }
+      if (E.conf && DEP && (E.conf.depDemande || E.conf.chDemande)) { E.conf.depEchec = E.conf.depDemande; E.conf.chEchec = !!E.conf.chDemande; E.conf.depDemande = false; E.conf.chDemande = ''; dessineConflits(); }
       $('alerte').querySelector('span').textContent = m.message;
       $('alerte').className = 'on';
     }

@@ -2,7 +2,7 @@
   "name": "red-stack",
   "displayName": "Red Stack",
   "description": "%description%",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "publisher": "doublescotch",
   "license": "MIT",
   "icon": "media/icone.png",
@@ -46,6 +46,7 @@
     "onWebviewPanel:redStackAnalyse",
     "onWebviewPanel:redStackCode",
     "onWebviewPanel:redStackObjets",
+    "onWebviewPanel:redStackDependances",
     "onWebviewPanel:redStackAide",
     "onView:redStack.accueil"
   ],

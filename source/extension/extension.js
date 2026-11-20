@@ -14,7 +14,7 @@ const { T, N } = langue;
 const nxm = require('./nxm');
 
 const ECRIT = ['pose', 'remplace', 'retire', 'lie', 'delie'];
-let ctx, moteur, telecharge, panneau, analyse, code, objets, aide, barre, minuterie, veille, demandeVue = '', stable = '';
+let ctx, moteur, telecharge, panneau, analyse, code, objets, deps, aide, barre, minuterie, veille, demandeVue = '', stable = '';
 // actualisation automatique : ce que le moteur dit de veiller, la signature du disque au dernier état lu, celle en cours de contrôle
 let cibles = null, vu = '', enVue = '', guets = [], guetCle = '', bientot = null, ronde = null;
 let resume = null, vueVoulue = '';                  // barre latérale : chiffres du dernier état lu ; vue demandée avant que la page soit prête
@@ -40,6 +40,8 @@ function activate(context) {
     vscode.window.registerWebviewPanelSerializer('redStackCode', { deserializeWebviewPanel: async (p) => (code ? p.dispose() : monte(p, 'code')) }),
     // et l'onglet « Objets »
     vscode.window.registerWebviewPanelSerializer('redStackObjets', { deserializeWebviewPanel: async (p) => (objets ? p.dispose() : monte(p, 'objets')) }),
+    // et l'onglet « Dépendances »
+    vscode.window.registerWebviewPanelSerializer('redStackDependances', { deserializeWebviewPanel: async (p) => (deps ? p.dispose() : monte(p, 'dependances')) }),
     // et le manuel
     vscode.window.registerWebviewPanelSerializer('redStackAide', { deserializeWebviewPanel: async (p) => (aide ? p.dispose() : monteAide(p)) }),
     // retour sur la fenêtre : le disque a pu changer pendant qu'on était ailleurs
@@ -241,7 +243,7 @@ function arreteVeille() {
 
 const profil = () => ctx.workspaceState.get('redStack.profil', 'actuel');
 // la page et la fenêtre d'analyse reçoivent les mêmes messages ; chacune ne garde que ce qui la regarde
-const envoie = (m) => { for (const p of [panneau, analyse, code, objets]) if (p) p.webview.postMessage(m); };
+const envoie = (m) => { for (const p of [panneau, analyse, code, objets, deps]) if (p) p.webview.postMessage(m); };
 const erreur = (e) => {
   const message = String((e && e.message) || e);
   if (e && e.code === 'PYTHON') {                   // poste sans Python : un écran qui dit quoi faire, pas un bandeau
@@ -281,6 +283,17 @@ function ouvrirObjets() {
   if (objets) return objets.reveal();
   monte(vscode.window.createWebviewPanel('redStackObjets', T('Red Stack · Objets'), (analyse && analyse.viewColumn) || (code && code.viewColumn) || vscode.ViewColumn.Beside,
     { enableScripts: true, retainContextWhenHidden: true, localResourceRoots: [] }), 'objets');
+}
+
+/** Chaîne des prérequis d'un mod, en liste ou en graphe : un cinquième onglet, rangé avec les analyses.
+ *  `cle` = « clé du zip|sens » (sens : chute ou besoin) ; vide = la liste des socles. */
+function ouvrirDependances(cle = '') {
+  if (deps) {
+    deps.reveal();
+    return cle ? deps.webview.postMessage({ t: 'conflitsCible', cle }) : undefined;
+  }
+  monte(vscode.window.createWebviewPanel('redStackDependances', T('Red Stack · Dépendances'), (analyse && analyse.viewColumn) || (objets && objets.viewColumn) || vscode.ViewColumn.Beside,
+    { enableScripts: true, retainContextWhenHidden: true, localResourceRoots: [] }), 'dependances', cle);
 }
 
 /** Manuel : une page d'aide statique (`media/aide.html`, corps anglais dans `media/aide.en.html`) dans un onglet à elle ; `section` = l'ancre à montrer. */
@@ -334,10 +347,10 @@ async function regleTheme(m) {
 /** Branche la page sur un onglet : celui qu'on vient de créer, ou celui que VS Code rouvre à son démarrage.
  *  `seule` : la même page, réduite à l'analyse des conflits (classe `analyse` du corps) ; 'code' : aux conflits de code. */
 function monte(p, seule = false, cle = '') {
-  if (seule === 'code') code = p; else if (seule === 'objets') objets = p; else if (seule) analyse = p; else panneau = p;
+  if (seule === 'code') code = p; else if (seule === 'objets') objets = p; else if (seule === 'dependances') deps = p; else if (seule) analyse = p; else panneau = p;
   p.webview.options = { enableScripts: true, localResourceRoots: [] };
-  p.iconPath = new vscode.ThemeIcon(seule === 'code' ? 'code' : seule === 'objets' ? 'package' : seule ? 'git-compare' : 'layers');
-  p.onDidDispose(() => { if (panneau === p) panneau = null; if (analyse === p) analyse = null; if (code === p) code = null; if (objets === p) objets = null; });
+  p.iconPath = new vscode.ThemeIcon(seule === 'code' ? 'code' : seule === 'objets' ? 'package' : seule === 'dependances' ? 'type-hierarchy' : seule ? 'git-compare' : 'layers');
+  p.onDidDispose(() => { if (panneau === p) panneau = null; if (analyse === p) analyse = null; if (code === p) code = null; if (objets === p) objets = null; if (deps === p) deps = null; });
   if (p.onDidChangeViewState) p.onDidChangeViewState((e) => { if (e.webviewPanel.visible) controle(200); });
   p.webview.onDidReceiveMessage((m) => recoitGarde(m).catch(erreur));
   habille(p, seule, cle);
@@ -346,10 +359,10 @@ function monte(p, seule = false, cle = '') {
 /** Écrit la page dans l'onglet, dans la langue en cours (le catalogue part avec elle). */
 function habille(p, seule = false, cle = '') {
   const nonce = [...Array(32)].map(() => Math.floor(Math.random() * 36).toString(36)).join('');
-  p.title = seule === 'code' ? T('Red Stack · Scripts et tweaks') : seule === 'objets' ? T('Red Stack · Objets') : seule ? T('Red Stack · Conflits') : 'Red Stack';
+  p.title = seule === 'code' ? T('Red Stack · Scripts et tweaks') : seule === 'objets' ? T('Red Stack · Objets') : seule === 'dependances' ? T('Red Stack · Dépendances') : seule ? T('Red Stack · Conflits') : 'Red Stack';
   p.webview.html = fs.readFileSync(path.join(ctx.extensionPath, 'media', 'page.html'), 'utf8')
     .replace(/\{\{nonce\}\}/g, nonce).replace('{{langue}}', () => langue.pourPage(langue.enCours()))
-    .replace('<body>', seule ? `<body class="analyse${seule === 'code' ? ' code' : seule === 'objets' ? ' objets' : ''}" data-cle="${cle.replace(/[&"<>]/g, (c) => '&#' + c.charCodeAt(0) + ';')}">` : '<body>');
+    .replace('<body>', seule ? `<body class="analyse${seule === 'code' ? ' code' : seule === 'objets' ? ' objets' : seule === 'dependances' ? ' dependances' : ''}" data-cle="${cle.replace(/[&"<>]/g, (c) => '&#' + c.charCodeAt(0) + ';')}">` : '<body>');
 }
 
 /** Lignes de la barre latérale : profil, chiffres du dernier état lu, raccourcis vers les vues de la page. */
@@ -372,6 +385,7 @@ function lignesBarre() {
   out.push(ligne(T("Conflits d'archives"), c ? T`${N(c.en_conflit, '{n} ressource', '{n} ressources')}, ${N(c.paires, '{n} paire', '{n} paires')}` : T('lecture…'), 'git-compare', 'redStack.vue', 'conflits', T("Ouvrir l'analyse des conflits")));
   out.push(ligne(T('Scripts et tweaks'), T('conflits de code'), 'code', 'redStack.vue', 'code', T("Ouvrir l'analyse des conflits de code (lue à l'ouverture)")));
   out.push(ligne(T('Objets'), T('face à une sauvegarde'), 'package', 'redStack.vue', 'objets', T('Objets des mods (armes, vêtements, implants, accessoires d\'armes, mods d\'équipement) : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas')));
+  out.push(ligne(T('Dépendances'), T('chaîne des prérequis'), 'type-hierarchy', 'redStack.vue', 'dependances', T("Ce qui ne se charge plus si un mod part, et tout ce qu'il lui faut : en liste ou en graphe")));
   if (r.demande) out.push(ligne(T("Demande d'une session Claude"), T('en attente'), 'bell', 'redStack.demande'));
   out.push(ligne(T('Aperçu du plan'), '', 'checklist', 'redStack.vue', 'plan'), ligne(T('Arrivages'), '', 'inbox', 'redStack.vue', 'arrivages'),
     ligne(T('Mises à jour'), 'Nexus', 'cloud-download', 'redStack.vue', 'maj', T('Chercher sur Nexus les nouvelles versions des zips du dépôt, les télécharger')),
@@ -387,6 +401,7 @@ async function montreVue(v) {
   if (v === 'conflits') return ouvrirAnalyse();
   if (v === 'code') return ouvrirCode();
   if (v === 'objets') return ouvrirObjets();
+  if (v === 'dependances') return ouvrirDependances();
   const prete = !!panneau;
   ouvrir();
   if (v === 'actualise') return prete ? rafraichit() : undefined;
@@ -793,6 +808,15 @@ async function recoit(m) {
       return ouvrirCode();
     case 'objetsFenetre':                           // « Objets » : son onglet à lui
       return ouvrirObjets();
+    case 'dependancesFenetre':                      // « Dépendances » : son onglet à lui, sur la chaîne d'un mod si demandée
+      return ouvrirDependances(m.cle || '');
+    case 'dependances':                             // prérequis de tout le dépôt ; `code` : lire d'abord le code de tous les zips
+      return envoie({ t: 'dependances', data: await moteur.run(['prerequis', ...P].concat(m.code ? ['--code'] : [])) });
+    case 'chaine': {                                // la chaîne d'un mod ou d'un cadre : lecture seule
+      const depart = String(m.depart || '');
+      const qui = depart.startsWith('c:') ? ['--cadre', depart.slice(2)] : ['--mod', depart];
+      return envoie({ t: 'chaine', data: await moteur.run(['prerequis', ...P, ...qui, m.sens === 'besoin' && !depart.startsWith('c:') ? '--besoin' : '--chute']) });
+    }
     case 'objets':                                  // objets des mods face à une sauvegarde de partie : lecture seule, à la demande
       return envoie({ t: 'objets', data: await moteur.run(['objets', ...P].concat(m.partie ? ['--partie', m.partie] : [])) });
     case 'ouvreReglages':                           // depuis un onglet d'analyse : la page, à ses « Réglages »

@@ -72,7 +72,14 @@ bibliothèque : Red Stack lit les zips là où vous les rangez, ne les copie pas
 - Prérequis : le détail d'un mod liste ce qu'il exige, d'après la liste que son auteur donne sur Nexus et
   d'après les cadres déduits de la place de ses fichiers (CET, RED4ext, redscript, TweakXL, ArchiveXL…),
   avec le zip qui fournit chacun et son état. Un mod actif à qui il manque un cadre est signalé dans la
-  liste et dans l'aperçu du plan.
+  liste et dans l'aperçu du plan. Les prérequis se lisent aussi dans le code des zips : un module
+  Redscript importé, une classe ou une fonction globale qu'un autre zip déclare, `ModuleExists`, un
+  mod CET appelé par `GetMod`, un objet TweakXL bâti sur celui d'un autre mod ; chacun dit le fichier
+  et la ligne où il est vu, et un usage gardé par `@if` ou un `GetMod` testé compte pour optionnel.
+- « Dépendances » : une analyse à part de la chaîne des prérequis d'un mod, en liste ou en graphe.
+  Ce qui tombe sans lui : les mods actifs qui ne se chargeraient plus, palier par palier (ceux qui
+  l'exigent, puis ceux qui exigent ceux-là…), et ceux qui ne perdent qu'une partie optionnelle.
+  Ce qu'il lui faut : tout ce qu'il exige, de proche en proche. Lecture seule.
 - La version d'un REDmod est lue dans son `info.json` quand le nom du zip n'en porte pas.
 - « Mises à jour » : chaque zip nommé à la forme du site Nexus est comparé aux fichiers publiés
   de son mod. La nouvelle version se télécharge à la place de l'ancienne, rangée dans le dossier
@@ -170,7 +177,7 @@ que nous recommandons avec ces thèmes.
 
 ## Pilotage par une session Claude Code
 
-Le paquet porte un serveur MCP (28 outils) : une session lit l'état, les conflits, l'historique,
+Le paquet porte un serveur MCP (29 outils) : une session lit l'état, les conflits, l'historique,
 les arrivages et les mises à jour proposées, change un profil et prépare un plan. Elle n'écrit ni
 le jeu ni le dépôt de zips : parquer, renommer, télécharger restent vos gestes, dans la page.
 Pour le jeu, elle dépose une demande, que cette extension vous montre (plan

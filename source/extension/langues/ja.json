@@ -1822,7 +1822,6 @@
   "other": "作者が Nexus で必須とした MOD {n} 個が有効になっていません。詳細に内訳と作者のメモがあります。"
  },
  "prérequis ?": "前提?",
- "déclaré sur Nexus, et déduit de ses fichiers": "Nexus に記載、かつファイルから推定",
  "déclaré sur Nexus": "Nexus に記載",
  "déduit de ses fichiers": "ファイルから推定",
  "Ouvrir le détail du zip qui le fournit": "これを提供する zip の詳細を開く",
@@ -1982,5 +1981,97 @@
  "Pièces montées illisibles sur {n} objet de cette sauvegarde : elles ne sont pas comptées.": {
   "other": "このセーブデータの {n} 個のアイテムで装着パーツを読み取れません: それらは数えられません。"
  },
- "monté sur un objet": "アイテムに装着"
+ "monté sur un objet": "アイテムに装着",
+ "Red Stack · Dépendances": "Red Stack · 依存関係",
+ "Dépendances": "依存関係",
+ "chaîne des prérequis": "前提チェーン",
+ "Ce qui ne se charge plus si un mod part, et tout ce qu'il lui faut : en liste ou en graphe": "MOD を外すと読み込めなくなるもの、およびその MOD に必要なすべて: リストまたはグラフで表示",
+ "Chaîne des prérequis d'un mod, en liste ou en graphe : ce qui ne se charge plus s'il part, et tout ce qu'il lui faut. S'ouvre dans un onglet à lui. Lecture seule.": "MOD の前提チェーンをリストまたはグラフで表示: 外すと読み込めなくなるもの、およびその MOD に必要なすべて。専用のタブで開きます。読み取り専用。",
+ "Filtrer : mod…": "フィルター: MOD…",
+ "Filtrer par nom de mod": "MOD 名でフィルター",
+ "lu dans son code": "コードから読み取り",
+ "vu dans {0}, ligne {1} : {2}": "{0} の {1} 行目で検出: {2}",
+ "{n} autre usage": {
+  "other": "ほか {n} 件の使用"
+ },
+ "Les mods actifs qui ne se chargent plus si ce mod part, palier par palier, en liste ou en graphe": "この MOD を外すと読み込めなくなる有効な MOD を段階ごとに、リストまたはグラフで表示",
+ "Ce qui tombe sans lui…": "これがないと脱落するもの…",
+ "Tout ce que ce mod exige, de proche en proche, en liste ou en graphe": "この MOD が必要とするすべてを順にたどって、リストまたはグラフで表示",
+ "Tout ce qu'il lui faut…": "必要なすべて…",
+ "La lecture des prérequis a échoué (message en haut de l'onglet).": "前提の読み込みに失敗しました (タブ上部のメッセージを参照)。",
+ "Lecture du code de tous les zips du dépôt… Une demi-minute à une minute la première fois.": "リポジトリのすべての zip のコードを読み込んでいます… 初回は 30 秒から 1 分かかります。",
+ "Lecture des prérequis du dépôt…": "リポジトリの前提を読み込んでいます…",
+ "Le code de {n} zip n'est pas encore lu : ses prérequis lus dans le code manquent.": {
+  "other": "zip {n} 個のコードがまだ読み込まれていません: コードから読み取る前提が欠けています。"
+ },
+ "Lire le code": "コードを読む",
+ "Un prérequis vient de trois sources : déclaré sur Nexus, déduit de la place des fichiers (un script Redscript exige redscript), ou lu dans le code (un module importé, une classe d'un autre mod, un appel GetMod, un objet TweakXL bâti sur celui d'un autre).": "前提には 3 つの出所があります: Nexus での記載、ファイルの配置からの推定 (Redscript のスクリプトには redscript が必要)、コードからの読み取り (インポートされたモジュール、別の MOD のクラス、GetMod の呼び出し、別の MOD のアイテムを基にした TweakXL のアイテム)。",
+ "Un prérequis est <b>ferme</b> si le mod ne se charge pas sans lui ; <b>optionnel</b> si l'auteur le dit facultatif, ou si le code s'en passe (usage gardé par ModuleExists, @if, GetMod testé). Lecture seule.": "前提がないと MOD が読み込まれない場合、その前提は<b>必須</b>です。作者が任意と明記している場合、またはコードがそれなしで動く場合 (ModuleExists、@if、判定付きの GetMod で保護された使用) は<b>任意</b>です。読み取り専用。",
+ "Choisissez un mod : sa chaîne dit ce qui ne se charge plus s'il part, palier par palier, ou tout ce qu'il lui faut. Ici, les mods dont dépendent le plus de mods actifs.": "MOD を選んでください: そのチェーンで、外すと読み込めなくなるもの (段階ごと)、または必要なすべてが分かります。ここには、最も多くの有効な MOD が依存している MOD を表示します。",
+ "{n} mod exigé par d'autres, {0} montrés : affinez par le champ de filtre.": {
+  "other": "他の MOD が必要とする MOD {n} 個、{0} 個を表示: フィルター欄で絞り込んでください。"
+ },
+ "{n} mod exigé par d'autres mods actifs.": {
+  "other": "他の有効な MOD が必要とする MOD {n} 個。"
+ },
+ "Montrer sa chaîne": "チェーンを表示",
+ "Revenir à la liste des mods dont d'autres dépendent": "他の MOD が依存している MOD の一覧に戻る",
+ "← Socles": "← 基盤 MOD",
+ "Chaîne": "チェーン",
+ "Ce qui tombe sans lui": "これがないと脱落するもの",
+ "Les mods actifs qui ne se chargent plus si ce mod part : ceux qui l'exigent, puis ceux qui exigent ceux-là, jusqu'au bout.": "この MOD を外すと読み込めなくなる有効な MOD: これを必要とする MOD、さらにそれらを必要とする MOD を最後までたどります。",
+ "Ce qu'il lui faut": "必要なもの",
+ "Tout ce que ce mod exige, puis ce que ses prérequis exigent, jusqu'au bout.": "この MOD が必要とするすべて、さらにその前提が必要とするものを最後までたどります。",
+ "Vue": "表示",
+ "Liste": "リスト",
+ "Graphe": "グラフ",
+ "Réduire": "縮小",
+ "Agrandir": "拡大",
+ "La lecture de la chaîne a échoué (message en haut de l'onglet).": "チェーンの読み込みに失敗しました (タブ上部のメッセージを参照)。",
+ "Lecture de la chaîne…": "チェーンを読み込んでいます…",
+ "Si {0} part, aucun mod actif ne tombe.": "{0} を外しても、脱落する有効な MOD はありません。",
+ "{0} n'a besoin d'aucun mod du dépôt.": "{0} はリポジトリのどの MOD も必要としません。",
+ "Si {0} part, {n} mod actif ne se charge plus.": {
+  "other": "{0} を外すと、有効な MOD {n} 個が読み込めなくなります。"
+ },
+ "{n} autre perd un prérequis optionnel.": {
+  "other": "ほか {n} 個は任意の前提を失います。"
+ },
+ "{0} a besoin de {n} mod, de proche en proche.": {
+  "other": "{0} は順にたどると MOD {n} 個を必要とします。"
+ },
+ "Montrer la chaîne de ce mod": "この MOD のチェーンを表示",
+ "Sa chaîne": "そのチェーン",
+ "perd : {0}": "失う: {0}",
+ "tombe avec : {0}": "連鎖で脱落: {0}",
+ "exigé par : {0}": "必要としている MOD: {0}",
+ "prérequis : {0}": "前提: {0}",
+ "Palier {0}": "段階 {0}",
+ "Amputés, sans tomber": "縮退 (脱落なし)",
+ "{n} mod perd un prérequis optionnel": {
+  "other": "MOD {n} 個が任意の前提を失います"
+ },
+ "Départ": "起点",
+ "clic : la chaîne de ce mod": "クリック: この MOD のチェーン",
+ "Graphe de la chaîne des prérequis": "前提チェーンのグラフ",
+ "{n} amputé": {
+  "other": "縮退 {n} 個"
+ },
+ "  ! code de {n} zip pas encore lu : `prerequis --code` le lit": {
+  "other": "  ! zip {n} 個のコードが未読: `prerequis --code` で読み込めます"
+ },
+ "prerequis --cadre : un de {0}": "prerequis --cadre: {0} のいずれか",
+ "prerequis --chute / --besoin : --mod MOD, ou --cadre CODE": "prerequis --chute / --besoin: --mod MOD または --cadre CODE",
+ "prerequis --besoin : --mod MOD": "prerequis --besoin: --mod MOD",
+ "  palier {0} ({n} mod)": {
+  "other": "  段階 {0} (MOD {n} 個)"
+ },
+ "{n} mod perd un prérequis optionnel sans tomber :": {
+  "other": "MOD {n} 個が任意の前提を失いますが、脱落はしません:"
+ },
+ "Ce qu'il faut à {0}, de proche en proche :": "{0} に必要なもの (順にたどる):",
+ "Si {0} part, {n} mod actif ne se charge plus :": {
+  "other": "{0} を外すと、有効な MOD {n} 個が読み込めなくなります:"
+ },
+ " (optionnel)": " (任意)"
 }

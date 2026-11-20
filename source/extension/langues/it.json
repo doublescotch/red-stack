@@ -1997,7 +1997,6 @@
   "other": "{n} mod che l'autore dichiara richiesti su Nexus non sono attivi. I dettagli dicono quali, con la nota dell'autore."
  },
  "prérequis ?": "requisito?",
- "déclaré sur Nexus, et déduit de ses fichiers": "dichiarato su Nexus e dedotto dai suoi file",
  "déclaré sur Nexus": "dichiarato su Nexus",
  "déduit de ses fichiers": "dedotto dai suoi file",
  "Ouvrir le détail du zip qui le fournit": "Apri i dettagli dello zip che lo fornisce",
@@ -2178,5 +2177,110 @@
   "one": "Componenti montati illeggibili su {n} oggetto di questo salvataggio: non vengono contati.",
   "other": "Componenti montati illeggibili su {n} oggetti di questo salvataggio: non vengono contati."
  },
- "monté sur un objet": "montato su un oggetto"
+ "monté sur un objet": "montato su un oggetto",
+ "Red Stack · Dépendances": "Red Stack · Dipendenze",
+ "Dépendances": "Dipendenze",
+ "chaîne des prérequis": "catena dei requisiti",
+ "Ce qui ne se charge plus si un mod part, et tout ce qu'il lui faut : en liste ou en graphe": "Ciò che non si carica più se un mod viene rimosso, e tutto ciò di cui ha bisogno: come elenco o come grafo",
+ "Chaîne des prérequis d'un mod, en liste ou en graphe : ce qui ne se charge plus s'il part, et tout ce qu'il lui faut. S'ouvre dans un onglet à lui. Lecture seule.": "Catena dei requisiti di un mod, come elenco o come grafo: ciò che non si carica più se viene rimosso, e tutto ciò di cui ha bisogno. Si apre in una scheda dedicata. Sola lettura.",
+ "Filtrer : mod…": "Filtra: mod…",
+ "Filtrer par nom de mod": "Filtra per nome del mod",
+ "lu dans son code": "letto nel suo codice",
+ "vu dans {0}, ligne {1} : {2}": "visto in {0}, riga {1}: {2}",
+ "{n} autre usage": {
+  "one": "{n} altro utilizzo",
+  "other": "{n} altri utilizzi"
+ },
+ "Les mods actifs qui ne se chargent plus si ce mod part, palier par palier, en liste ou en graphe": "I mod attivi che non si caricano più se questo mod viene rimosso, livello per livello, come elenco o come grafo",
+ "Ce qui tombe sans lui…": "Ciò che cade senza di lui…",
+ "Tout ce que ce mod exige, de proche en proche, en liste ou en graphe": "Tutto ciò che questo mod richiede, a cascata, come elenco o come grafo",
+ "Tout ce qu'il lui faut…": "Tutto ciò di cui ha bisogno…",
+ "La lecture des prérequis a échoué (message en haut de l'onglet).": "La lettura dei requisiti non è riuscita (messaggio in cima alla scheda).",
+ "Lecture du code de tous les zips du dépôt… Une demi-minute à une minute la première fois.": "Lettura del codice di tutti gli zip del repository… La prima volta, da mezzo minuto a un minuto.",
+ "Lecture des prérequis du dépôt…": "Lettura dei requisiti del repository…",
+ "Le code de {n} zip n'est pas encore lu : ses prérequis lus dans le code manquent.": {
+  "one": "Il codice di {n} zip non è ancora stato letto: mancano i suoi requisiti letti nel codice.",
+  "other": "Il codice di {n} zip non è ancora stato letto: mancano i loro requisiti letti nel codice."
+ },
+ "Lire le code": "Leggi il codice",
+ "Un prérequis vient de trois sources : déclaré sur Nexus, déduit de la place des fichiers (un script Redscript exige redscript), ou lu dans le code (un module importé, une classe d'un autre mod, un appel GetMod, un objet TweakXL bâti sur celui d'un autre).": "Un requisito proviene da tre fonti: dichiarato su Nexus, dedotto dalla posizione dei file (uno script Redscript richiede redscript), o letto nel codice (un modulo importato, una classe di un altro mod, una chiamata GetMod, un oggetto TweakXL costruito su quello di un altro).",
+ "Un prérequis est <b>ferme</b> si le mod ne se charge pas sans lui ; <b>optionnel</b> si l'auteur le dit facultatif, ou si le code s'en passe (usage gardé par ModuleExists, @if, GetMod testé). Lecture seule.": "Un requisito è <b>obbligatorio</b> se il mod non si carica senza di esso; <b>facoltativo</b> se l'autore lo dichiara facoltativo, o se il codice ne fa a meno (uso protetto da ModuleExists, @if, GetMod verificato). Sola lettura.",
+ "Choisissez un mod : sa chaîne dit ce qui ne se charge plus s'il part, palier par palier, ou tout ce qu'il lui faut. Ici, les mods dont dépendent le plus de mods actifs.": "Scegli un mod: la sua catena dice ciò che non si carica più se viene rimosso, livello per livello, o tutto ciò di cui ha bisogno. Qui, i mod da cui dipende il maggior numero di mod attivi.",
+ "{n} mod exigé par d'autres, {0} montrés : affinez par le champ de filtre.": {
+  "one": "{n} mod richiesto da altri ({0} mostrati): restringi con il campo filtro.",
+  "other": "{n} mod richiesti da altri ({0} mostrati): restringi con il campo filtro."
+ },
+ "{n} mod exigé par d'autres mods actifs.": {
+  "one": "{n} mod richiesto da altri mod attivi.",
+  "other": "{n} mod richiesti da altri mod attivi."
+ },
+ "Montrer sa chaîne": "Mostra la sua catena",
+ "Revenir à la liste des mods dont d'autres dépendent": "Torna all'elenco dei mod da cui dipendono altri",
+ "← Socles": "← Core",
+ "Chaîne": "Catena",
+ "Ce qui tombe sans lui": "Ciò che cade senza di lui",
+ "Les mods actifs qui ne se chargent plus si ce mod part : ceux qui l'exigent, puis ceux qui exigent ceux-là, jusqu'au bout.": "I mod attivi che non si caricano più se questo mod viene rimosso: quelli che lo richiedono, poi quelli che richiedono questi, fino in fondo.",
+ "Ce qu'il lui faut": "Ciò di cui ha bisogno",
+ "Tout ce que ce mod exige, puis ce que ses prérequis exigent, jusqu'au bout.": "Tutto ciò che questo mod richiede, poi ciò che richiedono i suoi requisiti, fino in fondo.",
+ "Vue": "Vista",
+ "Liste": "Elenco",
+ "Graphe": "Grafo",
+ "Réduire": "Riduci",
+ "Agrandir": "Ingrandisci",
+ "La lecture de la chaîne a échoué (message en haut de l'onglet).": "La lettura della catena non è riuscita (messaggio in cima alla scheda).",
+ "Lecture de la chaîne…": "Lettura della catena…",
+ "Si {0} part, aucun mod actif ne tombe.": "Se {0} viene rimosso, nessun mod attivo cade.",
+ "{0} n'a besoin d'aucun mod du dépôt.": "{0} non ha bisogno di alcun mod del repository.",
+ "Si {0} part, {n} mod actif ne se charge plus.": {
+  "one": "Se {0} viene rimosso, {n} mod attivo non si carica più.",
+  "other": "Se {0} viene rimosso, {n} mod attivi non si caricano più."
+ },
+ "{n} autre perd un prérequis optionnel.": {
+  "one": "{n} altro perde un requisito facoltativo.",
+  "other": "{n} altri perdono un requisito facoltativo."
+ },
+ "{0} a besoin de {n} mod, de proche en proche.": {
+  "one": "{0} ha bisogno di {n} mod, a cascata.",
+  "other": "{0} ha bisogno di {n} mod, a cascata."
+ },
+ "Montrer la chaîne de ce mod": "Mostra la catena di questo mod",
+ "Sa chaîne": "La sua catena",
+ "perd : {0}": "perde: {0}",
+ "tombe avec : {0}": "cade con: {0}",
+ "exigé par : {0}": "richiesto da: {0}",
+ "prérequis : {0}": "requisiti: {0}",
+ "Palier {0}": "Livello {0}",
+ "Amputés, sans tomber": "Indeboliti, senza cadere",
+ "{n} mod perd un prérequis optionnel": {
+  "one": "{n} mod perde un requisito facoltativo",
+  "other": "{n} mod perdono un requisito facoltativo"
+ },
+ "Départ": "Partenza",
+ "clic : la chaîne de ce mod": "clic: la catena di questo mod",
+ "Graphe de la chaîne des prérequis": "Grafo della catena dei requisiti",
+ "{n} amputé": {
+  "one": "{n} indebolito",
+  "other": "{n} indeboliti"
+ },
+ "  ! code de {n} zip pas encore lu : `prerequis --code` le lit": {
+  "one": "  ! codice di {n} zip non ancora letto: `prerequis --code` lo legge",
+  "other": "  ! codice di {n} zip non ancora letto: `prerequis --code` li legge"
+ },
+ "prerequis --cadre : un de {0}": "prerequis --cadre: uno tra {0}",
+ "prerequis --chute / --besoin : --mod MOD, ou --cadre CODE": "prerequis --chute / --besoin: --mod MOD, oppure --cadre CODE",
+ "prerequis --besoin : --mod MOD": "prerequis --besoin: --mod MOD",
+ "  palier {0} ({n} mod)": {
+  "one": "  livello {0} ({n} mod)",
+  "other": "  livello {0} ({n} mod)"
+ },
+ "{n} mod perd un prérequis optionnel sans tomber :": {
+  "one": "{n} mod perde un requisito facoltativo senza cadere:",
+  "other": "{n} mod perdono un requisito facoltativo senza cadere:"
+ },
+ "Ce qu'il faut à {0}, de proche en proche :": "Ciò di cui ha bisogno {0}, a cascata:",
+ "Si {0} part, {n} mod actif ne se charge plus :": {
+  "one": "Se {0} viene rimosso, {n} mod attivo non si carica più:",
+  "other": "Se {0} viene rimosso, {n} mod attivi non si caricano più:"
+ },
+ " (optionnel)": " (facoltativo)"
 }

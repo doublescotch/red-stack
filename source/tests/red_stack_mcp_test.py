@@ -59,8 +59,8 @@ check("initialize rend la version demandée et le nom du serveur",
       r["result"]["protocolVersion"] == "2025-06-18" and r["result"]["serverInfo"]["name"] == "red-stack", r)
 rpc("notifications/initialized", notif=True)
 tools = rpc("tools/list")["result"]["tools"]
-check("tools/list : 28 outils, tous avec un schéma objet",
-      len(tools) == 28 and all(t["inputSchema"]["type"] == "object" for t in tools), len(tools))
+check("tools/list : 29 outils, tous avec un schéma objet",
+      len(tools) == 29 and all(t["inputSchema"]["type"] == "object" for t in tools), len(tools))
 check("ping répond", rpc("ping")["result"] == {})
 check("méthode inconnue = erreur -32601", rpc("nimporte")["error"]["code"] == -32601)
 r = rpc("tools/call", {"name": "red_stack_inexistant", "arguments": {}})
@@ -133,6 +133,11 @@ check("prérequis : les cadres et les mods actifs sans un prérequis, lus sans a
       not err and any(c["cadre"] == "cet" for c in pq["cadres"]) and isinstance(pq["mods"], list) and pq["erreur"] is None and pq["mods_total"] >= len(pq["mods"]), pq)
 pq, err = call("red_stack_prerequis", profil="mcp", mod=world)
 check("prérequis d'un mod : sa liste et qui l'exige", not err and isinstance(pq["mod"]["requis"], list) and "requis_par_total" in pq["mod"], pq)
+ch, err = call("red_stack_dependances", profil="mcp", mod=world)
+ch2, err2 = call("red_stack_dependances", profil="mcp", cadre="cet")
+check("dépendances : la chaîne d'un mod (ce qui tombe) et celle d'un cadre ; ni mod ni cadre = refus",
+      not err and not err2 and ch["depart"] and ch["sens"] == "chute" and ch["noeuds"][ch["depart"]]["palier"] == 0 and isinstance(ch["liens"], list)
+      and "c:cet" in ch2["noeuds"] and call("red_stack_dependances", profil="mcp")[1], [ch, ch2])
 mj, err = call("red_stack_mises_a_jour")
 check("mises à jour : Nexus injoignable (adresse du banc), dit sans planter ; aucune clé ni marque interne rendue",
       not err and "unreachable" in (mj["erreur"] or "") and mj["total"] > 3 and "cle_api" not in mj and all("qui" not in r for r in mj["lignes"]), mj)

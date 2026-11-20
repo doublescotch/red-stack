@@ -1822,7 +1822,6 @@
   "other": "作者在 Nexus 上声明为必需的 {n} 个模组未启用。详情中会说明是哪些，并附作者的备注。"
  },
  "prérequis ?": "前置？",
- "déclaré sur Nexus, et déduit de ses fichiers": "在 Nexus 上声明，并由其文件推断",
  "déclaré sur Nexus": "在 Nexus 上声明",
  "déduit de ses fichiers": "由其文件推断",
  "Ouvrir le détail du zip qui le fournit": "打开提供它的 zip 的详情",
@@ -1982,5 +1981,97 @@
  "Pièces montées illisibles sur {n} objet de cette sauvegarde : elles ne sont pas comptées.": {
   "other": "此存档中有 {n} 件物品的已安装部件无法读取：它们不计入统计。"
  },
- "monté sur un objet": "装在物品上"
+ "monté sur un objet": "装在物品上",
+ "Red Stack · Dépendances": "Red Stack · 依赖关系",
+ "Dépendances": "依赖关系",
+ "chaîne des prérequis": "前置链",
+ "Ce qui ne se charge plus si un mod part, et tout ce qu'il lui faut : en liste ou en graphe": "移除某个模组后哪些模组将无法加载，以及它所需的一切：以列表或图形显示",
+ "Chaîne des prérequis d'un mod, en liste ou en graphe : ce qui ne se charge plus s'il part, et tout ce qu'il lui faut. S'ouvre dans un onglet à lui. Lecture seule.": "模组的前置链，以列表或图形显示：移除它后哪些模组将无法加载，以及它所需的一切。在单独的选项卡中打开。只读。",
+ "Filtrer : mod…": "筛选：模组…",
+ "Filtrer par nom de mod": "按模组名称筛选",
+ "lu dans son code": "从其代码中读取",
+ "vu dans {0}, ligne {1} : {2}": "见于 {0} 第 {1} 行：{2}",
+ "{n} autre usage": {
+  "other": "另外 {n} 处使用"
+ },
+ "Les mods actifs qui ne se chargent plus si ce mod part, palier par palier, en liste ou en graphe": "移除此模组后无法加载的已启用模组，逐层显示，以列表或图形呈现",
+ "Ce qui tombe sans lui…": "没有它就会失效的…",
+ "Tout ce que ce mod exige, de proche en proche, en liste ou en graphe": "此模组逐级需要的一切，以列表或图形显示",
+ "Tout ce qu'il lui faut…": "它所需的一切…",
+ "La lecture des prérequis a échoué (message en haut de l'onglet).": "读取前置失败（消息见选项卡顶部）。",
+ "Lecture du code de tous les zips du dépôt… Une demi-minute à une minute la première fois.": "正在读取仓库中所有 zip 的代码… 首次需要半分钟到一分钟。",
+ "Lecture des prérequis du dépôt…": "正在读取仓库的前置…",
+ "Le code de {n} zip n'est pas encore lu : ses prérequis lus dans le code manquent.": {
+  "other": "{n} 个 zip 的代码尚未读取：缺少从代码中读取的前置。"
+ },
+ "Lire le code": "读取代码",
+ "Un prérequis vient de trois sources : déclaré sur Nexus, déduit de la place des fichiers (un script Redscript exige redscript), ou lu dans le code (un module importé, une classe d'un autre mod, un appel GetMod, un objet TweakXL bâti sur celui d'un autre).": "前置有三个来源：在 Nexus 上声明；由文件的位置推断（Redscript 脚本需要 redscript）；或从代码中读取（导入的模块、另一个模组的类、GetMod 调用、基于另一个模组的物品构建的 TweakXL 物品）。",
+ "Un prérequis est <b>ferme</b> si le mod ne se charge pas sans lui ; <b>optionnel</b> si l'auteur le dit facultatif, ou si le code s'en passe (usage gardé par ModuleExists, @if, GetMod testé). Lecture seule.": "如果模组缺少某个前置就无法加载，该前置为<b>必需</b>；如果作者说明它是可选的，或代码可以不依赖它（用法受 ModuleExists、@if、经检测的 GetMod 保护），则为<b>可选</b>。只读。",
+ "Choisissez un mod : sa chaîne dit ce qui ne se charge plus s'il part, palier par palier, ou tout ce qu'il lui faut. Ici, les mods dont dépendent le plus de mods actifs.": "选择一个模组：它的前置链会显示移除它后哪些模组将无法加载（逐层显示），或它所需的一切。这里列出被最多已启用模组依赖的模组。",
+ "{n} mod exigé par d'autres, {0} montrés : affinez par le champ de filtre.": {
+  "other": "{n} 个模组被其他模组需要，显示 {0} 个：可用筛选框缩小范围。"
+ },
+ "{n} mod exigé par d'autres mods actifs.": {
+  "other": "{n} 个模组被其他已启用的模组需要。"
+ },
+ "Montrer sa chaîne": "显示其前置链",
+ "Revenir à la liste des mods dont d'autres dépendent": "返回被其他模组依赖的模组列表",
+ "← Socles": "← 基础模组",
+ "Chaîne": "前置链",
+ "Ce qui tombe sans lui": "没有它就会失效的",
+ "Les mods actifs qui ne se chargent plus si ce mod part : ceux qui l'exigent, puis ceux qui exigent ceux-là, jusqu'au bout.": "移除此模组后无法加载的已启用模组：需要它的模组，再到需要这些模组的模组，一直追溯到底。",
+ "Ce qu'il lui faut": "它所需的",
+ "Tout ce que ce mod exige, puis ce que ses prérequis exigent, jusqu'au bout.": "此模组需要的一切，再到其前置需要的一切，一直追溯到底。",
+ "Vue": "视图",
+ "Liste": "列表",
+ "Graphe": "图形",
+ "Réduire": "缩小",
+ "Agrandir": "放大",
+ "La lecture de la chaîne a échoué (message en haut de l'onglet).": "读取前置链失败（消息见选项卡顶部）。",
+ "Lecture de la chaîne…": "正在读取前置链…",
+ "Si {0} part, aucun mod actif ne tombe.": "如果移除 {0}，不会有已启用的模组失效。",
+ "{0} n'a besoin d'aucun mod du dépôt.": "{0} 不需要仓库中的任何模组。",
+ "Si {0} part, {n} mod actif ne se charge plus.": {
+  "other": "如果移除 {0}，将有 {n} 个已启用的模组无法加载。"
+ },
+ "{n} autre perd un prérequis optionnel.": {
+  "other": "另有 {n} 个模组失去一个可选前置。"
+ },
+ "{0} a besoin de {n} mod, de proche en proche.": {
+  "other": "{0} 逐级需要 {n} 个模组。"
+ },
+ "Montrer la chaîne de ce mod": "显示此模组的前置链",
+ "Sa chaîne": "其前置链",
+ "perd : {0}": "失去：{0}",
+ "tombe avec : {0}": "随之失效：{0}",
+ "exigé par : {0}": "被以下模组需要：{0}",
+ "prérequis : {0}": "前置：{0}",
+ "Palier {0}": "第 {0} 层",
+ "Amputés, sans tomber": "受损但未失效",
+ "{n} mod perd un prérequis optionnel": {
+  "other": "{n} 个模组失去一个可选前置"
+ },
+ "Départ": "起点",
+ "clic : la chaîne de ce mod": "点击：此模组的前置链",
+ "Graphe de la chaîne des prérequis": "前置链图形",
+ "{n} amputé": {
+  "other": "{n} 个受损"
+ },
+ "  ! code de {n} zip pas encore lu : `prerequis --code` le lit": {
+  "other": "  ! {n} 个 zip 的代码尚未读取：`prerequis --code` 可读取"
+ },
+ "prerequis --cadre : un de {0}": "prerequis --cadre：须为以下之一：{0}",
+ "prerequis --chute / --besoin : --mod MOD, ou --cadre CODE": "prerequis --chute / --besoin：--mod MOD，或 --cadre CODE",
+ "prerequis --besoin : --mod MOD": "prerequis --besoin：--mod MOD",
+ "  palier {0} ({n} mod)": {
+  "other": "  第 {0} 层（{n} 个模组）"
+ },
+ "{n} mod perd un prérequis optionnel sans tomber :": {
+  "other": "{n} 个模组失去一个可选前置，但未失效："
+ },
+ "Ce qu'il faut à {0}, de proche en proche :": "{0} 逐级所需：",
+ "Si {0} part, {n} mod actif ne se charge plus :": {
+  "other": "如果移除 {0}，将有 {n} 个已启用的模组无法加载："
+ },
+ " (optionnel)": " （可选）"
 }

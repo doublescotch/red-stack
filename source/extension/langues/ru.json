@@ -2347,7 +2347,6 @@
   "other": "{n} мода, которые автор указал на Nexus как обязательные, не активны. В подробностях сказано какие, с примечанием автора."
  },
  "prérequis ?": "требование?",
- "déclaré sur Nexus, et déduit de ses fichiers": "указано на Nexus и определено по его файлам",
  "déclaré sur Nexus": "указано на Nexus",
  "déduit de ses fichiers": "определено по его файлам",
  "Ouvrir le détail du zip qui le fournit": "Открыть подробности zip, который его предоставляет",
@@ -2570,5 +2569,136 @@
   "many": "Не удалось прочитать установленные детали на {n} предметах этого сохранения: они не учитываются.",
   "other": "Не удалось прочитать установленные детали на {n} предмета этого сохранения: они не учитываются."
  },
- "monté sur un objet": "установлено на предмет"
+ "monté sur un objet": "установлено на предмет",
+ "Red Stack · Dépendances": "Red Stack · Зависимости",
+ "Dépendances": "Зависимости",
+ "chaîne des prérequis": "цепочка требований",
+ "Ce qui ne se charge plus si un mod part, et tout ce qu'il lui faut : en liste ou en graphe": "Что перестаёт загружаться, если убрать мод, и всё, что ему нужно: списком или графом",
+ "Chaîne des prérequis d'un mod, en liste ou en graphe : ce qui ne se charge plus s'il part, et tout ce qu'il lui faut. S'ouvre dans un onglet à lui. Lecture seule.": "Цепочка требований мода, списком или графом: что перестаёт загружаться, если его убрать, и всё, что ему нужно. Открывается в отдельной вкладке. Только чтение.",
+ "Filtrer : mod…": "Фильтр: мод…",
+ "Filtrer par nom de mod": "Фильтр по имени мода",
+ "lu dans son code": "прочитано в его коде",
+ "vu dans {0}, ligne {1} : {2}": "найдено в {0}, строка {1}: {2}",
+ "{n} autre usage": {
+  "one": "ещё {n} использование",
+  "few": "ещё {n} использования",
+  "many": "ещё {n} использований",
+  "other": "ещё {n} использования"
+ },
+ "Les mods actifs qui ne se chargent plus si ce mod part, palier par palier, en liste ou en graphe": "Активные моды, которые перестают загружаться, если убрать этот мод, уровень за уровнем, списком или графом",
+ "Ce qui tombe sans lui…": "Что отпадает без него…",
+ "Tout ce que ce mod exige, de proche en proche, en liste ou en graphe": "Всё, что требует этот мод, по цепочке, списком или графом",
+ "Tout ce qu'il lui faut…": "Всё, что ему нужно…",
+ "La lecture des prérequis a échoué (message en haut de l'onglet).": "Не удалось прочитать требования (сообщение вверху вкладки).",
+ "Lecture du code de tous les zips du dépôt… Une demi-minute à une minute la première fois.": "Чтение кода всех zip библиотеки… В первый раз — от полуминуты до минуты.",
+ "Lecture des prérequis du dépôt…": "Чтение требований библиотеки…",
+ "Le code de {n} zip n'est pas encore lu : ses prérequis lus dans le code manquent.": {
+  "one": "Код {n} zip ещё не прочитан: не хватает его требований, прочитанных в коде.",
+  "few": "Код {n} zip ещё не прочитан: не хватает их требований, прочитанных в коде.",
+  "many": "Код {n} zip ещё не прочитан: не хватает их требований, прочитанных в коде.",
+  "other": "Код {n} zip ещё не прочитан: не хватает их требований, прочитанных в коде."
+ },
+ "Lire le code": "Прочитать код",
+ "Un prérequis vient de trois sources : déclaré sur Nexus, déduit de la place des fichiers (un script Redscript exige redscript), ou lu dans le code (un module importé, une classe d'un autre mod, un appel GetMod, un objet TweakXL bâti sur celui d'un autre).": "Требование берётся из трёх источников: указано на Nexus, определено по расположению файлов (скрипту Redscript нужен redscript) или прочитано в коде (импортированный модуль, класс другого мода, вызов GetMod, предмет TweakXL, построенный на предмете другого мода).",
+ "Un prérequis est <b>ferme</b> si le mod ne se charge pas sans lui ; <b>optionnel</b> si l'auteur le dit facultatif, ou si le code s'en passe (usage gardé par ModuleExists, @if, GetMod testé). Lecture seule.": "Требование <b>обязательное</b>, если мод без него не загружается; <b>необязательное</b>, если автор называет его необязательным или код обходится без него (использование защищено ModuleExists, @if, проверкой GetMod). Только чтение.",
+ "Choisissez un mod : sa chaîne dit ce qui ne se charge plus s'il part, palier par palier, ou tout ce qu'il lui faut. Ici, les mods dont dépendent le plus de mods actifs.": "Выберите мод: его цепочка показывает, что перестаёт загружаться, если его убрать, уровень за уровнем, или всё, что ему нужно. Здесь — моды, от которых зависит больше всего активных модов.",
+ "{n} mod exigé par d'autres, {0} montrés : affinez par le champ de filtre.": {
+  "one": "{n} мод требуется другим (показано: {0}): уточните полем фильтра.",
+  "few": "{n} мода требуются другим (показано: {0}): уточните полем фильтра.",
+  "many": "{n} модов требуются другим (показано: {0}): уточните полем фильтра.",
+  "other": "{n} мода требуются другим (показано: {0}): уточните полем фильтра."
+ },
+ "{n} mod exigé par d'autres mods actifs.": {
+  "one": "{n} мод требуется другим активным модам.",
+  "few": "{n} мода требуются другим активным модам.",
+  "many": "{n} модов требуются другим активным модам.",
+  "other": "{n} мода требуются другим активным модам."
+ },
+ "Montrer sa chaîne": "Показать его цепочку",
+ "Revenir à la liste des mods dont d'autres dépendent": "Вернуться к списку модов, от которых зависят другие",
+ "← Socles": "← Ядра",
+ "Chaîne": "Цепочка",
+ "Ce qui tombe sans lui": "Что отпадает без него",
+ "Les mods actifs qui ne se chargent plus si ce mod part : ceux qui l'exigent, puis ceux qui exigent ceux-là, jusqu'au bout.": "Активные моды, которые перестают загружаться, если убрать этот мод: те, что его требуют, затем те, что требуют их, и так до конца.",
+ "Ce qu'il lui faut": "Что ему нужно",
+ "Tout ce que ce mod exige, puis ce que ses prérequis exigent, jusqu'au bout.": "Всё, что требует этот мод, затем то, что нужно его требованиям, и так до конца.",
+ "Vue": "Вид",
+ "Liste": "Список",
+ "Graphe": "Граф",
+ "Réduire": "Уменьшить",
+ "Agrandir": "Увеличить",
+ "La lecture de la chaîne a échoué (message en haut de l'onglet).": "Не удалось прочитать цепочку (сообщение вверху вкладки).",
+ "Lecture de la chaîne…": "Чтение цепочки…",
+ "Si {0} part, aucun mod actif ne tombe.": "Если убрать {0}, ни один активный мод не отпадёт.",
+ "{0} n'a besoin d'aucun mod du dépôt.": "Моду {0} не нужен ни один мод библиотеки.",
+ "Si {0} part, {n} mod actif ne se charge plus.": {
+  "one": "Если убрать {0}, {n} активный мод перестанет загружаться.",
+  "few": "Если убрать {0}, {n} активных мода перестанут загружаться.",
+  "many": "Если убрать {0}, {n} активных модов перестанут загружаться.",
+  "other": "Если убрать {0}, {n} активного мода перестанут загружаться."
+ },
+ "{n} autre perd un prérequis optionnel.": {
+  "one": "Ещё {n} мод теряет необязательное требование.",
+  "few": "Ещё {n} мода теряют необязательное требование.",
+  "many": "Ещё {n} модов теряют необязательное требование.",
+  "other": "Ещё {n} мода теряют необязательное требование."
+ },
+ "{0} a besoin de {n} mod, de proche en proche.": {
+  "one": "Моду {0} нужен {n} мод, по цепочке.",
+  "few": "Моду {0} нужны {n} мода, по цепочке.",
+  "many": "Моду {0} нужно {n} модов, по цепочке.",
+  "other": "Моду {0} нужно {n} мода, по цепочке."
+ },
+ "Montrer la chaîne de ce mod": "Показать цепочку этого мода",
+ "Sa chaîne": "Его цепочка",
+ "perd : {0}": "теряет: {0}",
+ "tombe avec : {0}": "отпадает вместе с: {0}",
+ "exigé par : {0}": "требуется для: {0}",
+ "prérequis : {0}": "требования: {0}",
+ "Palier {0}": "Уровень {0}",
+ "Amputés, sans tomber": "Ослаблены, но не отпадают",
+ "{n} mod perd un prérequis optionnel": {
+  "one": "{n} мод теряет необязательное требование",
+  "few": "{n} мода теряют необязательное требование",
+  "many": "{n} модов теряют необязательное требование",
+  "other": "{n} мода теряют необязательное требование"
+ },
+ "Départ": "Начало",
+ "clic : la chaîne de ce mod": "щелчок: цепочка этого мода",
+ "Graphe de la chaîne des prérequis": "Граф цепочки требований",
+ "{n} amputé": {
+  "one": "{n} ослабленный",
+  "few": "{n} ослабленных",
+  "many": "{n} ослабленных",
+  "other": "{n} ослабленного"
+ },
+ "  ! code de {n} zip pas encore lu : `prerequis --code` le lit": {
+  "one": "  ! код {n} zip ещё не прочитан: `prerequis --code` его прочитает",
+  "few": "  ! код {n} zip ещё не прочитан: `prerequis --code` их прочитает",
+  "many": "  ! код {n} zip ещё не прочитан: `prerequis --code` их прочитает",
+  "other": "  ! код {n} zip ещё не прочитан: `prerequis --code` их прочитает"
+ },
+ "prerequis --cadre : un de {0}": "prerequis --cadre: один из {0}",
+ "prerequis --chute / --besoin : --mod MOD, ou --cadre CODE": "prerequis --chute / --besoin: --mod MOD или --cadre CODE",
+ "prerequis --besoin : --mod MOD": "prerequis --besoin: --mod MOD",
+ "  palier {0} ({n} mod)": {
+  "one": "  уровень {0} ({n} мод)",
+  "few": "  уровень {0} ({n} мода)",
+  "many": "  уровень {0} ({n} модов)",
+  "other": "  уровень {0} ({n} мода)"
+ },
+ "{n} mod perd un prérequis optionnel sans tomber :": {
+  "one": "{n} мод теряет необязательное требование, но не отпадает:",
+  "few": "{n} мода теряют необязательное требование, но не отпадают:",
+  "many": "{n} модов теряют необязательное требование, но не отпадают:",
+  "other": "{n} мода теряют необязательное требование, но не отпадают:"
+ },
+ "Ce qu'il faut à {0}, de proche en proche :": "Что нужно моду {0}, по цепочке:",
+ "Si {0} part, {n} mod actif ne se charge plus :": {
+  "one": "Если убрать {0}, {n} активный мод перестанет загружаться:",
+  "few": "Если убрать {0}, {n} активных мода перестанут загружаться:",
+  "many": "Если убрать {0}, {n} активных модов перестанут загружаться:",
+  "other": "Если убрать {0}, {n} активного мода перестанут загружаться:"
+ },
+ " (optionnel)": " (необязательно)"
 }

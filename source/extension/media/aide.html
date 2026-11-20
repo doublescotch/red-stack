@@ -175,10 +175,11 @@ a { color: var(--bleu); }
 <li><b>Priorité entre deux mods</b> : quand deux mods actifs veulent le même fichier avec un contenu différent, le plan s'arrête sur un conflit à trancher. Vous dites lequel gagne, fichier par fichier ou pour tout le mod ; le profil s'en souvient.</li>
 </ul>
 <h3 id="prerequis">Prérequis</h3>
-<p>Le détail dit ce que le mod exige pour marcher, quel zip de votre dépôt le fournit, et dans quel état. Deux sources :</p>
+<p>Le détail dit ce que le mod exige pour marcher, quel zip de votre dépôt le fournit, et dans quel état. Trois sources :</p>
 <ul>
 <li><b>Déclaré sur Nexus</b> : la liste que l'auteur donne sur la page du mod. Elle est lue en même temps que les mises à jour (vue « Mises à jour »), ou pour un mod seul par <b class="b">Lire sur Nexus</b> ; aucune clé d'API n'est demandée. Nexus ne donne aucune version minimale, et les auteurs y rangent aussi ce qu'ils conseillent : seule leur note le dit. Red Stack marque « optionnel » un prérequis dont la note le laisse entendre, et ne le compte jamais comme un défaut.</li>
 <li><b>Déduit de ses fichiers</b> : un cadre se reconnaît à la place de ce que le zip pose (un script Lua dans le dossier des mods de Cyber Engine Tweaks, un <code>.reds</code> sous <code>r6/scripts</code>, un tweak sous <code>r6/tweaks</code>, un <code>.xl</code>, un greffon sous <code>red4ext/plugins</code>, une entrée sous <code>r6/input</code>, un son sous <code>r6/audioware</code>, un REDmod). Cette lecture se passe de Nexus : elle vaut aussi pour un mod sans numéro.</li>
+<li><b>Lu dans son code</b> : ce que les scripts du zip appellent d'un autre zip du dépôt. Un module Redscript importé (<code>import Module.*</code>), une classe ou une fonction globale qu'un autre zip déclare, un <code>ModuleExists("…")</code>, un mod CET appelé par <code>GetMod("…")</code>, un objet TweakXL bâti (<code>$base</code>) sur celui d'un autre mod ou qui le cite. La ligne dit où c'est vu : fichier du zip, ligne, nom appelé. Un usage toujours gardé (<code>@if(ModuleExists(…))</code>, <code>ModuleExists</code>, un <code>GetMod</code> testé avant usage) rend le prérequis optionnel : le mod s'en passe. Ce que le jeu de base porte déjà (ses scripts, sa base de données, Phantom Liberty compris) n'est le prérequis de personne.</li>
 </ul>
 <table>
 <tr><th>actif</th><td>Un zip actif du profil le fournit.</td></tr>
@@ -189,6 +190,7 @@ a { color: var(--bleu); }
 <tr><th>hors Nexus</th><td>Prérequis extérieur à Nexus (ReShade…) ou d'un autre jeu : Red Stack ne peut pas le contrôler.</td></tr>
 </table>
 <p>« Exigé par » liste, à l'inverse, les mods du dépôt qui ont besoin de celui-ci ; un mod coupé que des mods actifs exigent le dit en rouge. Un prérequis que vous avez sous un autre zip (un pack, une version retouchée sans numéro Nexus) reste dit « absent » : Red Stack ne reconnaît un mod de Nexus qu'au numéro porté par le nom du zip. Dans ce cas, ou si vous n'en voulez pas, <b class="b">Ignorer</b> sur sa ligne le fait taire pour ce mod : il reste listé, marqué « ignoré », ne lève plus de puce ni d'alerte au plan, et le choix suit le mod d'une version à l'autre ; <b class="b">Ne plus ignorer</b> le rend.</p>
+<p><b class="b">Ce qui tombe sans lui…</b> et <b class="b">Tout ce qu'il lui faut…</b> ouvrent la <a href="#dependances">chaîne des prérequis</a> de ce mod, en liste ou en graphe.</p>
 <h3>Les boutons du détail</h3>
 <ul>
 <li><b class="b">Installateur…</b> : les pages de choix d'un <a href="#fomod">FOMOD</a>.</li>
@@ -395,6 +397,19 @@ a { color: var(--bleu); }
 <li>Une ligne dépliée liste les objets du mod, chacun avec l'endroit où la sauvegarde le tient. Un clic sur <code>fichier:ligne</code> ouvre le tweak qui le crée ; « Détail du mod » ouvre sa fiche.</li>
 </ul>
 <div class="note garde">Les objets sont lus dans les tweaks TweakXL du profil (<code>.yaml</code>). Ne sont pas vus : les objets créés par un fichier <code>.tweak</code> de l'ancien format, par du Lua de CET ou par Redscript. La sorte d'un objet se déduit de ce que son enregistrement dit de lui ; s'il est bâti sur un objet du jeu, de ce que la base de données du jeu (<code>r6/cache/tweakdb.bin</code>) dit de celui-ci. Sans elle, le nom de l'objet du jeu sert d'indice, et un nom rare peut laisser l'objet hors liste ; l'onglet le dit. La sauvegarde se lit d'après le format décrit par WolvenKit (licence MIT), pour le jeu 2.0 et après.</div>
+</section>
+
+<section id="dependances" data-groupe="Analyses">
+<h2>Dépendances : la chaîne des prérequis</h2>
+<p><b class="b">Dépendances</b> ouvre une analyse à part : la chaîne des <a href="#prerequis">prérequis</a> d'un mod, jusqu'au bout. Elle répond à « si je retire ce mod, qu'est-ce qui ne se charge plus ? », et à « de quoi ce mod a-t-il besoin, de proche en proche ? ». Lecture seule.</p>
+<ul>
+<li>À l'ouverture, la liste des <b>socles</b> : les mods dont dépendent d'autres mods actifs, du plus exigé au moins exigé. Un clic sur un nom montre sa chaîne ; <b class="b">← Socles</b> y revient. Depuis le détail d'un mod, <b class="b">Ce qui tombe sans lui…</b> et <b class="b">Tout ce qu'il lui faut…</b> ouvrent directement sa chaîne.</li>
+<li><b class="b">Ce qui tombe sans lui</b> : palier 1, les mods actifs qui l'exigent ; palier 2, ceux qui exigent un mod du palier 1 ; et ainsi de suite. Un mod tombe quand <b>tous</b> les zips actifs qui tiennent un de ses prérequis fermes sont tombés : si un autre zip actif fournit la même chose, il reste. Les <b>amputés</b> perdent seulement un prérequis optionnel : ils se chargent, sans la partie qui s'en sert.</li>
+<li><b class="b">Ce qu'il lui faut</b> : ce que le mod exige, puis ce que ses prérequis exigent. Un prérequis que rien dans le dépôt ne fournit est une feuille, avec son état (absent, coupé, hors Nexus).</li>
+<li><b class="b">Liste</b> : un bloc par palier, chaque mod avec ce par quoi il tombe (ou pour qui il est exigé) et le nom du prérequis ; <b class="b">Sa chaîne</b> repart de lui. <b class="b">Graphe</b> : une colonne par palier, le mod de départ à gauche ; un trait plein est un prérequis ferme, un pointillé un prérequis optionnel. Le survol d'un mod fait ressortir ses traits, un clic repart de lui ; <b>−</b> et <b>+</b> règlent la taille.</li>
+<li>Seuls comptent les mods actifs du profil : un mod coupé ne tourne pas déjà, sa perte ne change rien.</li>
+</ul>
+<div class="note garde">La chaîne vaut ce que valent ses trois sources. Nexus range sous le même mot ce qui est exigé et ce qui est conseillé ; la note de l'auteur seule le dit. Le code se lit sans le compiler : deux mods qui déclarent le même nom sont dits tous les deux, et un nom cité sans servir compte. Ne sont pas lus : les <code>.tweak</code> de l'ancien format, les <code>.xl</code> d'ArchiveXL, les ressources d'une archive tirées d'une autre, le Lua qui appelle Redscript par un nom écrit en texte. La première lecture du code de tout le dépôt prend une demi-minute à une minute (<b class="b">Lire le code</b>) ; ensuite seuls les zips nouveaux ou changés sont relus.</div>
 </section>
 
 <section id="historique" data-groupe="Suivi">
