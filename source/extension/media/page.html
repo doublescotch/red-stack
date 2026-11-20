@@ -346,7 +346,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
   <span class="groupe" role="group" aria-label="Analyses, chacune dans son onglet">
     <button id="conf" title="Analyse des conflits dans les archives : ordre de chargement, qui gagne sur qui. S'ouvre dans un onglet à côté. Lecture seule.">Conflits</button>
     <button id="scripts" title="Conflits de code entre mods : méthodes Redscript, propriétés TweakXL. S'ouvre dans un onglet à lui. Lecture seule ; la première fois, quelques dizaines de secondes.">Scripts</button>
-    <button id="objets" title="Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.">Objets</button>
+    <button id="objets" title="Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement), face à une sauvegarde de partie : ce qui est sur V, dans la planque, la garde-robe ou monté sur un objet, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.">Objets</button>
   </span>
   <span class="sep"></span>
   <button id="regle" title="Dossiers du dépôt, du jeu et du magasin, convention, réglages, hors Red Stack, référence du jeu" aria-pressed="false">Réglages</button>
@@ -1045,8 +1045,10 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       }).join('') + (lues.length ? '' : `<p class="vide">${duNiveau.length ? T('Rien ne correspond à ces filtres.') : niv === 'agir' ? T('Aucun conflit de code à regarder ni à revoir dans ce profil.') : T('Rien à ce niveau.')}</p>`));
   }
 
-  // ---- Objets : armes, vêtements, implants que les tweaks du profil créent, face à une sauvegarde de partie. E.conf.obj = réponse du moteur.
-  const SORTE_OBJ = { arme: [T('Armes'), T('arme')], vetement: [T('Vêtements'), T('vêtement')], implant: [T('Implants'), T('implant')] };
+  // ---- Objets : armes, vêtements, implants, accessoires d'armes, mods d'équipement que les tweaks du profil créent, face à une sauvegarde de partie.
+  // E.conf.obj = réponse du moteur.
+  const SORTE_OBJ = { arme: [T('Armes'), T('arme')], vetement: [T('Vêtements'), T('vêtement')], implant: [T('Implants'), T('implant')],
+    accessoire: [T('Accessoires d\'armes'), T('accessoire d\'arme')], module: [T('Mods d\'équipement'), T('mod d\'équipement')] };
   const LIEU_OBJ = { v: T('sur V'), planque: T('dans la planque'), garde_robe: T('dans la garde-robe') };
   const ETAT_OBJ = { aucun: 'gris', part: 'ambre', tous: 'vert' };
   function dessineObjets() {
@@ -1082,9 +1084,12 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
         + '</div>'
         + `<div class="grille"><span>${T`Sorte`}</span>` + Object.keys(SORTE_OBJ).filter(nbSorte).map((k) =>
           `<button data-osorte="${k}" class="${so === k ? 'on' : ''}" aria-pressed="${so === k}">${h(SORTE_OBJ[k][0])} <small>${nbSorte(k)}</small></button>`).join('') + '</div>' : '')
-      + `<p>${T`<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n\'est possédé est en tête de liste.`} `
+      + `<p>${T`<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde, ou monté sur un objet qui y est (lunette sur une arme, mod sur un vêtement). Un mod dont aucun objet n\'est possédé est en tête de liste.`} `
       + `${T`La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu\'elle est sur le disque. Lecture seule : rien n\'est écrit, ni dans le jeu ni dans la sauvegarde.`}</p>`
-      + `<p>${T`Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).`}</p>`
+      + `<p>${T`Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont pas des objets à porter ou à monter (pièces internes d\'une arme, programmes, recettes, plans de fabrication, apparences, PNJ).`} `
+      + `${d.tweakdb ? T`La sorte d\'un objet se lit dans ce que son enregistrement dit de lui, puis dans la base de données du jeu (<code>tweakdb.bin</code>).`
+        : T`Base de données du jeu (<code>r6/cache/tweakdb.bin</code>) illisible : la sorte d\'un objet bâti sur un objet du jeu se devine par le nom de ce dernier, et un nom rare peut le laisser hors liste.`}`
+      + `${d.pieces_illisibles ? ' ' + N(d.pieces_illisibles, 'Pièces montées illisibles sur {n} objet de cette sauvegarde : elles ne sont pas comptées.', 'Pièces montées illisibles sur {n} objets de cette sauvegarde : elles ne sont pas comptées.') : ''}</p>`
       + '</div>'];
     const haut = $('conflits').scrollTop;
     const pose = (corps) => { $('conflits').innerHTML = html.join('') + corps; $('conflits').scrollTop = haut; };
@@ -1109,6 +1114,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
           + (hors ? '' : `<p><button class="lien" data-va="${h(r.m.prov)}" title="${T`Ouvrir le détail de ce mod`}">${T`Détail du mod`}</button></p>`)
           + '<ul>' + r.o.filter((x) => !t || !r.o.some((y) => y.rec.toLowerCase().includes(t)) || x.rec.toLowerCase().includes(t)).map((x) => `<li class="site${x.lieux.length ? ' gagne' : ''}">`
             + `<code>${h(x.rec)}</code> <small>${h(SORTE_OBJ[x.sorte][1])}</small> · ${x.lieux.length ? h(x.lieux.map((l) => LIEU_OBJ[l]).join(', ')) : `<small>${T`pas dans cette sauvegarde`}</small>`}`
+            + (x.monte ? ` · ${h(T('monté sur un objet'))}` : '')
             + (x.chemin ? `<div><button class="lien fich" data-ouvre="${h(x.chemin)}" data-ligne="${x.ligne}" title="${T`Ouvrir ce fichier du jeu à la ligne ${x.ligne}`}">${h(x.fichier)}:${x.ligne}</button></div>`
               : `<div><small title="${T`Ce fichier n'est pas encore dans le jeu : il sera posé au prochain « Appliquer »`}">${T`${h(x.fichier)}:${x.ligne} · pas encore posé`}</small></div>`)
             + '</li>').join('') + '</ul></div></details>';

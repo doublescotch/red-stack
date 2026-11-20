@@ -371,7 +371,7 @@ function lignesBarre() {
   if (r.conflitsPlan) out.push(ligne(T('Conflits de fichiers à trancher'), String(r.conflitsPlan), 'error', 'redStack.vue', 'plan'));
   out.push(ligne(T("Conflits d'archives"), c ? T`${N(c.en_conflit, '{n} ressource', '{n} ressources')}, ${N(c.paires, '{n} paire', '{n} paires')}` : T('lecture…'), 'git-compare', 'redStack.vue', 'conflits', T("Ouvrir l'analyse des conflits")));
   out.push(ligne(T('Scripts et tweaks'), T('conflits de code'), 'code', 'redStack.vue', 'code', T("Ouvrir l'analyse des conflits de code (lue à l'ouverture)")));
-  out.push(ligne(T('Objets'), T('face à une sauvegarde'), 'package', 'redStack.vue', 'objets', T('Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas')));
+  out.push(ligne(T('Objets'), T('face à une sauvegarde'), 'package', 'redStack.vue', 'objets', T('Objets des mods (armes, vêtements, implants, accessoires d\'armes, mods d\'équipement) : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas')));
   if (r.demande) out.push(ligne(T("Demande d'une session Claude"), T('en attente'), 'bell', 'redStack.demande'));
   out.push(ligne(T('Aperçu du plan'), '', 'checklist', 'redStack.vue', 'plan'), ligne(T('Arrivages'), '', 'inbox', 'redStack.vue', 'arrivages'),
     ligne(T('Mises à jour'), 'Nexus', 'cloud-download', 'redStack.vue', 'maj', T('Chercher sur Nexus les nouvelles versions des zips du dépôt, les télécharger')),

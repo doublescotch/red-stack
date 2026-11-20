@@ -325,14 +325,14 @@
 
 <section id="objets" data-groupe="Analyses">
 <h2>Mod items against a save</h2>
-<p><b class="b">Items</b> opens an analysis of its own: for each mod of the profile, the weapons, clothing and cyberware it adds to the game, and what a game save holds of them. A way to spot the item mods that are not used. Read only: nothing is written, neither in the game nor in the save.</p>
+<p><b class="b">Items</b> opens an analysis of its own: for each mod of the profile, the weapons, clothing, cyberware, weapon attachments (scopes, muzzles) and equipment mods (weapon, clothing and cyberware mods) it adds to the game, and what a game save holds of them. A way to spot the item mods that are not used. Read only: nothing is written, neither in the game nor in the save.</p>
 <ul>
 <li>The list at the top picks the save; by default, the most recent one of the <b>saves folder</b> (see <a href="#reglages">Settings</a>).</li>
-<li>An item is <b>owned</b> if it is on V, in the stash or in the wardrobe. The wardrobe remembers a piece of clothing even once sold: it can still be worn as an appearance.</li>
-<li>The chips count the mods with no item owned (first in the list), those partly used and those fully owned; a click shows only them. The kind buttons keep the weapons, the clothing or the cyberware.</li>
+<li>An item is <b>owned</b> if it is on V, in the stash or in the wardrobe. The wardrobe remembers a piece of clothing even once sold: it can still be worn as an appearance. An attachment or a mod installed on an owned item is owned too, and its row says “installed on an item”.</li>
+<li>The chips count the mods with no item owned (first in the list), those partly used and those fully owned; a click shows only them. The kind buttons keep a single kind: weapons, clothing, cyberware, weapon attachments or equipment mods.</li>
 <li>An unfolded row lists the items of the mod, each with where the save holds it. A click on <code>file:line</code> opens the tweak that creates it; “Mod detail” opens its detail.</li>
 </ul>
-<div class="note garde">Items are read from the profile's TweakXL tweaks (<code>.yaml</code>). Not seen: items created by a <code>.tweak</code> file of the old format, by CET Lua or by Redscript. The kind of an item is deduced from what its record says about itself, then from the name of its base in the game: a rare base can stay out of the list. The save is read after the format described by WolvenKit (MIT licence), for game 2.0 and later.</div>
+<div class="note garde">Items are read from the profile's TweakXL tweaks (<code>.yaml</code>). Not seen: items created by a <code>.tweak</code> file of the old format, by CET Lua or by Redscript. The kind of an item is deduced from what its record says about itself; if it is built on a game item, from what the game's database (<code>r6/cache/tweakdb.bin</code>) says about that one. Without it, the name of the game item serves as a clue, and a rare name can leave the item out of the list; the tab says so. The save is read after the format described by WolvenKit (MIT licence), for game 2.0 and later.</div>
 </section>
 
 <section id="historique" data-groupe="Tracking">

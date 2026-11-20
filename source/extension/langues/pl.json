@@ -2479,8 +2479,6 @@
  "Red Stack · Objets": "Red Stack · Przedmioty",
  "Objets": "Przedmioty",
  "face à une sauvegarde": "względem zapisu gry",
- "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Broń, ubrania i wszczepy z modów: co jest używane w zapisie gry, a co nie",
- "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Broń, ubrania i wszczepy z modów, względem zapisu gry: co jest przy V, w schowku lub w garderobie, a co nie jest używane. Otwiera się we własnej karcie. Tylko do odczytu.",
  "Filtrer : mod ou objet…": "Filtr: mod lub przedmiot…",
  "Filtrer par mod ou par nom d'objet": "Filtruj według moda lub nazwy przedmiotu",
  "Armes": "Broń",
@@ -2502,9 +2500,7 @@
  "Une partie de leurs objets est possédée, le reste non.": "Część ich przedmiotów jest w posiadaniu, reszta nie.",
  "Tous leurs objets sont possédés.": "Wszystkie ich przedmioty są w posiadaniu.",
  "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "Pliki tweaków, których ten widok nie mógł odczytać: ich ewentualne przedmioty nie są liczone.",
- "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>W posiadaniu</b>: przy V, w schowku lub w garderobie tego zapisu. Mod, którego żaden przedmiot nie jest w posiadaniu, jest na początku listy.",
  "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "Widok odczytuje tweaki, których profil chce w grze (plus te zainstalowane poza Red Stack), oraz zapis gry w takiej postaci, w jakiej jest na dysku. Tylko do odczytu: nic nie jest zapisywane ani w grze, ani w zapisie gry.",
- "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "Niewidoczne tutaj: przedmioty tworzone przez plik <code>.tweak</code> w formacie RED, przez Lua z CET lub przez Redscript; rekordy, które nie są ani bronią, ani ubraniami, ani wszczepami (części, dodatki, receptury, wyglądy, NPC).",
  "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "Nie znaleziono zapisu gry w {0}. Folder ustawia się w widoku „Ustawienia”, sekcja „Folder zapisów gry”.",
  "Sauvegarde {0} illisible : {1}": "Zapis gry {0} jest nieczytelny: {1}",
  "{0} : {1} sur {2}": "{0}: {1} z {2}",
@@ -2557,5 +2553,22 @@
  "inventaire introuvable": "nie znaleziono ekwipunku",
  "structure non comprise": "niezrozumiała struktura",
  "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "Zapis gry {0} ({1}), przedmioty z modów profilu w posiadaniu (V, schowek, garderoba): {2} z {3}",
- "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Nie znaleziono zapisu gry: {0} (folder zapisów gry: {1})"
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Nie znaleziono zapisu gry: {0} (folder zapisów gry: {1})",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement) : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Przedmioty z modów (broń, ubrania, wszczepy, dodatki do broni, modyfikacje wyposażenia): co jest używane w zapisie gry, a co nie",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement), face à une sauvegarde de partie : ce qui est sur V, dans la planque, la garde-robe ou monté sur un objet, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Przedmioty z modów (broń, ubrania, wszczepy, dodatki do broni, modyfikacje wyposażenia), względem zapisu gry: co jest przy V, w schowku, w garderobie lub zamontowane na przedmiocie, a co nie jest używane. Otwiera się we własnej karcie. Tylko do odczytu.",
+ "Accessoires d'armes": "Dodatki do broni",
+ "accessoire d'arme": "dodatek do broni",
+ "Mods d'équipement": "Modyfikacje wyposażenia",
+ "mod d'équipement": "modyfikacja wyposażenia",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde, ou monté sur un objet qui y est (lunette sur une arme, mod sur un vêtement). Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>W posiadaniu</b>: przy V, w schowku lub w garderobie tego zapisu gry albo zamontowane na przedmiocie, który tam jest (celownik na broni, modyfikacja na ubraniu). Mod, z którego żaden przedmiot nie jest w posiadaniu, jest na początku listy.",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont pas des objets à porter ou à monter (pièces internes d'une arme, programmes, recettes, plans de fabrication, apparences, PNJ).": "Niewidoczne tutaj: przedmioty tworzone przez plik <code>.tweak</code> w formacie RED, przez Lua z CET lub przez Redscript; rekordy, które nie są przedmiotami do noszenia ani montowania (wewnętrzne części broni, programy, receptury, schematy, wyglądy, NPC).",
+ "La sorte d'un objet se lit dans ce que son enregistrement dit de lui, puis dans la base de données du jeu (<code>tweakdb.bin</code>).": "Rodzaj przedmiotu odczytuje się z tego, co mówi o nim jego rekord, a potem z bazy danych gry (<code>tweakdb.bin</code>).",
+ "Base de données du jeu (<code>r6/cache/tweakdb.bin</code>) illisible : la sorte d'un objet bâti sur un objet du jeu se devine par le nom de ce dernier, et un nom rare peut le laisser hors liste.": "Nie można odczytać bazy danych gry (<code>r6/cache/tweakdb.bin</code>): rodzaj przedmiotu opartego na przedmiocie z gry jest zgadywany z nazwy tego ostatniego, a rzadka nazwa może go pominąć na liście.",
+ "Pièces montées illisibles sur {n} objet de cette sauvegarde : elles ne sont pas comptées.": {
+  "one": "Nieczytelne zamontowane części na {n} przedmiocie tego zapisu gry: nie są liczone.",
+  "few": "Nieczytelne zamontowane części na {n} przedmiotach tego zapisu gry: nie są liczone.",
+  "many": "Nieczytelne zamontowane części na {n} przedmiotach tego zapisu gry: nie są liczone.",
+  "other": "Nieczytelne zamontowane części na {n} przedmiotu tego zapisu gry: nie są liczone."
+ },
+ "monté sur un objet": "zamontowane na przedmiocie"
 }

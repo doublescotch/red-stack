@@ -2101,8 +2101,6 @@
  "Red Stack · Objets": "Red Stack · Items",
  "Objets": "Items",
  "face à une sauvegarde": "against a save",
- "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Weapons, clothing and cyberware from mods: what is used in a game save, and what is not",
- "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Weapons, clothing and cyberware from mods, against a game save: what is on V, in the stash or in the wardrobe, and what is not used. Opens in a tab of its own. Read only.",
  "Filtrer : mod ou objet…": "Filter: mod or item…",
  "Filtrer par mod ou par nom d'objet": "Filter by mod or by item name",
  "Armes": "Weapons",
@@ -2124,9 +2122,7 @@
  "Une partie de leurs objets est possédée, le reste non.": "Some of their items are owned, the rest are not.",
  "Tous leurs objets sont possédés.": "All their items are owned.",
  "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "Tweak files this view could not read: any items they create are not counted.",
- "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>Owned</b>: on V, in the stash or in the wardrobe of this save. A mod with no item owned comes first in the list.",
  "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "The view reads the tweaks the profile wants in the game (plus those installed outside Red Stack), and the save as it is on disk. Read only: nothing is written, neither in the game nor in the save.",
- "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "Not seen here: items created by a RED-format <code>.tweak</code> file, by CET Lua or by Redscript; records that are neither weapons, clothing nor cyberware (parts, attachments, recipes, appearances, NPCs).",
  "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "No save found in {0}. The folder is set in “Settings”, section “Saves folder”.",
  "Sauvegarde {0} illisible : {1}": "Save {0} unreadable: {1}",
  "{0} : {1} sur {2}": "{0}: {1} of {2}",
@@ -2167,5 +2163,20 @@
  "inventaire introuvable": "inventory not found",
  "structure non comprise": "structure not understood",
  "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "Save {0} ({1}), items of the profile's mods owned (V, stash, wardrobe): {2} of {3}",
- "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Save not found: {0} (saves folder: {1})"
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Save not found: {0} (saves folder: {1})",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement) : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Mod items (weapons, clothing, cyberware, weapon attachments, equipment mods): what is used in a game save, and what is not",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement), face à une sauvegarde de partie : ce qui est sur V, dans la planque, la garde-robe ou monté sur un objet, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Mod items (weapons, clothing, cyberware, weapon attachments, equipment mods), against a game save: what is on V, in the stash, in the wardrobe or installed on an item, and what is not used. Opens in a tab of its own. Read only.",
+ "Accessoires d'armes": "Weapon attachments",
+ "accessoire d'arme": "weapon attachment",
+ "Mods d'équipement": "Equipment mods",
+ "mod d'équipement": "equipment mod",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde, ou monté sur un objet qui y est (lunette sur une arme, mod sur un vêtement). Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>Owned</b>: on V, in the stash or in the wardrobe of this save, or installed on an item held there (a scope on a weapon, a mod on a piece of clothing). A mod with no item owned comes first in the list.",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont pas des objets à porter ou à monter (pièces internes d'une arme, programmes, recettes, plans de fabrication, apparences, PNJ).": "Not seen here: items created by a RED-format <code>.tweak</code> file, by CET Lua or by Redscript; records that are not items to wear or to install (internal weapon parts, programs, recipes, blueprints, appearances, NPCs).",
+ "La sorte d'un objet se lit dans ce que son enregistrement dit de lui, puis dans la base de données du jeu (<code>tweakdb.bin</code>).": "The kind of an item is read from what its record says about itself, then from the game's database (<code>tweakdb.bin</code>).",
+ "Base de données du jeu (<code>r6/cache/tweakdb.bin</code>) illisible : la sorte d'un objet bâti sur un objet du jeu se devine par le nom de ce dernier, et un nom rare peut le laisser hors liste.": "The game's database (<code>r6/cache/tweakdb.bin</code>) cannot be read: the kind of an item built on a game item is guessed from the name of that one, and a rare name can leave it out of the list.",
+ "Pièces montées illisibles sur {n} objet de cette sauvegarde : elles ne sont pas comptées.": {
+  "one": "Installed parts unreadable on {n} item of this save: they are not counted.",
+  "other": "Installed parts unreadable on {n} items of this save: they are not counted."
+ },
+ "monté sur un objet": "installed on an item"
 }

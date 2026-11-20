@@ -2101,8 +2101,6 @@
  "Red Stack · Objets": "Red Stack · Objetos",
  "Objets": "Objetos",
  "face à une sauvegarde": "frente a una partida guardada",
- "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Armas, ropa e implantes de los mods: lo que se usa en una partida guardada y lo que no",
- "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Armas, ropa e implantes de los mods, frente a una partida guardada: lo que está con V, en el alijo o en el armario, y lo que no se usa. Se abre en su propia pestaña. Solo lectura.",
  "Filtrer : mod ou objet…": "Filtrar: mod u objeto…",
  "Filtrer par mod ou par nom d'objet": "Filtrar por mod o por nombre de objeto",
  "Armes": "Armas",
@@ -2124,9 +2122,7 @@
  "Une partie de leurs objets est possédée, le reste non.": "Parte de sus objetos está en posesión, el resto no.",
  "Tous leurs objets sont possédés.": "Todos sus objetos están en posesión.",
  "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "Archivos de tweaks que esta vista no ha podido leer: sus posibles objetos no se cuentan.",
- "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>Poseído</b>: con V, en el alijo o en el armario de esta partida guardada. Un mod sin ningún objeto en posesión aparece al principio de la lista.",
  "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "La vista lee los tweaks que el perfil quiere en el juego (más los instalados fuera de Red Stack) y la partida guardada tal como está en el disco. Solo lectura: no se escribe nada, ni en el juego ni en la partida guardada.",
- "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "No se ven aquí: los objetos creados por un archivo <code>.tweak</code> en formato RED, por Lua de CET o por Redscript; los registros que no son ni armas, ni ropa, ni implantes (piezas, accesorios, recetas, apariencias, PNJ).",
  "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "No se ha encontrado ninguna partida guardada en {0}. La carpeta se configura en «Ajustes», sección «Carpeta de partidas».",
  "Sauvegarde {0} illisible : {1}": "Partida guardada {0} ilegible: {1}",
  "{0} : {1} sur {2}": "{0}: {1} de {2}",
@@ -2167,5 +2163,20 @@
  "inventaire introuvable": "inventario no encontrado",
  "structure non comprise": "estructura no comprendida",
  "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "Partida guardada {0} ({1}), objetos de los mods del perfil en posesión (V, alijo, armario): {2} de {3}",
- "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Partida guardada no encontrada: {0} (carpeta de partidas: {1})"
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Partida guardada no encontrada: {0} (carpeta de partidas: {1})",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement) : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Objetos de los mods (armas, ropa, implantes, accesorios de armas, mods de equipo): lo que se usa en una partida guardada y lo que no",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement), face à une sauvegarde de partie : ce qui est sur V, dans la planque, la garde-robe ou monté sur un objet, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Objetos de los mods (armas, ropa, implantes, accesorios de armas, mods de equipo), frente a una partida guardada: lo que está con V, en el alijo, en el armario o montado en un objeto, y lo que no se usa. Se abre en su propia pestaña. Solo lectura.",
+ "Accessoires d'armes": "Accesorios de armas",
+ "accessoire d'arme": "accesorio de arma",
+ "Mods d'équipement": "Mods de equipo",
+ "mod d'équipement": "mod de equipo",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde, ou monté sur un objet qui y est (lunette sur une arme, mod sur un vêtement). Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>Poseído</b>: con V, en el alijo o en el armario de esta partida guardada, o montado en un objeto que está allí (una mira en un arma, un mod en una prenda). Un mod del que no se posee ningún objeto va al principio de la lista.",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont pas des objets à porter ou à monter (pièces internes d'une arme, programmes, recettes, plans de fabrication, apparences, PNJ).": "No se ven aquí: los objetos creados por un archivo <code>.tweak</code> en formato RED, por Lua de CET o por Redscript; los registros que no son objetos para llevar o montar (piezas internas de un arma, programas, recetas, planos de fabricación, apariencias, PNJ).",
+ "La sorte d'un objet se lit dans ce que son enregistrement dit de lui, puis dans la base de données du jeu (<code>tweakdb.bin</code>).": "El tipo de un objeto se lee en lo que su registro dice de él y luego en la base de datos del juego (<code>tweakdb.bin</code>).",
+ "Base de données du jeu (<code>r6/cache/tweakdb.bin</code>) illisible : la sorte d'un objet bâti sur un objet du jeu se devine par le nom de ce dernier, et un nom rare peut le laisser hors liste.": "La base de datos del juego (<code>r6/cache/tweakdb.bin</code>) no se puede leer: el tipo de un objeto basado en un objeto del juego se deduce del nombre de este, y un nombre poco común puede dejarlo fuera de la lista.",
+ "Pièces montées illisibles sur {n} objet de cette sauvegarde : elles ne sont pas comptées.": {
+  "one": "Piezas montadas ilegibles en {n} objeto de esta partida guardada: no se cuentan.",
+  "other": "Piezas montadas ilegibles en {n} objetos de esta partida guardada: no se cuentan."
+ },
+ "monté sur un objet": "montado en un objeto"
 }

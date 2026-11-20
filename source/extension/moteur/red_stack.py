@@ -2794,7 +2794,8 @@ def analyse_code(sources):
 
 INV_V, INV_PLANQUE = 0x1, 0xF4240                    # V, et la planque (le coffre des appartements, un seul pour tous)
 LIEUX_OBJET = ("v", "planque", "garde_robe")
-SORTES_OBJET = ("arme", "vetement", "implant")
+SORTES_OBJET = ("arme", "vetement", "implant", "accessoire", "module")   # accessoire = lunette, bouche ; module = mod d'équipement
+M40 = 0xFFFFFFFFFF                                   # un identifiant TweakDB se compare sur ses 40 bits (CRC32 et longueur)
 DOSSIER_PARTIES = os.path.join(os.path.expanduser("~"), "Saved Games", "CD Projekt Red", "Cyberpunk 2077")
 
 
@@ -2876,8 +2877,35 @@ def tdbid(nom):
     return zlib.crc32(o) | (len(o) << 32)
 
 
+def _piece(b, p, out):
+    """une pièce d'objet (ItemSlotPart d'après WolvenKit) et celles qu'elle porte : leurs identifiants dans `out`"""
+    out.append(struct.unpack_from("<Q", b, p)[0] & M40)
+    p += 16                                          # ItemID : identifiant, graine, structure, compteur, drapeaux
+    _, p = _chaine(b, p)                             # apparence
+    p += 8                                           # emplacement où elle se monte
+    n, p = _vlq(b, p)
+    for _ in range(n):
+        p = _piece(b, p, out)
+    return p + 4 + 16                                # inconnu, puis infos de butin (pool, inconnu, niveau requis)
+
+
+def pieces_montees(b, p):
+    """identifiants des pièces montées sur l'objet dont le nœud itemData commence en `p` (après l'index du nœud) :
+    lunettes, bouches, mods d'armes, de vêtements, d'implants. L'objet lui-même n'y est pas."""
+    ident, graine, forme = struct.unpack_from("<QIB", b, p)
+    p += 16 + 1 + 4                                  # ItemID, drapeaux, date de création
+    if forme & 2 or (forme == 0 and graine == 2):
+        p += 4                                       # quantité
+    out = []
+    if forme & 1 or (forme == 0 and graine != 2):
+        _piece(b, p + 16, out)                       # après les infos de butin : l'arbre des pièces, l'objet à sa racine
+    return [i for i in out if i != ident & M40]
+
+
 def lit_partie(chemin):
-    """objets d'une sauvegarde : ({identifiant TweakDB : {"v", "planque"}}, octets de la garde-robe, version du jeu).
+    """objets d'une sauvegarde : ({identifiant TweakDB : {"v", "planque", "monte"}}, octets de la garde-robe, version du
+    jeu, objets dont les pièces n'ont pas pu se lire). « monte » : une pièce montée sur un objet de ce lieu (lunette sur
+    une arme, mod sur un vêtement…).
     PartieErreur si le fichier n'est pas une sauvegarde que ce lecteur comprend."""
     try:
         f = open(chemin, "rb").read()
@@ -2911,18 +2939,23 @@ def lit_partie(chemin):
             raise PartieErreur(T("inventaire introuvable"))
         _, _, _, off, taille = inv
         items = [n for n in noeuds if n[0] == "itemData" and off <= n[3] < off + taille]
-        objets, k, p = collections.defaultdict(set), 0, off + 8     # identifiant du nœud, puis nombre de sous-inventaires
+        objets, k, p, illisibles = collections.defaultdict(set), 0, off + 8, 0   # identifiant du nœud, puis nombre de sous-inventaires
         for _ in range(struct.unpack_from("<i", data, off + 4)[0]):
             ident, nb = struct.unpack_from("<QI", data, p)
             p += 12
             lieu = "v" if ident == INV_V else "planque" if ident == INV_PLANQUE else None
             for _ in range(nb):                      # tête de l'objet (identifiant TweakDB d'abord), puis son nœud itemData
                 if lieu:
-                    objets[struct.unpack_from("<Q", data, p)[0] & 0xFFFFFFFFFF].add(lieu)
+                    objets[struct.unpack_from("<Q", data, p)[0] & M40].add(lieu)
+                    try:
+                        for i in pieces_montees(data, items[k][3] + 4):
+                            objets[i] |= {lieu, "monte"}
+                    except (struct.error, IndexError):
+                        illisibles += 1              # ses pièces seules restent hors compte, l'objet lui-même est lu
                 p = items[k][3] + items[k][4]
                 k += 1
         gr = next((n for n in noeuds if n[0] == "WardrobeSystem"), None)
-        return objets, bytes(data[gr[3]:gr[3] + gr[4]]) if gr else b"", version
+        return objets, bytes(data[gr[3]:gr[3] + gr[4]]) if gr else b"", version, illisibles
     except (struct.error, IndexError, StopIteration):
         raise PartieErreur(T("structure non comprise"))
 
@@ -2954,21 +2987,99 @@ def parties(dossier):
 
 
 # Sorte d'un objet : d'abord ce que l'enregistrement dit de lui (itemType, equipArea, placementSlots, itemCategory), le sien
-# ou celui d'une base écrite par un mod ; puis son `$type` ; puis le nom de sa base du jeu, par familles de noms. Ce qui
-# ne se classe pas (pièces, accessoires d'armes, recettes, apparences, PNJ…) n'est pas un objet pour cette vue.
+# ou celui d'une base écrite par un mod ; puis son `$type` ; puis, pour une base du jeu, ce que la TweakDB du jeu en dit
+# (`r6/cache/tweakdb.bin`) ; sans elle, le nom de la base, par familles de noms. Ce qui ne se classe pas (pièces internes
+# d'une arme, programmes, recettes, apparences, PNJ…) n'est pas un objet pour cette vue. Les pièces passent avant les
+# implants : un mod d'implant (`Prt_Fragment`) porte aussi la catégorie des implants.
 PROPS_OBJET = ("itemType", "equipArea", "placementSlots", "itemCategory")
-RX_SORTE_PROPS = (("arme", re.compile(r"ItemType\.(Wea_|Gad_Grenade)|EquipmentArea\.Weapon|ItemCategory\.Weapon")),
-                  ("vetement", re.compile(r"ItemType\.Clo_|OutfitSlots\.|EquipmentArea\.(Head|Face|OuterChest|InnerChest|Legs|Feet|Outfit)\b|ItemCategory\.Clothing")),
-                  ("implant", re.compile(r"ItemType\.Cyb|EquipmentArea\.\w*CW\b|ItemCategory\.Cyberware")))
+RX_SORTE_PROPS = (("accessoire", re.compile(r"ItemType\.Prt_\w*(Scope|Muzzle)\b|AttachmentSlots\.(Scope|PowerModule)\b")),
+                  ("module", re.compile(r"ItemType\.Prt_(\w*Mod|\w*FabricEnhancer|Fragment)\b|ItemCategory\.WeaponMod\b"
+                                        r"|AttachmentSlots\.\w*(WeaponMod|FabricEnhancer)")),
+                  ("implant", re.compile(r"ItemType\.(Cyb_|Cyberware\b)|EquipmentArea\.\w*CW\b|ItemCategory\.Cyberware\b")),
+                  ("arme", re.compile(r"ItemType\.(Wea_|Gad_Grenade)|EquipmentArea\.Weapon|ItemCategory\.Weapon\b")),
+                  ("vetement", re.compile(r"ItemType\.Clo_|OutfitSlots\.|EquipmentArea\.(Head|Face|OuterChest|InnerChest|Legs|Feet|Outfit)\b|ItemCategory\.Clothing\b")))
 TYPES_OBJET = {"WeaponItem": "arme", "Grenade": "arme", "Clothing": "vetement"}
-RX_SORTE_BASE = (("arme", re.compile(r"^Items\.(Preset_|Base_|Grenade)")),
+RX_SORTE_BASE = (("accessoire", re.compile(r"^Items\.w_(att_scope|silencer|att_muzzle)")),
+                 ("module", re.compile(r"^Items\.\w*(WeaponMod|FabricEnhancer)\d*$")),
+                 ("arme", re.compile(r"^Items\.(Preset_|Base_|Grenade)")),
                  ("vetement", re.compile(r"^Items\.(Generic\w*Clothing$|Outfit$|[A-Za-z]+_\d\d_[A-Za-z]+_\d\d)")),
                  ("implant", re.compile(r"^Items\.(Advanced|Berserk|Sandevistan|Kiroshi|\w*Cyberdeck|\w*Netdriver)")))
 RX_SOUS_ENREG = re.compile(r"_inline\d+$")
 
+# TweakDB du jeu, d'après `WolvenKit.RED4/TweakDB/TweakDBReader.cs` (MIT) : en-tête, puis des flats rangés par type de
+# valeur (hachage FNV-1a 64 du nom du type ; valeurs, puis clés « identifiant du flat → rang de la valeur »), puis les
+# enregistrements (identifiant, hachage Murmur3 du nom de leur type, graine 0x5EEDBA5E). Les noms n'y sont pas : on
+# compare des identifiants, ceux des quelques noms dont le tri a besoin (catégories, sortes de pièces, zones d'équipement).
+TWEAKDB = "r6/cache/tweakdb.bin"
+NOMS_TDB = (["ItemCategory." + x for x in ("Weapon", "Clothing", "Cyberware", "WeaponMod")]
+            + ["ItemType." + x for x in ("Gad_Grenade", "Cyberware", "Cyb_Ability", "Cyb_Launcher", "Cyb_MantisBlades", "Cyb_NanoWires",
+                                         "Cyb_StrongArms", "Cyb_HealingAbility", "Prt_Mod", "Prt_Fragment", "Prt_FabricEnhancer",
+                                         "Prt_Muzzle", "Prt_HandgunMuzzle", "Prt_RifleMuzzle", "Prt_ShortScope", "Prt_LongScope",
+                                         "Prt_TechSniperScope", "Prt_PowerSniperScope", "Prt_HandgunMod", "Prt_AR_SMG_LMGMod",
+                                         "Prt_Precision_Sniper_RifleMod", "Prt_MeleeMod", "Prt_BladeMod", "Prt_BluntMod",
+                                         "Prt_ThrowableMod", "Prt_ShotgunMod", "Prt_RangedMod", "Prt_HeadFabricEnhancer",
+                                         "Prt_FaceFabricEnhancer", "Prt_OuterTorsoFabricEnhancer", "Prt_TorsoFabricEnhancer",
+                                         "Prt_PantsFabricEnhancer", "Prt_BootsFabricEnhancer")]
+            + ["EquipmentArea." + x for x in ("Weapon", "InnerChest", "Feet", "Outfit", "HandsCW", "ArmsCW", "EyesCW",
+                                              "FrontalCortexCW", "SystemReplacementCW", "NervousSystemCW", "CardiovascularSystemCW",
+                                              "IntegumentarySystemCW", "LegsCW", "MusculoskeletalSystemCW")])
 
-def objets_des_tweaks(sources):
-    """objets (armes, vêtements, implants) que les tweaks lus créent : ({prov : [{rec, sorte, fichier, chemin, ligne}]}, non classés)"""
+
+def _murmur3(data, graine):
+    c1, c2, h, n = 0xCC9E2D51, 0x1B873593, graine, len(data)
+    rot = lambda x, r: ((x << r) | (x >> (32 - r))) & 0xFFFFFFFF
+    for i in range(0, n - n % 4, 4):
+        h ^= (rot((struct.unpack_from("<I", data, i)[0] * c1) & 0xFFFFFFFF, 15) * c2) & 0xFFFFFFFF
+        h = (rot(h, 13) * 5 + 0xE6546B64) & 0xFFFFFFFF
+    reste = int.from_bytes(data[n - n % 4:], "little")
+    if n % 4:
+        h ^= (rot((reste * c1) & 0xFFFFFFFF, 15) * c2) & 0xFFFFFFFF
+    h ^= n
+    h = ((h ^ (h >> 16)) * 0x85EBCA6B) & 0xFFFFFFFF
+    h = ((h ^ (h >> 13)) * 0xC2B2AE35) & 0xFFFFFFFF
+    return h ^ (h >> 16)
+
+
+def _fnv1a64(texte):
+    h = 0xCBF29CE484222325
+    for b in texte.encode():
+        h = ((h ^ b) * 0x100000001B3) & 0xFFFFFFFFFFFFFFFF
+    return h
+
+
+def lit_tweakdb(racine_jeu):
+    """sorte des enregistrements du jeu, à la demande : une fonction nom → sorte (ou None), ou None si la TweakDB du jeu
+    manque ou ne se lit pas (le tri retombe alors sur les familles de noms)"""
+    try:
+        f = open(os.path.join(racine_jeu, *TWEAKDB.split("/")), "rb").read()
+        magie, _, _, _, flats, recs, _, _ = struct.unpack_from("<IIIIiiii", f, 0)
+        if magie != 0x0BB1DB47:
+            return None
+        n = struct.unpack_from("<i", f, recs)[0]
+        types = {i & M40: t for i, t in struct.iter_unpack("<QI", f[recs + 4:recs + 4 + 12 * n])}
+        valeurs = {}
+        for th, nv, nk, off in (struct.unpack_from("<QIII", f, flats + 4 + 20 * i) for i in range(struct.unpack_from("<i", f, flats)[0])):
+            if th == _fnv1a64("TweakDBID"):
+                v = struct.unpack_from(f"<{nv}Q", f, off + 4)
+                p = off + 8 + 8 * nv
+                valeurs = {k & M40: v[r] & M40 for k, r in struct.iter_unpack("<Qi", f[p:p + 12 * nk])}
+    except (OSError, struct.error, IndexError):
+        return None
+    noms = {tdbid(x): x for x in NOMS_TDB}
+    sortes_type = {_murmur3(t.encode(), 0x5EEDBA5E): s for t, s in TYPES_OBJET.items()}
+
+    def sorte(nom):
+        i = tdbid(nom)
+        if i not in types:
+            return "inconnu"                         # pas un enregistrement du jeu : la famille de noms décide
+        dit = " ".join(noms.get(valeurs.get(tdbid(f"{nom}.{p}")), "") for p in PROPS_OBJET)
+        return next((k for k, rx in RX_SORTE_PROPS if rx.search(dit)), None) or sortes_type.get(types[i])
+    return sorte
+
+
+def objets_des_tweaks(sources, sorte_jeu=None):
+    """objets (armes, vêtements, implants, accessoires d'armes, mods d'équipement) que les tweaks lus créent :
+    ({prov : [{rec, sorte, fichier, chemin, ligne}]}, non classés). `sorte_jeu` : la TweakDB du jeu (lit_tweakdb)."""
     defs, props, ou = {}, collections.defaultdict(dict), collections.defaultdict(list)
     for s in sources:
         if s["voie"] != "tweak" or "erreur" in s.get("lu", {"erreur": 1}):
@@ -2996,7 +3107,9 @@ def objets_des_tweaks(sources):
             elif genre == "base" and v in defs:
                 s = sorte(v, vus + (rec,))
             elif genre == "base" and not RX_SOUS_ENREG.search(v):
-                s = next((k for k, rx in RX_SORTE_BASE if rx.search(v)), None)
+                s = sorte_jeu(v) if sorte_jeu else "inconnu"
+                if s == "inconnu":
+                    s = next((k for k, rx in RX_SORTE_BASE if rx.search(v)), None)
         memo[rec] = s
         return s
 
@@ -3020,6 +3133,7 @@ def objets_face_partie(par, objets, garde_robe):
             i = tdbid(r["rec"])
             r["lieux"] = [l for l in LIEUX_OBJET if l in objets.get(i, ())
                           or (l == "garde_robe" and garde_robe and struct.pack("<Q", i) in garde_robe)]
+            r["monte"] = "monte" in objets.get(i, ())    # monté sur un objet (lunette sur une arme…), peut-être aussi rangé seul
         recs.sort(key=lambda r: (SORTES_OBJET.index(r["sorte"]), not r["lieux"], r["rec"].lower()))
         compte = {s: [sum(1 for r in recs if r["sorte"] == s and r["lieux"]), sum(1 for r in recs if r["sorte"] == s)] for s in SORTES_OBJET}
         mods.append({"prov": prov, "objets": recs, "possedes": sum(1 for r in recs if r["lieux"]), "total": len(recs),
@@ -5576,23 +5690,25 @@ def main():
             choisie = liste[0]
         srcs = sources_code(index, plan, pose, jeu, store, data)
         jeu.save()
-        par, hors = objets_des_tweaks(srcs)
+        sorte_jeu = lit_tweakdb(a.jeu)
+        par, hors = objets_des_tweaks(srcs, sorte_jeu)
         if a.mod:
             cle = find_mod(index, prof, a.mod)
             par = {k: v for k, v in par.items() if k == cle}
         limites = [{"prov": s["prov"], "fichier": s["fichier"],
                     "quoi": T("fichier .tweak (format RED) : posé, pas analysé") if s["voie"] == "red" else s["lu"]["erreur"]}
                    for s in srcs if s["voie"] in ("tweak", "red") and (s["voie"] == "red" or "erreur" in s["lu"])]
-        objets, garde_robe, erreur = {}, b"", None
+        objets, garde_robe, erreur, illisibles = {}, b"", None, 0
         if choisie:
             try:
-                objets, garde_robe, choisie["jeu"] = lit_partie(choisie["chemin"])
+                objets, garde_robe, choisie["jeu"], illisibles = lit_partie(choisie["chemin"])
             except PartieErreur as e:
                 erreur = str(e)
         mods = objets_face_partie(par, objets, garde_robe)
         d = {"profil": a.profil, "dossier": dossier, "parties": liste, "partie": choisie, "erreur": erreur,
              "mods": mods, "objets": sum(m["total"] for m in mods), "possedes": sum(m["possedes"] for m in mods),
-             "non_classes": hors, "limites": limites, "a_appliquer": sum(len(plan[k]) for k in ("pose", "remplace", "retire"))}
+             "non_classes": hors, "limites": limites, "tweakdb": sorte_jeu is not None, "pieces_illisibles": illisibles,
+             "a_appliquer": sum(len(plan[k]) for k in ("pose", "remplace", "retire"))}
         if not choisie:
             tete = T("Aucune sauvegarde dans {0} : réglage « Dossier des parties ».", dossier)
         elif erreur:

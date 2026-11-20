@@ -136,7 +136,7 @@ page = (open(os.path.join(HERE, "..", "media", "page.html"), encoding="utf-8").r
 AILLEURS = {"en": {"liste": ["active mods out of", "Plan preview", "Fold / unfold all", "Full names"], "historique": ["recorded actions", "Applied"],
                    "magasin": ["Real size", "Windows Explorer adds up", "Trees without an active mod", "Purge "], "conflits": ["archives loaded", "per archive", "Wins over"],
                    "code": ["to look at", "to review", "Code conflict", "Filter: mod, method"],
-                   "objets": ["with no item owned", "Saves folder…", "Filter: mod or item", "Mod detail", "<b>Owned</b>"], "detail": ["Pack options", "Show the zip", "Rename the content…"],
+                   "objets": ["with no item owned", "Saves folder…", "Filter: mod or item", "Mod detail", "<b>Owned</b>", "Weapon attachments", "Equipment mods"], "detail": ["Pack options", "Show the zip", "Rename the content…"],
                    "plan": ["already in place", "Apply to the game…", "Plan of the profile", "mod disabled"], "arrivages": ["Wanted name", "Re-read Nexus", "File the update…"],
                    "maj": ["Zip of the repository", "New version", "free account", "Stop ignoring"], "fomod": ["Installer of “", "What the installer installs"],
                    "prerequis": ["<h3>Requirements</h3>", "deduced from its files", "Read on Nexus", "⚠ requirement", "outside Nexus, not checked", "Required by 1 mod of the repository, 1 of them active"],
@@ -169,7 +169,8 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
                             ("objets", "recoit({t:'objets', data: D.objets});"
                                        "document.querySelectorAll('#conflits details.code summary').forEach((x, i) => { if (i < 2) x.click(); });",
                              ['<body class="analyse objets conf"', "sans objet possédé", "Dossier des parties…", 'id="opartie"', 'data-ofiltre="aucun"',
-                              'data-osorte="', "Filtrer : mod ou objet", "Détail du mod", 'data-ouvre="', "<b>Possédé</b>"]),
+                              'data-osorte="', "Filtrer : mod ou objet", "Détail du mod", 'data-ouvre="', "<b>Possédé</b>",
+                              'data-osorte="accessoire"', 'data-osorte="module"', "Accessoires d'armes", "Mods d'équipement", "tweakdb.bin"]),
                             ("ordre", "document.querySelectorAll('#conflits details.arch summary').forEach((x, i) => { if (i < 4) x.click(); });",
                              ["Changer l'ordre", "Renommer dans le jeu…", "Passer de", 'data-sens="']),
                             ("paires", "document.querySelector('[data-grille=paires]').click();"

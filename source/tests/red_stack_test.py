@@ -1624,7 +1624,7 @@ c = plan_counts()
 check("profil « t » intact après l'essai (28)", c["pose"] == c["remplace"] == c["retire"] == c["conflit"] == 0, str(c))
 
 # ---------------------------------------------------------------- 29. objets des mods face à une sauvegarde de partie
-print("29. objets des mods (armes, vêtements, implants) face à une sauvegarde fabriquée : V, planque, garde-robe")
+print("29. objets des mods (armes, vêtements, implants, accessoires, mods d'équipement) face à une sauvegarde fabriquée et une TweakDB fabriquée")
 import zlib
 tdb = lambda n: zlib.crc32(n.encode()) | (len(n) << 32)
 
@@ -1640,8 +1640,22 @@ def lz4_litteraux(b):                       # bloc LZ4 fait d'une seule séquenc
     return bytes(out + bytes([reste])) + b
 
 
-def fausse_partie(v, planque, ailleurs, garde_robe, compresse=True, version=2500):
-    """sav.dat minimal : en-tête, table FZLC d'un bloc, nœuds inventory / itemData / WardrobeSystem, table NODE, DONE"""
+def item_data(nom, pieces=(), quantite=False):
+    """nœud itemData d'après WolvenKit : index du nœud, ItemID, drapeaux, date ; puis la quantité (forme 2), ou les infos
+    de butin et l'arbre des pièces (forme 1), l'objet à sa racine. `pieces` : [(nom, [sous-pièces…])]."""
+    info = lambda n, forme: struct.pack("<QIBHB", tdb(n), 2 if forme == 2 else 7, forme, 0, 0)
+
+    def piece(n, enfants):
+        return (info(n, 1) + b"\x00" + struct.pack("<Q", 0) + bytes([len(enfants)])
+                + b"".join(piece(x, e) for x, e in enfants) + struct.pack("<I", 0) + b"\x00" * 16)
+    if quantite:
+        return struct.pack("<i", 1) + info(nom, 2) + b"\x00" + struct.pack("<II", 0, 5)
+    return struct.pack("<i", 1) + info(nom, 1) + b"\x00" + struct.pack("<I", 0) + b"\x00" * 16 + piece(nom, list(pieces))
+
+
+def fausse_partie(v, planque, ailleurs, garde_robe, compresse=True, version=2500, montes=None):
+    """sav.dat minimal : en-tête, table FZLC d'un bloc, nœuds inventory / itemData / WardrobeSystem, table NODE, DONE.
+    `montes` : {objet : pièces montées dessus}. Les objets d'« ailleurs » n'ont qu'une quantité (forme 2)."""
     tete = b"VASC" + struct.pack("<II", 1, version) + b"\x00" + struct.pack("<QI", 0, 0)
     base = len(tete) + 8 + 0x100 * 12
     corps, noeuds = bytearray(), []
@@ -1651,8 +1665,9 @@ def fausse_partie(v, planque, ailleurs, garde_robe, compresse=True, version=2500
         corps += struct.pack("<QI", ident, len(noms))
         for n in noms:
             corps += struct.pack("<QIBHB", tdb(n), 7, 0, 0, 0)
-            noeuds.append(("itemData", base + len(corps), 13))
-            corps += struct.pack("<i", 1) + b"\x01" * 9
+            nd = item_data(n, (montes or {}).get(n, ()), quantite=ident == 0x999)
+            noeuds.append(("itemData", base + len(corps), len(nd)))
+            corps += nd
     noeuds.insert(0, ("inventory", base + inv, len(corps) - inv))
     gr = len(corps)
     corps += struct.pack("<i", 9) + b"\x05\x00\x07" + b"".join(struct.pack("<Q", tdb(n)) + b"\x00\x02" for n in garde_robe)
@@ -1667,8 +1682,39 @@ def fausse_partie(v, planque, ailleurs, garde_robe, compresse=True, version=2500
     return bytes(f + struct.pack("<i", info) + b"ENOD")
 
 
+def fausse_tweakdb(recs, flats):
+    """tweakdb.bin minimal d'après WolvenKit : en-tête, deux types de flats (un Float vide, puis les TweakDBID),
+    enregistrements, requêtes et étiquettes vides. `recs` : {nom : type}, `flats` : {"Nom.prop" : "Valeur.Nom"}."""
+    sys.path.insert(0, os.path.dirname(TOOL))
+    import red_stack as m
+    vals = sorted(set(flats.values()))
+    tdbids = struct.pack("<I", len(vals)) + b"".join(struct.pack("<Q", tdb(x)) for x in vals) + struct.pack("<I", len(flats)) \
+        + b"".join(struct.pack("<Qi", tdb(k), vals.index(v)) for k, v in flats.items())
+    tete = 32
+    table = 4 + 2 * 20
+    flottants = tete + table
+    off_tdb = flottants + 8
+    recs_off = off_tdb + len(tdbids)
+    enr = struct.pack("<i", len(recs)) + b"".join(struct.pack("<QI", tdb(n) | (0xAB << 56), m._murmur3(t.encode(), 0x5EEDBA5E)) for n, t in recs.items())
+    fin = recs_off + len(enr)
+    return (struct.pack("<IIIIiiii", 0x0BB1DB47, 8, 4, 0, tete, recs_off, fin, fin + 4)
+            + struct.pack("<i", 2) + struct.pack("<QIII", m._fnv1a64("Float"), 0, 0, flottants)
+            + struct.pack("<QIII", m._fnv1a64("TweakDBID"), len(vals), len(flats), off_tdb)
+            + struct.pack("<II", 0, 0) + tdbids + enr + struct.pack("<ii", 0, 0))
+
+
+TDB_BANC = os.path.join(JEU, "r6", "cache", "tweakdb.bin")
+os.makedirs(os.path.dirname(TDB_BANC), exist_ok=True)
+open(TDB_BANC, "wb").write(fausse_tweakdb(
+    {"Items.BancJeu_Lames": "WeaponItem", "Items.BancJeu_Viseur": "Item", "Items.BancJeu_ModArme": "Item",
+     "Items.Preset_BancPlan": "Item", "Items.BancJeu_Manteau": "Clothing"},
+    {"Items.BancJeu_Lames.itemType": "ItemType.Cyb_MantisBlades", "Items.BancJeu_Lames.equipArea": "EquipmentArea.ArmsCW",
+     "Items.BancJeu_Lames.itemCategory": "ItemCategory.Weapon", "Items.BancJeu_Viseur.itemType": "ItemType.Prt_ShortScope",
+     "Items.BancJeu_ModArme.itemCategory": "ItemCategory.WeaponMod", "Items.Preset_BancPlan.itemType": "ItemType.Gen_Readable"}))
+MONTES = {"Items.Banc_Fusil": [("Items.Banc_Viseur", [])], "Items.Banc_Pistolet": [("Items.w_att_scope_vanilla", [("Items.Banc_ModArme", [])])]}
 PARTIES = os.path.join(BASE, "parties")
-for nom, octets in (("ManualSave-1", fausse_partie(["Items.Banc_Veste"], ["Items.Banc_Pistolet"], ["Items.Banc_Implant"], ["Items.Banc_Variante", "Items.Banc_Veste"])),
+for nom, octets in (("ManualSave-1", fausse_partie(["Items.Banc_Veste", "Items.Banc_Fusil", "Items.Banc_Lames"], ["Items.Banc_Pistolet"],
+                                                   ["Items.Banc_Implant", "Items.Banc_Manteau"], ["Items.Banc_Variante", "Items.Banc_Veste"], montes=MONTES)),
                     ("ManualSave-2", fausse_partie([], [], [], [], compresse=False)),
                     ("AutoSave-0", b"pas une sauvegarde")):
     os.makedirs(os.path.join(PARTIES, nom))
@@ -1685,27 +1731,46 @@ mkzip("9_Objets/Garde Robe-9101-1-0-1700000901.zip", {"r6/tweaks/banc/objets.yam
       "Items.Banc_Modele_$(c):\n  $instances:\n    - { c: rouge }\n    - { c: bleu }\n  $base: Items.Preset_Lexington_Default\n"})
 mkzip("9_Objets/Jamais Porte-9102-1-0-1700000902.zip", {"r6/tweaks/jamais.yaml": "Items.Banc_Robe:\n  $type: gamedataClothing_Record\n",
                                                       "r6/tweaks/vieux.tweak": "Items.Banc_Rien = { }\n"})
+mkzip("9_Objets/Pieces-9103-1-0-1700000903.zip", {"r6/tweaks/pieces.yaml":
+      "Items.Banc_Lames:\n  $base: Items.BancJeu_Lames\nItems.Banc_Viseur:\n  $base: Items.BancJeu_Viseur\n"
+      "Items.Banc_ModArme:\n  $base: Items.BancJeu_ModArme\nItems.Banc_Plan:\n  $base: Items.Preset_BancPlan\n"
+      "Items.Banc_Manteau:\n  $base: Items.BancJeu_Manteau\nItems.Banc_Silencieux:\n  $type: gamedataItem_Record\n"
+      "  placementSlots: [ AttachmentSlots.PowerModule ]\nItems.Banc_Fragment:\n  $type: gamedataItem_Record\n"
+      "  itemType: ItemType.Prt_Fragment\n  itemCategory: ItemCategory.Cyberware\n"})
 rs("profils", "--profil", "x", "--copie", "t")
-for m in ("Garde Robe-9101-1-0-1700000901", "Jamais Porte-9102-1-0-1700000902"):
+for m in ("Garde Robe-9101-1-0-1700000901", "Jamais Porte-9102-1-0-1700000902", "Pieces-9103-1-0-1700000903"):
     rs("bascule", "on", "--profil", "x", "--mod", "9_Objets/" + m)
 rs("config", "--fixe", json.dumps({"parties": PARTIES}))
 d = rs("objets", "--profil", "x", "--partie", "ManualSave-1")
 M = {m["prov"].split("/")[-1][:-4].split("-")[0]: m for m in d["mods"]}
 O = {o["rec"]: o for m in d["mods"] for o in m["objets"]}
-check("tri : $base vanilla par familles de noms, $type, equipArea, base écrite par un autre enregistrement du mod, $instances développées",
+check("tri : $base du jeu absente de la TweakDB par familles de noms, $type, equipArea, placementSlots, base écrite par un autre "
+      "enregistrement du mod, $instances développées ; base présente dans la TweakDB par ce qu'elle dit (lames = implant, lunette, "
+      "mod d'arme), ou par son type (Clothing) ; un mod d'implant (Prt_Fragment) est un mod d'équipement, pas un implant",
       {k: O[k]["sorte"] for k in O} == {"Items.Banc_Veste": "vetement", "Items.Banc_Variante": "vetement", "Items.Banc_Pistolet": "arme",
                                          "Items.Banc_Implant": "implant", "Items.Banc_Crane": "implant", "Items.Banc_Robe": "vetement",
-                                         "Items.Banc_Modele_rouge": "arme", "Items.Banc_Modele_bleu": "arme"}, str({k: O[k]["sorte"] for k in O}))
-check("ni accessoire d'arme ni sous-enregistrement « _inline » dans la liste ; ils sont comptés à part",
-      "Items.Banc_Lunette" not in O and "Items.Banc_Veste_inline0" not in O and d["non_classes"] >= 2, str(d["non_classes"]))
+                                         "Items.Banc_Modele_rouge": "arme", "Items.Banc_Modele_bleu": "arme", "Items.Banc_Lunette": "accessoire",
+                                         "Items.Banc_Lames": "implant", "Items.Banc_Viseur": "accessoire", "Items.Banc_ModArme": "module",
+                                         "Items.Banc_Manteau": "vetement", "Items.Banc_Silencieux": "accessoire", "Items.Banc_Fragment": "module"}
+      and d["tweakdb"] is True, str({k: O[k]["sorte"] for k in O}))
+check("la TweakDB l'emporte sur le nom : une base du jeu au nom d'arme (Preset_) qui n'est pas un objet reste hors liste ; "
+      "les sous-enregistrements « _inline » aussi ; ils sont comptés à part",
+      "Items.Banc_Plan" not in O and "Items.Banc_Veste_inline0" not in O and d["non_classes"] >= 2, str(d["non_classes"]))
 check("lieux lus dans la sauvegarde (LZ4) : V, planque, garde-robe seule ; un autre inventaire que V et la planque ne compte pas",
       O["Items.Banc_Veste"]["lieux"] == ["v", "garde_robe"] and O["Items.Banc_Pistolet"]["lieux"] == ["planque"]
-      and O["Items.Banc_Variante"]["lieux"] == ["garde_robe"] and O["Items.Banc_Implant"]["lieux"] == [] and O["Items.Banc_Crane"]["lieux"] == [],
-      str({k: O[k]["lieux"] for k in O}))
+      and O["Items.Banc_Variante"]["lieux"] == ["garde_robe"] and O["Items.Banc_Implant"]["lieux"] == [] and O["Items.Banc_Crane"]["lieux"] == []
+      and O["Items.Banc_Manteau"]["lieux"] == [], str({k: O[k]["lieux"] for k in O}))
+check("pièces montées : une lunette sur une arme de V, un mod d'arme monté sur une pièce d'une arme de la planque (arbre à deux "
+      "étages) comptent au lieu de l'arme et disent « monté » ; l'arme elle-même n'est pas « montée » ; rien d'illisible",
+      O["Items.Banc_Viseur"]["lieux"] == ["v"] and O["Items.Banc_Viseur"]["monte"] and O["Items.Banc_ModArme"]["lieux"] == ["planque"]
+      and O["Items.Banc_ModArme"]["monte"] and not O["Items.Banc_Pistolet"]["monte"] and not O["Items.Banc_Lames"]["monte"]
+      and O["Items.Banc_Lames"]["lieux"] == ["v"] and d["pieces_illisibles"] == 0, str({k: (O[k]["lieux"], O[k]["monte"]) for k in O}))
 check("comptes par mod et par sorte ; le mod sans objet possédé vient en tête ; la sauvegarde dit ce que sa metadata porte",
-      d["mods"][0]["prov"].endswith("Jamais Porte-9102-1-0-1700000902.zip") and M["Garde Robe"]["possedes"] == 3 and M["Garde Robe"]["total"] == 7
-      and M["Garde Robe"]["sortes"] == {"arme": [1, 3], "vetement": [2, 2], "implant": [0, 2]} and d["possedes"] == 3 and d["objets"] == 8
-      and d["partie"]["niveau"] == 12 and d["partie"]["vie"] == "Nomad" and d["partie"]["jeu"] == 2500, str(M.get("Garde Robe")) + str(d["partie"]))
+      d["mods"][0]["prov"].endswith("Jamais Porte-9102-1-0-1700000902.zip") and M["Garde Robe"]["possedes"] == 3 and M["Garde Robe"]["total"] == 8
+      and M["Garde Robe"]["sortes"] == {"arme": [1, 3], "vetement": [2, 2], "implant": [0, 2], "accessoire": [0, 1]}
+      and M["Pieces"]["sortes"] == {"vetement": [0, 1], "implant": [1, 1], "accessoire": [1, 2], "module": [1, 2]}
+      and d["possedes"] == 6 and d["objets"] == 15
+      and d["partie"]["niveau"] == 12 and d["partie"]["vie"] == "Nomad" and d["partie"]["jeu"] == 2500, str(M.get("Garde Robe")) + str(M.get("Pieces")) + str(d["partie"]))
 check("limite dite : un .tweak au format RED est nommé ; la liste des parties va de la plus récente à la plus ancienne",
       any(l["fichier"] == "r6/tweaks/vieux.tweak" for l in d["limites"]) and [x["nom"] for x in d["parties"]] == ["ManualSave-2", "AutoSave-0", "ManualSave-1"],
       str(d["limites"]) + str([x["nom"] for x in d["parties"]]))
@@ -1713,8 +1778,18 @@ d2 = rs("objets", "--profil", "x")
 d3 = rs("objets", "--profil", "x", "--partie", "AutoSave-0")
 d4 = rs("objets", "--profil", "x", "--partie", "Introuvable", ok=False)
 check("sans --partie : la plus récente (bloc non compressé, inventaire vide) ; fichier qui n'est pas une sauvegarde = erreur dite, la liste reste ; nom inconnu = refus",
-      d2["partie"]["nom"] == "ManualSave-2" and d2["erreur"] is None and d2["possedes"] == 0 and d2["objets"] == 8
-      and d3["erreur"] and d3["possedes"] == 0 and len(d3["mods"]) == 2 and isinstance(d4, str) and "Introuvable" in d4, str(d3["erreur"]) + str(d4)[:200])
+      d2["partie"]["nom"] == "ManualSave-2" and d2["erreur"] is None and d2["possedes"] == 0 and d2["objets"] == 15
+      and d3["erreur"] and d3["possedes"] == 0 and len(d3["mods"]) == 3 and isinstance(d4, str) and "Introuvable" in d4, str(d3["erreur"]) + str(d4)[:200])
+os.remove(TDB_BANC)
+d5 = rs("objets", "--profil", "x", "--partie", "ManualSave-1")
+O5 = {o["rec"]: o["sorte"] for m in d5["mods"] for o in m["objets"]}
+check("sans TweakDB du jeu : dit (tweakdb faux), les bases du jeu retombent sur les familles de noms (une base au nom rare sort, "
+      "un nom d'arme trompe), ce que l'enregistrement dit de lui reste lu",
+      d5["tweakdb"] is False and "Items.Banc_Viseur" not in O5 and "Items.Banc_Lames" not in O5 and O5.get("Items.Banc_Plan") == "arme"
+      and O5.get("Items.Banc_Fragment") == "module" and O5.get("Items.Banc_Silencieux") == "accessoire", str(O5))
+open(TDB_BANC, "wb").write(b"pas une base")
+check("TweakDB illisible : comme absente, sans échec", rs("objets", "--profil", "x", "--partie", "ManualSave-1")["tweakdb"] is False)
+os.remove(TDB_BANC)
 open(os.path.join(PARTIES, "ManualSave-2", "sav.dat"), "wb").write(fausse_partie([], [], [], [], version=1600))
 check("sauvegarde d'avant la 2.0 : refus dit, pas une lecture fausse", "2.0" in (rs("objets", "--profil", "x")["erreur"] or ""))
 vu = rs("config")
@@ -1726,6 +1801,9 @@ import red_stack as moteur_rs
 bloc = bytes([0x22]) + b"AB" + struct.pack("<H", 2) + bytes([0x10]) + b"Z"      # « AB », copie recouvrante de 6, « Z »
 check("LZ4 : une copie qui recouvre ce qu'elle écrit se déroule octet par octet ; une distance hors de ce qui est écrit est refusée",
       bytes(moteur_rs._lz4_bloc(bloc, 9)) == b"ABABABABZ" and refuse_lz4(moteur_rs))
+check("hachages de la TweakDB : ceux lus dans le vrai tweakdb.bin du jeu le 20/11 (Murmur3 des types, FNV-1a 64 des types de flats)",
+      moteur_rs._murmur3(b"Item", 0x5EEDBA5E) == 0x1416443D and moteur_rs._murmur3(b"Character", 0x5EEDBA5E) == 0x6CD8E482
+      and moteur_rs._fnv1a64("TweakDBID") == 0x4072151FF3DCF7BC and moteur_rs._fnv1a64("Float") == 0xB64F4A0ACCC8A8C5)
 shutil.rmtree(os.path.join(DEPOT, "9_Objets"))
 shutil.rmtree(PARTIES)
 rs("profils", "--profil", "x", "--supprime")

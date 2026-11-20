@@ -34,8 +34,9 @@ bibliothèque : Red Stack lit les zips là où vous les rangez, ne les copie pas
   ligne. Le « dernier mot » annoncé est prévu d'après l'ordre des noms de fichiers, pas observé
   dans le jeu. Détection reprise de Conflict Studio (MIT). Lecture seule.
 - « Objets » : une analyse à part, qui lit une sauvegarde de partie. Pour chaque mod du profil,
-  les armes, vêtements et implants que créent ses tweaks TweakXL, et si la sauvegarde les tient :
-  sur V, dans la planque ou dans la garde-robe. Les mods dont aucun objet n'est possédé viennent
+  les armes, vêtements, implants, accessoires d'armes et mods d'équipement que créent ses tweaks
+  TweakXL, et si la sauvegarde les tient : sur V, dans la planque, dans la garde-robe ou monté sur
+  un objet. La sorte d'un objet bâti sur un objet du jeu se lit dans la base du jeu (`tweakdb.bin`). Les mods dont aucun objet n'est possédé viennent
   en tête : de quoi repérer les mods d'objets qui ne servent pas. La sauvegarde est lue, jamais
   écrite (format d'après WolvenKit, MIT).
 - « Arrivages » : les archives des dossiers d'arrivée, les noms au format de l'application Nexus

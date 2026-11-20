@@ -1912,8 +1912,6 @@
  "Red Stack · Objets": "Red Stack · 아이템",
  "Objets": "아이템",
  "face à une sauvegarde": "저장 파일과 대조",
- "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "mod의 무기, 의류, 사이버웨어: 게임 저장 파일에서 사용되는 것과 사용되지 않는 것",
- "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "mod의 무기, 의류, 사이버웨어를 게임 저장 파일과 대조: V가 소지한 것, 창고나 옷장에 있는 것, 사용되지 않는 것. 별도 탭에서 열립니다. 읽기 전용.",
  "Filtrer : mod ou objet…": "필터: mod 또는 아이템…",
  "Filtrer par mod ou par nom d'objet": "mod 또는 아이템 이름으로 필터링",
  "Armes": "무기",
@@ -1935,9 +1933,7 @@
  "Une partie de leurs objets est possédée, le reste non.": "아이템 중 일부는 보유하고 있고, 나머지는 보유하지 않았습니다.",
  "Tous leurs objets sont possédés.": "아이템을 모두 보유하고 있습니다.",
  "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "이 보기에서 읽지 못한 tweak 파일: 이 파일들이 만드는 아이템은 집계되지 않습니다.",
- "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>보유</b>: 이 저장 파일에서 V가 소지하고 있거나 창고 또는 옷장에 있는 것. 보유한 아이템이 하나도 없는 mod가 목록 맨 위에 표시됩니다.",
  "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "이 보기는 프로필이 게임에 넣으려는 tweak(및 Red Stack 외부에서 설치된 것)과 디스크에 있는 그대로의 저장 파일을 읽습니다. 읽기 전용: 게임에도 저장 파일에도 아무것도 쓰지 않습니다.",
- "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "여기에 표시되지 않는 것: RED 형식의 <code>.tweak</code> 파일, CET의 Lua 또는 Redscript로 만든 아이템, 무기도 의류도 사이버웨어도 아닌 레코드(부품, 부착물, 제작법, 외형, NPC).",
  "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "{0}에서 저장 파일을 찾을 수 없습니다. 폴더는 “설정”의 “저장 파일 폴더” 섹션에서 지정합니다.",
  "Sauvegarde {0} illisible : {1}": "저장 파일 {0}을(를) 읽을 수 없음: {1}",
  "{0} : {1} sur {2}": "{0}: {1}/{2}",
@@ -1972,5 +1968,19 @@
  "inventaire introuvable": "인벤토리를 찾을 수 없음",
  "structure non comprise": "이해할 수 없는 구조",
  "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "저장 파일 {0}({1}), 보유한 프로필 mod 아이템(V, 창고, 옷장): {2}/{3}",
- "Sauvegarde introuvable : {0} (dossier des parties : {1})": "저장 파일을 찾을 수 없음: {0}(저장 파일 폴더: {1})"
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "저장 파일을 찾을 수 없음: {0}(저장 파일 폴더: {1})",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement) : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "mod의 아이템(무기, 의류, 사이버웨어, 무기 부착물, 장비 개조 부품): 게임 저장 파일에서 사용되는 것과 사용되지 않는 것",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement), face à une sauvegarde de partie : ce qui est sur V, dans la planque, la garde-robe ou monté sur un objet, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "mod의 아이템(무기, 의류, 사이버웨어, 무기 부착물, 장비 개조 부품)을 게임 저장 파일과 대조: V가 소지한 것, 창고나 옷장에 있는 것, 아이템에 장착된 것, 사용되지 않는 것. 별도 탭에서 열립니다. 읽기 전용.",
+ "Accessoires d'armes": "무기 부착물",
+ "accessoire d'arme": "무기 부착물",
+ "Mods d'équipement": "장비 개조 부품",
+ "mod d'équipement": "장비 개조 부품",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde, ou monté sur un objet qui y est (lunette sur une arme, mod sur un vêtement). Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>소지</b>: 이 저장 파일에서 V가 소지하거나 창고 또는 옷장에 있는 것, 또는 그곳에 있는 아이템에 장착된 것(무기의 조준경, 의류의 개조 부품). 소지한 아이템이 하나도 없는 mod가 목록 맨 앞에 옵니다.",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont pas des objets à porter ou à monter (pièces internes d'une arme, programmes, recettes, plans de fabrication, apparences, PNJ).": "여기에 표시되지 않는 것: RED 형식의 <code>.tweak</code> 파일, CET의 Lua 또는 Redscript로 만든 아이템, 착용하거나 장착하는 아이템이 아닌 레코드(무기 내부 부품, 프로그램, 제작법, 설계도, 외형, NPC).",
+ "La sorte d'un objet se lit dans ce que son enregistrement dit de lui, puis dans la base de données du jeu (<code>tweakdb.bin</code>).": "아이템의 종류는 레코드가 스스로에 대해 말하는 내용에서, 그다음 게임 데이터베이스(<code>tweakdb.bin</code>)에서 읽습니다.",
+ "Base de données du jeu (<code>r6/cache/tweakdb.bin</code>) illisible : la sorte d'un objet bâti sur un objet du jeu se devine par le nom de ce dernier, et un nom rare peut le laisser hors liste.": "게임 데이터베이스(<code>r6/cache/tweakdb.bin</code>)를 읽을 수 없습니다: 게임 아이템을 바탕으로 한 아이템의 종류는 그 아이템의 이름으로 추측하므로, 드문 이름이면 목록에서 빠질 수 있습니다.",
+ "Pièces montées illisibles sur {n} objet de cette sauvegarde : elles ne sont pas comptées.": {
+  "other": "이 저장 파일의 아이템 {n}개에서 장착된 부품을 읽을 수 없습니다: 집계되지 않습니다."
+ },
+ "monté sur un objet": "아이템에 장착됨"
 }

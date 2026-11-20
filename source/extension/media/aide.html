@@ -387,14 +387,14 @@ a { color: var(--bleu); }
 
 <section id="objets" data-groupe="Analyses">
 <h2>Objets des mods face à une sauvegarde</h2>
-<p><b class="b">Objets</b> ouvre une analyse à part : pour chaque mod du profil, les armes, les vêtements et les implants qu'il ajoute au jeu, et ce qu'en tient une sauvegarde de partie. De quoi repérer les mods d'objets qui ne servent pas. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.</p>
+<p><b class="b">Objets</b> ouvre une analyse à part : pour chaque mod du profil, les armes, les vêtements, les implants, les accessoires d'armes (lunettes, bouches) et les mods d'équipement (mods d'armes, de vêtements, d'implants) qu'il ajoute au jeu, et ce qu'en tient une sauvegarde de partie. De quoi repérer les mods d'objets qui ne servent pas. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.</p>
 <ul>
 <li>La liste du haut choisit la sauvegarde ; d'office, la plus récente du <b>dossier des parties</b> (voir <a href="#reglages">Réglages</a>).</li>
-<li>Un objet est <b>possédé</b> s'il est sur V, dans la planque ou dans la garde-robe. La garde-robe se souvient d'un vêtement même vendu : il reste portable en apparence.</li>
-<li>Les puces comptent les mods sans objet possédé (en tête de liste), ceux utilisés en partie et ceux entièrement possédés ; un clic ne montre qu'eux. Les boutons de sorte gardent les armes, les vêtements ou les implants.</li>
+<li>Un objet est <b>possédé</b> s'il est sur V, dans la planque ou dans la garde-robe. La garde-robe se souvient d'un vêtement même vendu : il reste portable en apparence. Un accessoire ou un mod monté sur un objet possédé l'est aussi, et sa ligne dit « monté sur un objet ».</li>
+<li>Les puces comptent les mods sans objet possédé (en tête de liste), ceux utilisés en partie et ceux entièrement possédés ; un clic ne montre qu'eux. Les boutons de sorte gardent une seule sorte : armes, vêtements, implants, accessoires d'armes ou mods d'équipement.</li>
 <li>Une ligne dépliée liste les objets du mod, chacun avec l'endroit où la sauvegarde le tient. Un clic sur <code>fichier:ligne</code> ouvre le tweak qui le crée ; « Détail du mod » ouvre sa fiche.</li>
 </ul>
-<div class="note garde">Les objets sont lus dans les tweaks TweakXL du profil (<code>.yaml</code>). Ne sont pas vus : les objets créés par un fichier <code>.tweak</code> de l'ancien format, par du Lua de CET ou par Redscript. La sorte d'un objet se déduit de ce que son enregistrement dit de lui, puis du nom de sa base dans le jeu : une base rare peut rester hors liste. La sauvegarde se lit d'après le format décrit par WolvenKit (licence MIT), pour le jeu 2.0 et après.</div>
+<div class="note garde">Les objets sont lus dans les tweaks TweakXL du profil (<code>.yaml</code>). Ne sont pas vus : les objets créés par un fichier <code>.tweak</code> de l'ancien format, par du Lua de CET ou par Redscript. La sorte d'un objet se déduit de ce que son enregistrement dit de lui ; s'il est bâti sur un objet du jeu, de ce que la base de données du jeu (<code>r6/cache/tweakdb.bin</code>) dit de celui-ci. Sans elle, le nom de l'objet du jeu sert d'indice, et un nom rare peut laisser l'objet hors liste ; l'onglet le dit. La sauvegarde se lit d'après le format décrit par WolvenKit (licence MIT), pour le jeu 2.0 et après.</div>
 </section>
 
 <section id="historique" data-groupe="Suivi">

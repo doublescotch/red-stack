@@ -2101,8 +2101,6 @@
  "Red Stack · Objets": "Red Stack · Oggetti",
  "Objets": "Oggetti",
  "face à une sauvegarde": "a confronto con un salvataggio",
- "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Armi, abbigliamento e impianti dei mod: ciò che serve in un salvataggio e ciò che non serve",
- "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Armi, abbigliamento e impianti dei mod, a confronto con un salvataggio: ciò che è su V, nel deposito o nel guardaroba, e ciò che non serve. Si apre in una scheda dedicata. Sola lettura.",
  "Filtrer : mod ou objet…": "Filtra: mod o oggetto…",
  "Filtrer par mod ou par nom d'objet": "Filtra per mod o per nome di oggetto",
  "Armes": "Armi",
@@ -2124,9 +2122,7 @@
  "Une partie de leurs objets est possédée, le reste non.": "Una parte dei loro oggetti è posseduta, il resto no.",
  "Tous leurs objets sont possédés.": "Tutti i loro oggetti sono posseduti.",
  "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "File di tweak che questa vista non ha potuto leggere: i loro eventuali oggetti non vengono contati.",
- "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>Posseduto</b>: su V, nel deposito o nel guardaroba di questo salvataggio. Un mod di cui nessun oggetto è posseduto è in cima all'elenco.",
  "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "La vista legge i tweak che il profilo vuole nel gioco (più quelli installati fuori da Red Stack) e il salvataggio così com'è sul disco. Sola lettura: nulla viene scritto, né nel gioco né nel salvataggio.",
- "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "Non visti qui: gli oggetti creati da un file <code>.tweak</code> in formato RED, da Lua di CET o da Redscript; i record che non sono né armi, né abbigliamento, né impianti (componenti, accessori, ricette, aspetti, PNG).",
  "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "Nessun salvataggio trovato in {0}. La cartella si imposta in «Impostazioni», sezione «Cartella dei salvataggi».",
  "Sauvegarde {0} illisible : {1}": "Salvataggio {0} illeggibile: {1}",
  "{0} : {1} sur {2}": "{0}: {1} di {2}",
@@ -2167,5 +2163,20 @@
  "inventaire introuvable": "inventario non trovato",
  "structure non comprise": "struttura non compresa",
  "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "Salvataggio {0} ({1}), oggetti dei mod del profilo posseduti (V, deposito, guardaroba): {2} di {3}",
- "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Salvataggio non trovato: {0} (cartella dei salvataggi: {1})"
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Salvataggio non trovato: {0} (cartella dei salvataggi: {1})",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement) : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Oggetti dei mod (armi, abbigliamento, impianti, accessori per armi, mod dell'equipaggiamento): ciò che serve in un salvataggio e ciò che non serve",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement), face à une sauvegarde de partie : ce qui est sur V, dans la planque, la garde-robe ou monté sur un objet, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Oggetti dei mod (armi, abbigliamento, impianti, accessori per armi, mod dell'equipaggiamento), a confronto con un salvataggio: ciò che è su V, nel deposito, nel guardaroba o montato su un oggetto, e ciò che non serve. Si apre in una scheda dedicata. Sola lettura.",
+ "Accessoires d'armes": "Accessori per armi",
+ "accessoire d'arme": "accessorio per armi",
+ "Mods d'équipement": "Mod dell'equipaggiamento",
+ "mod d'équipement": "mod dell'equipaggiamento",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde, ou monté sur un objet qui y est (lunette sur une arme, mod sur un vêtement). Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>Posseduto</b>: su V, nel deposito o nel guardaroba di questo salvataggio, oppure montato su un oggetto che vi si trova (un mirino su un'arma, una mod su un capo). Un mod di cui nessun oggetto è posseduto è in cima alla lista.",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont pas des objets à porter ou à monter (pièces internes d'une arme, programmes, recettes, plans de fabrication, apparences, PNJ).": "Non visti qui: gli oggetti creati da un file <code>.tweak</code> in formato RED, da Lua di CET o da Redscript; i record che non sono oggetti da indossare o da montare (componenti interni di un'arma, programmi, ricette, progetti di fabbricazione, aspetti, PNG).",
+ "La sorte d'un objet se lit dans ce que son enregistrement dit de lui, puis dans la base de données du jeu (<code>tweakdb.bin</code>).": "Il tipo di un oggetto si legge in ciò che il suo record dice di lui, poi nel database del gioco (<code>tweakdb.bin</code>).",
+ "Base de données du jeu (<code>r6/cache/tweakdb.bin</code>) illisible : la sorte d'un objet bâti sur un objet du jeu se devine par le nom de ce dernier, et un nom rare peut le laisser hors liste.": "Il database del gioco (<code>r6/cache/tweakdb.bin</code>) non è leggibile: il tipo di un oggetto basato su un oggetto del gioco si deduce dal nome di quest'ultimo, e un nome raro può lasciarlo fuori dalla lista.",
+ "Pièces montées illisibles sur {n} objet de cette sauvegarde : elles ne sont pas comptées.": {
+  "one": "Componenti montati illeggibili su {n} oggetto di questo salvataggio: non vengono contati.",
+  "other": "Componenti montati illeggibili su {n} oggetti di questo salvataggio: non vengono contati."
+ },
+ "monté sur un objet": "montato su un oggetto"
 }

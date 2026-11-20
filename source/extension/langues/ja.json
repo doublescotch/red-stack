@@ -1912,8 +1912,6 @@
  "Red Stack · Objets": "Red Stack · アイテム",
  "Objets": "アイテム",
  "face à une sauvegarde": "セーブデータと照合",
- "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "MOD の武器、衣服、サイバーウェア: ゲームのセーブデータで使われているものと使われていないもの",
- "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "MOD の武器、衣服、サイバーウェアをゲームのセーブデータと照合: V が所持しているもの、スタッシュやワードローブにあるもの、使われていないもの。専用のタブで開きます。読み取り専用。",
  "Filtrer : mod ou objet…": "フィルター: MOD、アイテム…",
  "Filtrer par mod ou par nom d'objet": "MOD またはアイテム名でフィルター",
  "Armes": "武器",
@@ -1935,9 +1933,7 @@
  "Une partie de leurs objets est possédée, le reste non.": "アイテムの一部は所持していますが、残りは所持していません。",
  "Tous leurs objets sont possédés.": "アイテムをすべて所持しています。",
  "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "このビューで読み取れなかった tweak ファイル: そこで作成されるアイテムは数に入っていません。",
- "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>所持</b>: このセーブデータで V が持っているか、スタッシュまたはワードローブにあるもの。所持アイテムが 1 つもない MOD は一覧の先頭に表示されます。",
  "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "このビューは、プロファイルがゲームに入れる tweak (および Red Stack 外でインストールされたもの) と、ディスク上にあるままのセーブデータを読み取ります。読み取り専用: ゲームにもセーブデータにも何も書き込みません。",
- "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "ここに表示されないもの: RED 形式の <code>.tweak</code> ファイル、CET の Lua、または Redscript で作成されたアイテム。武器、衣服、サイバーウェアのいずれでもないレコード (パーツ、アタッチメント、レシピ、外観、NPC)。",
  "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "{0} にセーブデータが見つかりません。フォルダーは「設定」の「セーブデータのフォルダー」セクションで指定します。",
  "Sauvegarde {0} illisible : {1}": "セーブデータ {0} を読み取れません: {1}",
  "{0} : {1} sur {2}": "{0}: {1} / {2}",
@@ -1972,5 +1968,19 @@
  "inventaire introuvable": "インベントリが見つかりません",
  "structure non comprise": "構造を解釈できません",
  "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "セーブデータ {0} ({1})、所持しているプロファイルの MOD のアイテム (V、スタッシュ、ワードローブ): {2} / {3}",
- "Sauvegarde introuvable : {0} (dossier des parties : {1})": "セーブデータが見つかりません: {0} (セーブデータのフォルダー: {1})"
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "セーブデータが見つかりません: {0} (セーブデータのフォルダー: {1})",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement) : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "MOD のアイテム (武器、衣服、サイバーウェア、武器アタッチメント、装備改造パーツ): ゲームのセーブデータで使われているものと使われていないもの",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement), face à une sauvegarde de partie : ce qui est sur V, dans la planque, la garde-robe ou monté sur un objet, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "MOD のアイテム (武器、衣服、サイバーウェア、武器アタッチメント、装備改造パーツ) をゲームのセーブデータと照合: V が所持しているもの、スタッシュやワードローブにあるもの、アイテムに装着されているもの、使われていないもの。専用のタブで開きます。読み取り専用。",
+ "Accessoires d'armes": "武器アタッチメント",
+ "accessoire d'arme": "武器アタッチメント",
+ "Mods d'équipement": "装備改造パーツ",
+ "mod d'équipement": "装備改造パーツ",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde, ou monté sur un objet qui y est (lunette sur une arme, mod sur un vêtement). Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>所持</b>: このセーブデータで V が所持している、スタッシュまたはワードローブにある、またはそこにあるアイテムに装着されている (武器のスコープ、衣服の改造パーツ)。所持しているアイテムがひとつもない MOD はリストの先頭に表示されます。",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont pas des objets à porter ou à monter (pièces internes d'une arme, programmes, recettes, plans de fabrication, apparences, PNJ).": "ここに表示されないもの: RED 形式の <code>.tweak</code> ファイル、CET の Lua、または Redscript で作成されたアイテム。身に着けたり装着したりするアイテムではないレコード (武器の内部パーツ、プログラム、レシピ、設計図、外観、NPC)。",
+ "La sorte d'un objet se lit dans ce que son enregistrement dit de lui, puis dans la base de données du jeu (<code>tweakdb.bin</code>).": "アイテムの種類は、そのレコード自身の記述から、次にゲームのデータベース (<code>tweakdb.bin</code>) から読み取ります。",
+ "Base de données du jeu (<code>r6/cache/tweakdb.bin</code>) illisible : la sorte d'un objet bâti sur un objet du jeu se devine par le nom de ce dernier, et un nom rare peut le laisser hors liste.": "ゲームのデータベース (<code>r6/cache/tweakdb.bin</code>) を読み取れません: ゲームのアイテムをもとにしたアイテムの種類は、そのアイテムの名前から推測されるため、珍しい名前だとリストから漏れることがあります。",
+ "Pièces montées illisibles sur {n} objet de cette sauvegarde : elles ne sont pas comptées.": {
+  "other": "このセーブデータの {n} 個のアイテムで装着パーツを読み取れません: それらは数えられません。"
+ },
+ "monté sur un objet": "アイテムに装着"
 }

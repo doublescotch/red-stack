@@ -2101,8 +2101,6 @@
  "Red Stack · Objets": "Red Stack · Gegenstände",
  "Objets": "Gegenstände",
  "face à une sauvegarde": "mit einem Spielstand abgeglichen",
- "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Waffen, Kleidung und Cyberware aus Mods: was in einem Spielstand genutzt wird und was nicht",
- "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Waffen, Kleidung und Cyberware aus Mods, mit einem Spielstand abgeglichen: was bei V, im Versteck oder im Kleiderschrank ist, und was nicht genutzt wird. Öffnet sich in einem eigenen Reiter. Schreibgeschützt.",
  "Filtrer : mod ou objet…": "Filtern: Mod oder Gegenstand…",
  "Filtrer par mod ou par nom d'objet": "Nach Mod oder Gegenstandsname filtern",
  "Armes": "Waffen",
@@ -2124,9 +2122,7 @@
  "Une partie de leurs objets est possédée, le reste non.": "Ein Teil ihrer Gegenstände ist im Besitz, der Rest nicht.",
  "Tous leurs objets sont possédés.": "Alle ihre Gegenstände sind im Besitz.",
  "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "Tweak-Dateien, die diese Ansicht nicht lesen konnte: Ihre etwaigen Gegenstände werden nicht gezählt.",
- "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>Im Besitz</b>: bei V, im Versteck oder im Kleiderschrank dieses Spielstands. Ein Mod, von dessen Gegenständen keiner im Besitz ist, steht oben in der Liste.",
  "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "Die Ansicht liest die Tweaks, die das Profil im Spiel will (plus die außerhalb von Red Stack installierten), und den Spielstand so, wie er auf dem Datenträger liegt. Schreibgeschützt: Nichts wird geschrieben, weder ins Spiel noch in den Spielstand.",
- "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "Hier nicht erfasst: Gegenstände, die von einer <code>.tweak</code>-Datei im RED-Format, von CET-Lua oder von Redscript erstellt werden; Datensätze, die weder Waffen noch Kleidung noch Cyberware sind (Teile, Aufsätze, Rezepte, Erscheinungsbilder, NPCs).",
  "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "Kein Spielstand in {0} gefunden. Der Ordner wird in „Einstellungen“ festgelegt, Abschnitt „Spielstand-Ordner“.",
  "Sauvegarde {0} illisible : {1}": "Spielstand {0} unlesbar: {1}",
  "{0} : {1} sur {2}": "{0}: {1} von {2}",
@@ -2167,5 +2163,20 @@
  "inventaire introuvable": "Inventar nicht gefunden",
  "structure non comprise": "Struktur nicht verstanden",
  "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "Spielstand {0} ({1}), Gegenstände der Profil-Mods im Besitz (V, Versteck, Kleiderschrank): {2} von {3}",
- "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Spielstand nicht gefunden: {0} (Spielstand-Ordner: {1})"
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Spielstand nicht gefunden: {0} (Spielstand-Ordner: {1})",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement) : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Gegenstände aus Mods (Waffen, Kleidung, Cyberware, Waffenaufsätze, Ausrüstungs-Mods): was in einem Spielstand genutzt wird und was nicht",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement), face à une sauvegarde de partie : ce qui est sur V, dans la planque, la garde-robe ou monté sur un objet, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Gegenstände aus Mods (Waffen, Kleidung, Cyberware, Waffenaufsätze, Ausrüstungs-Mods), mit einem Spielstand abgeglichen: was bei V, im Versteck, im Kleiderschrank oder an einem Gegenstand angebracht ist, und was nicht genutzt wird. Öffnet sich in einem eigenen Reiter. Schreibgeschützt.",
+ "Accessoires d'armes": "Waffenaufsätze",
+ "accessoire d'arme": "Waffenaufsatz",
+ "Mods d'équipement": "Ausrüstungs-Mods",
+ "mod d'équipement": "Ausrüstungs-Mod",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde, ou monté sur un objet qui y est (lunette sur une arme, mod sur un vêtement). Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>Im Besitz</b>: bei V, im Versteck oder im Kleiderschrank dieses Spielstands, oder an einem Gegenstand angebracht, der dort ist (ein Zielfernrohr an einer Waffe, ein Mod an einem Kleidungsstück). Ein Mod, von dem kein Gegenstand im Besitz ist, steht oben in der Liste.",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont pas des objets à porter ou à monter (pièces internes d'une arme, programmes, recettes, plans de fabrication, apparences, PNJ).": "Hier nicht erfasst: Gegenstände, die von einer <code>.tweak</code>-Datei im RED-Format, von CET-Lua oder von Redscript erstellt werden; Datensätze, die keine Gegenstände zum Tragen oder Anbringen sind (interne Waffenteile, Programme, Rezepte, Baupläne, Erscheinungsbilder, NPCs).",
+ "La sorte d'un objet se lit dans ce que son enregistrement dit de lui, puis dans la base de données du jeu (<code>tweakdb.bin</code>).": "Die Art eines Gegenstands wird aus dem gelesen, was sein Datensatz über ihn sagt, dann aus der Datenbank des Spiels (<code>tweakdb.bin</code>).",
+ "Base de données du jeu (<code>r6/cache/tweakdb.bin</code>) illisible : la sorte d'un objet bâti sur un objet du jeu se devine par le nom de ce dernier, et un nom rare peut le laisser hors liste.": "Die Datenbank des Spiels (<code>r6/cache/tweakdb.bin</code>) ist nicht lesbar: Die Art eines Gegenstands, der auf einem Gegenstand des Spiels aufbaut, wird aus dessen Namen erraten, und ein seltener Name kann ihn aus der Liste fallen lassen.",
+ "Pièces montées illisibles sur {n} objet de cette sauvegarde : elles ne sont pas comptées.": {
+  "one": "Angebrachte Teile an {n} Gegenstand dieses Spielstands nicht lesbar: Sie werden nicht gezählt.",
+  "other": "Angebrachte Teile an {n} Gegenständen dieses Spielstands nicht lesbar: Sie werden nicht gezählt."
+ },
+ "monté sur un objet": "an einem Gegenstand angebracht"
 }

@@ -1912,8 +1912,6 @@
  "Red Stack · Objets": "Red Stack · 物品",
  "Objets": "物品",
  "face à une sauvegarde": "对照存档",
- "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "模组中的武器、服装和义体：游戏存档中用到了哪些，没用到哪些",
- "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "模组中的武器、服装和义体，对照游戏存档：哪些在 V 身上、储物箱中或衣柜中，哪些没有用到。在单独的选项卡中打开。只读。",
  "Filtrer : mod ou objet…": "筛选：模组或物品…",
  "Filtrer par mod ou par nom d'objet": "按模组或物品名称筛选",
  "Armes": "武器",
@@ -1935,9 +1933,7 @@
  "Une partie de leurs objets est possédée, le reste non.": "它们的物品部分已拥有，其余未拥有。",
  "Tous leurs objets sont possédés.": "它们的物品已全部拥有。",
  "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "此视图无法读取的 tweak 文件：其中可能创建的物品未计入。",
- "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>已拥有</b>：在此存档的 V 身上、储物箱中或衣柜中。没有任何已拥有物品的模组排在列表最前。",
  "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "此视图读取配置文件要放入游戏的 tweak（以及在 Red Stack 之外安装的 tweak），以及磁盘上原样的存档。只读：不会写入任何内容，无论是游戏还是存档。",
- "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "此处看不到：由 RED 格式的 <code>.tweak</code> 文件、CET 的 Lua 或 Redscript 创建的物品；既不是武器、服装也不是义体的记录（部件、配件、配方、外观、NPC）。",
  "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "在 {0} 中未找到存档。该文件夹可在“设置”的“存档文件夹”部分中更改。",
  "Sauvegarde {0} illisible : {1}": "存档 {0} 无法读取：{1}",
  "{0} : {1} sur {2}": "{0}：{1}/{2}",
@@ -1972,5 +1968,19 @@
  "inventaire introuvable": "找不到物品栏",
  "structure non comprise": "无法理解的结构",
  "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "存档 {0}（{1}），配置文件中模组的已拥有物品（V、储物箱、衣柜）：{2}/{3}",
- "Sauvegarde introuvable : {0} (dossier des parties : {1})": "找不到存档：{0}（存档文件夹：{1}）"
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "找不到存档：{0}（存档文件夹：{1}）",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement) : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "模组中的物品（武器、服装、义体、武器配件、装备改装件）：游戏存档中用到了哪些，没用到哪些",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement), face à une sauvegarde de partie : ce qui est sur V, dans la planque, la garde-robe ou monté sur un objet, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "模组中的物品（武器、服装、义体、武器配件、装备改装件），对照游戏存档：哪些在 V 身上、储物箱中、衣柜中或装在某件物品上，哪些没有用到。在单独的选项卡中打开。只读。",
+ "Accessoires d'armes": "武器配件",
+ "accessoire d'arme": "武器配件",
+ "Mods d'équipement": "装备改装件",
+ "mod d'équipement": "装备改装件",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde, ou monté sur un objet qui y est (lunette sur une arme, mod sur un vêtement). Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>已拥有</b>：在此存档中位于 V 身上、储物箱或衣柜中，或装在位于这些地方的物品上（武器上的瞄准镜、服装上的改装件）。没有任何物品被拥有的模组排在列表最前。",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont pas des objets à porter ou à monter (pièces internes d'une arme, programmes, recettes, plans de fabrication, apparences, PNJ).": "此处看不到：由 RED 格式的 <code>.tweak</code> 文件、CET 的 Lua 或 Redscript 创建的物品；不是可穿戴或可安装物品的记录（武器内部部件、程序、配方、制作图纸、外观、NPC）。",
+ "La sorte d'un objet se lit dans ce que son enregistrement dit de lui, puis dans la base de données du jeu (<code>tweakdb.bin</code>).": "物品的种类先从其记录对自身的描述中读取，再从游戏数据库（<code>tweakdb.bin</code>）中读取。",
+ "Base de données du jeu (<code>r6/cache/tweakdb.bin</code>) illisible : la sorte d'un objet bâti sur un objet du jeu se devine par le nom de ce dernier, et un nom rare peut le laisser hors liste.": "无法读取游戏数据库（<code>r6/cache/tweakdb.bin</code>）：基于游戏物品的物品，其种类按该游戏物品的名称推测，名称少见时可能不在列表中。",
+ "Pièces montées illisibles sur {n} objet de cette sauvegarde : elles ne sont pas comptées.": {
+  "other": "此存档中有 {n} 件物品的已安装部件无法读取：它们不计入统计。"
+ },
+ "monté sur un objet": "装在物品上"
 }

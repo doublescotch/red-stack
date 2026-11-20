@@ -152,15 +152,19 @@ TOOLS = [
           "requis": {"type": "string", "description": "With `mod` and `ignore`: the `ident` of ONE requirement of that mod (as returned in its list)"},
           "ignore": {"type": "boolean", "description": "With `mod` and `requis`: true = stop counting this requirement for this mod (not needed, or held "
                                                        "under another zip), false = count it again. Noted in the settings, reversible; the game is not touched."}}),
-    tool("red_stack_objets", "Items of the mods against a game save (read only, the save is never written): the weapons, clothing and "
-                             "cyberware that the profile's TweakXL tweaks create, and for each one where the save holds it: `v` (on V), "
-                             "`planque` (the stash), `garde_robe` (the wardrobe, which remembers clothing even once sold). Without "
-                             "`partie`: the most recent save of the saves folder. Mods with nothing owned come first. Not seen: items "
-                             "created by a RED-format .tweak file, by CET Lua or by Redscript; records that are neither weapons, clothing "
-                             "nor cyberware (parts, attachments, recipes, appearances, NPCs) are only counted (`non_classes`).",
+    tool("red_stack_objets", "Items of the mods against a game save (read only, the save is never written): the weapons, clothing, "
+                             "cyberware, weapon attachments (scopes, muzzles) and equipment mods (weapon, clothing and cyberware mods) "
+                             "that the profile's TweakXL tweaks create, and for each one where the save holds it: `v` (on V), "
+                             "`planque` (the stash), `garde_robe` (the wardrobe, which remembers clothing even once sold); `monte` = "
+                             "installed on an item held there (a scope on a weapon). Without `partie`: the most recent save of the "
+                             "saves folder. Mods with nothing owned come first. The kind of an item built on a game record is read in "
+                             "the game's TweakDB (`tweakdb` true), else guessed from the record's name. Not seen: items created by a "
+                             "RED-format .tweak file, by CET Lua or by Redscript; other records (internal weapon parts, programs, "
+                             "recipes, blueprints, appearances, NPCs) are only counted (`non_classes`).",
          {**P_PROFIL, "partie": {"type": "string", "description": "Save to read: its folder name (e.g. ManualSave-183), or the path of its folder or sav.dat"},
           "mod": {"type": "string", "description": "Text that designates ONE active zip, or its exact key: its full list of items"},
-          "sorte": {"type": "string", "enum": ["arme", "vetement", "implant"], "description": "Only this kind (weapon, clothing, cyberware)"},
+          "sorte": {"type": "string", "enum": ["arme", "vetement", "implant", "accessoire", "module"],
+                    "description": "Only this kind (weapon, clothing, cyberware, weapon attachment, equipment mod)"},
           "sans_objet_possede": {"type": "boolean", "description": "Only the mods of which no item is owned"},
           "limite": {"type": "integer", "description": "Mods returned at most (default 60)"}}),
     tool("red_stack_sauvegardes", "Backups of the mods' settings (files never linked, delivered or written in game). Without an argument: the "
@@ -342,11 +346,12 @@ class Serveur:
             if not objs or (p.get("sans_objet_possede") and possedes):
                 continue
             mods.append({"mod": m["prov"], "possedes": possedes, "total": len(objs), "sortes": m["sortes"],
-                         "objets": [{"rec": o["rec"], "sorte": o["sorte"], "lieux": o["lieux"]} for o in objs[:200 if p.get("mod") else 30]]})
+                         "objets": [{"rec": o["rec"], "sorte": o["sorte"], "lieux": o["lieux"], **({"monte": True} if o.get("monte") else {})}
+                                    for o in objs[:200 if p.get("mod") else 30]]})
         partie = d["partie"] and {k: d["partie"].get(k) for k in ("nom", "chemin", "date", "niveau", "vie", "jeu")}
         return {"dossier": d["dossier"], "partie": partie, "erreur": d["erreur"], "parties": [x["nom"] for x in d["parties"][:30]],
                 "possedes": d["possedes"], "objets": d["objets"], "non_classes": d["non_classes"], "limites": d["limites"][:20],
-                "mods_total": len(mods), "mods": mods[:n]}
+                "tweakdb": d.get("tweakdb"), "pieces_illisibles": d.get("pieces_illisibles"), "mods_total": len(mods), "mods": mods[:n]}
 
     def red_stack_ordre(self, p):
         args = ["--nom=" + p["archive"]] if p.get("archive") else []

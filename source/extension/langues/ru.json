@@ -2479,8 +2479,6 @@
  "Red Stack · Objets": "Red Stack · Предметы",
  "Objets": "Предметы",
  "face à une sauvegarde": "относительно сохранения",
- "Armes, vêtements et implants des mods : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Оружие, одежда и импланты из модов: что используется в сохранении игры, а что нет",
- "Armes, vêtements et implants des mods, face à une sauvegarde de partie : ce qui est sur V, dans la planque ou la garde-robe, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Оружие, одежда и импланты из модов относительно сохранения игры: что есть у Ви, в тайнике или в гардеробе, а что не используется. Открывается в отдельной вкладке. Только чтение.",
  "Filtrer : mod ou objet…": "Фильтр: мод или предмет…",
  "Filtrer par mod ou par nom d'objet": "Фильтровать по моду или названию предмета",
  "Armes": "Оружие",
@@ -2502,9 +2500,7 @@
  "Une partie de leurs objets est possédée, le reste non.": "Часть их предметов есть в наличии, остальных нет.",
  "Tous leurs objets sont possédés.": "Все их предметы есть в наличии.",
  "Fichiers de tweaks que cette vue n'a pas pu lire : leurs objets éventuels ne sont pas comptés.": "Файлы твиков, которые это представление не смогло прочитать: их возможные предметы не учтены.",
- "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde. Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>В наличии</b>: у Ви, в тайнике или в гардеробе этого сохранения. Мод, ни одного предмета которого нет в наличии, стоит в начале списка.",
  "La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu'elle est sur le disque. Lecture seule : rien n'est écrit, ni dans le jeu ni dans la sauvegarde.": "Представление читает твики, которые профиль хочет видеть в игре (плюс установленные вне Red Stack), и сохранение в том виде, в каком оно лежит на диске. Только чтение: ничего не записывается ни в игру, ни в сохранение.",
- "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont ni des armes, ni des vêtements, ni des implants (pièces, accessoires, recettes, apparences, PNJ).": "Здесь не видны: предметы, созданные файлом <code>.tweak</code> в формате RED, Lua-кодом CET или Redscript; записи, которые не являются ни оружием, ни одеждой, ни имплантами (детали, модули, рецепты, облики, NPC).",
  "Aucune sauvegarde trouvée dans {0}. Le dossier se règle dans « Réglages », section « Dossier des parties ».": "В {0} не найдено ни одного сохранения. Папка задаётся в разделе «Настройки», секция «Папка сохранений».",
  "Sauvegarde {0} illisible : {1}": "Сохранение {0} не читается: {1}",
  "{0} : {1} sur {2}": "{0}: {1} из {2}",
@@ -2557,5 +2553,22 @@
  "inventaire introuvable": "инвентарь не найден",
  "structure non comprise": "структура не распознана",
  "Sauvegarde {0} ({1}), objets des mods du profil possédés (V, planque, garde-robe) : {2} sur {3}": "Сохранение {0} ({1}), предметы модов профиля в наличии (Ви, тайник, гардероб): {2} из {3}",
- "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Сохранение не найдено: {0} (папка сохранений: {1})"
+ "Sauvegarde introuvable : {0} (dossier des parties : {1})": "Сохранение не найдено: {0} (папка сохранений: {1})",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement) : ce qui sert dans une sauvegarde de partie, et ce qui ne sert pas": "Предметы из модов (оружие, одежда, импланты, насадки для оружия, модификации снаряжения): что используется в сохранении игры, а что нет",
+ "Objets des mods (armes, vêtements, implants, accessoires d'armes, mods d'équipement), face à une sauvegarde de partie : ce qui est sur V, dans la planque, la garde-robe ou monté sur un objet, et ce qui ne sert pas. S'ouvre dans un onglet à lui. Lecture seule.": "Предметы из модов (оружие, одежда, импланты, насадки для оружия, модификации снаряжения) относительно сохранения игры: что есть у Ви, в тайнике, в гардеробе или установлено на предмет, а что не используется. Открывается в отдельной вкладке. Только чтение.",
+ "Accessoires d'armes": "Насадки для оружия",
+ "accessoire d'arme": "насадка для оружия",
+ "Mods d'équipement": "Модификации снаряжения",
+ "mod d'équipement": "модификация снаряжения",
+ "<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde, ou monté sur un objet qui y est (lunette sur une arme, mod sur un vêtement). Un mod dont aucun objet n'est possédé est en tête de liste.": "<b>В наличии</b>: у Ви, в тайнике или в гардеробе этого сохранения, либо установлено на предмет, который там есть (прицел на оружии, модификация на одежде). Мод, ни один предмет которого не в наличии, стоит в начале списка.",
+ "Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont pas des objets à porter ou à monter (pièces internes d'une arme, programmes, recettes, plans de fabrication, apparences, PNJ).": "Здесь не видны: предметы, созданные файлом <code>.tweak</code> в формате RED, Lua-кодом CET или Redscript; записи, которые не являются предметами, которые носят или устанавливают (внутренние детали оружия, программы, рецепты, чертежи, облики, NPC).",
+ "La sorte d'un objet se lit dans ce que son enregistrement dit de lui, puis dans la base de données du jeu (<code>tweakdb.bin</code>).": "Тип предмета определяется по тому, что о нём говорит его запись, затем по базе данных игры (<code>tweakdb.bin</code>).",
+ "Base de données du jeu (<code>r6/cache/tweakdb.bin</code>) illisible : la sorte d'un objet bâti sur un objet du jeu se devine par le nom de ce dernier, et un nom rare peut le laisser hors liste.": "Не удаётся прочитать базу данных игры (<code>r6/cache/tweakdb.bin</code>): тип предмета, основанного на предмете игры, угадывается по имени последнего, и редкое имя может оставить его вне списка.",
+ "Pièces montées illisibles sur {n} objet de cette sauvegarde : elles ne sont pas comptées.": {
+  "one": "Не удалось прочитать установленные детали на {n} предмете этого сохранения: они не учитываются.",
+  "few": "Не удалось прочитать установленные детали на {n} предметах этого сохранения: они не учитываются.",
+  "many": "Не удалось прочитать установленные детали на {n} предметах этого сохранения: они не учитываются.",
+  "other": "Не удалось прочитать установленные детали на {n} предмета этого сохранения: они не учитываются."
+ },
+ "monté sur un objet": "установлено на предмет"
 }

@@ -34,8 +34,9 @@ Red Stack reads the zips where you file them, does not copy them and does not mo
   predicted from the order of the file names, not observed in the game. Detection taken from
   Conflict Studio (MIT). Read-only.
 - “Items”: a separate analysis that reads a game save. For each mod of the profile, the weapons,
-  clothing and cyberware its TweakXL tweaks create, and whether the save holds them: on V, in the
-  stash or in the wardrobe. The mods with no item owned come first: a way to spot the item mods
+  clothing, cyberware, weapon attachments and equipment mods its TweakXL tweaks create, and
+  whether the save holds them: on V, in the stash, in the wardrobe or installed on an item. The
+  kind of an item built on a game item is read in the game's own database (`tweakdb.bin`). The mods with no item owned come first: a way to spot the item mods
   you do not use. The save is only read, never written (format after WolvenKit, MIT).
 - “Arrivals”: the archives of the arrival folders, the names in the format of the Nexus app and
   the `.7z` / `.rar` files. Red Stack proposes the name of the Nexus site
