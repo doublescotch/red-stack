@@ -482,6 +482,9 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     if (r.etat.startsWith('posé')) return 'ok';
     return '';
   }
+  // Lignes dont la case coche un lot au lieu de toucher au profil : les zips rangés, et les mods coupés dans le filtre « Coupés ».
+  const coupe = (r) => !r.lieu && !r.actif && r.etat.startsWith('coupé');
+  const cochable = (r) => !!r.lieu || (E.filtre === 'coupes' && coupe(r));
   function garde(r, filtre) {
     const t = $('cherche').value.trim().toLowerCase(), f = filtre || E.filtre;
     if (t && !r.cle.toLowerCase().includes(t)) return false;
@@ -492,7 +495,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     if (f === 'retires') return r.genre === 'retiré' && !!r.lieu;
     if (r.lieu) return false;
     if (f === 'actifs') return r.actif;
-    if (f === 'coupes') return !r.actif && r.etat.startsWith('coupé');
+    if (f === 'coupes') return coupe(r);
     if (f === 'jamais') return r.etat === 'jamais posé';
     if (f === 'attente') return aEcrire(r) > 0 || r.etat.startsWith('à ');
     if (f === 'modifies') return r.etat.includes('modifié');
@@ -527,14 +530,17 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     sel.innerHTML = E.profils.map((p) => `<option value="${h(p.nom)}"${p.nom === E.profil ? ' selected' : ''}>${h(p.nom)} (${p.actifs})</option>`).join('');
 
     // zips rangés cochés (dossiers d'arrivée, parqués, retirés) : un lot à remonter, parquer ou retirer d'un geste
-    const ranges = new Map(d.mods.filter((r) => r.lieu).map((r) => [r.cle, r]));
+    // filtre « Coupés » : la case d'un mod coupé le coche aussi pour un lot (activer, parquer, retirer), elle ne l'active plus
+    // d'elle-même : la ligne reste sous les yeux jusqu'au geste. Un bouton qui ne peut rien pour le lot coché n'est pas montré.
+    const ranges = new Map(d.mods.filter(cochable).map((r) => [r.cle, r]));
     for (const k of [...E.lot]) if (!ranges.has(k)) E.lot.delete(k);
-    const lot = [...E.lot].map((k) => ranges.get(k)), LOT = ['neufs', 'parques', 'retires'].includes(E.filtre);
+    const lot = [...E.lot].map((k) => ranges.get(k)), LOT = ['neufs', 'parques', 'retires', 'coupes'].includes(E.filtre);
     $('puces').innerHTML = FILTRES.map(([k, mot]) => `<button data-filtre="${k}" class="${k === E.filtre ? 'on' : ''}" aria-pressed="${k === E.filtre}">${mot}<b>${d.mods.filter((r) => garde(r, k)).length}</b></button>`).join('')
       + (!lot.length ? '' : `<span class="lot"><b>${N(lot.length, '{n} zip coché', '{n} zips cochés')}</b>`
-        + `<button data-lotvers="pile">${T`Remonter dans la pile…`}</button>`
-        + `<button data-lotvers="parques"${lot.some((r) => r.genre !== 'parqué') ? '' : ' disabled'}>${T`Parquer…`}</button>`
-        + `<button data-lotvers="retires"${lot.some((r) => r.genre !== 'retiré') ? '' : ' disabled'}>${T`Retirer…`}</button>`
+        + (lot.some((r) => !r.lieu) ? `<button data-lotactive="1" title="${T`Activer les mods cochés au profil : ils reviennent dans le jeu au prochain « Appliquer »`}">${T`Activer`}</button>` : '')
+        + (lot.some((r) => r.lieu) ? `<button data-lotvers="pile">${T`Remonter dans la pile…`}</button>` : '')
+        + (lot.some((r) => r.genre !== 'parqué') ? `<button data-lotvers="parques">${T`Parquer…`}</button>` : '')
+        + (lot.some((r) => r.genre !== 'retiré') ? `<button data-lotvers="retires">${T`Retirer…`}</button>` : '')
         + (lot.some((r) => r.genre === 'retiré') ? `<button data-lotsuppr="1" title="${T`Supprimer les zips retirés cochés : ils quittent le dépôt pour la corbeille de Windows (après confirmation)`}">${T`Supprimer…`}</button>` : '')
         + `<button data-lotvide="1">${T`Tout décocher`}</button></span>`);
     const fleche = (c) => (E.tri.col === c ? (E.tri.sens > 0 ? ' ▲' : ' ▼') : '');
@@ -551,17 +557,17 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       const pile = tous.filter((r) => !r.lieu), actifsPile = pile.filter((r) => r.actif).length;
       const etatCase = actifsPile === 0 ? '' : actifsPile === pile.length ? 'checked' : 'data-mi="1"';
       // filtres des zips rangés : la case de la pile coche ces zips pour un lot, elle ne touche jamais le profil
-      const rangesVus = vus.filter((r) => r.lieu), coches = rangesVus.filter((r) => E.lot.has(r.cle)).length;
+      const rangesVus = vus.filter(cochable), coches = rangesVus.filter((r) => E.lot.has(r.cle)).length;
       html.push(`<details class="pile" data-pile="${h(s)}"${E.plies.has(s) ? '' : ' open'}><summary>`
         + (!LOT ? `<input type="checkbox" data-pile-case="${h(s)}" ${etatCase} title="${T`Activer ou couper toute la pile`}" aria-label="${T`Pile ${h(nomPile(s))}`}">`
-          : rangesVus.length ? `<input type="checkbox" data-pile-case="${h(s)}" data-pile-lot="1" ${coches === 0 ? '' : coches === rangesVus.length ? 'checked' : 'data-mi="1"'} title="${T`Cocher ou décocher les zips rangés de cette pile montrés ici`}" aria-label="${T`Pile ${h(nomPile(s))}`}">` : '')
+          : rangesVus.length ? `<input type="checkbox" data-pile-case="${h(s)}" data-pile-lot="1" ${coches === 0 ? '' : coches === rangesVus.length ? 'checked' : 'data-mi="1"'} title="${E.filtre === 'coupes' ? T`Cocher ou décocher les mods coupés de cette pile montrés ici` : T`Cocher ou décocher les zips rangés de cette pile montrés ici`}" aria-label="${T`Pile ${h(nomPile(s))}`}">` : '')
         + `<span class="nom">${h(nomPile(s))}</span>${ico('arbre', T('Ouvrir le dossier de la pile dans le dépôt'), ` data-chemin="${h(dossier)}"`)}<span class="compte">${actifsPile} / ${pile.length} · ${taille(pile.filter((r) => r.actif).reduce((a, r) => a + r.taille, 0))}</span>`
         + '</summary><table><tbody>');
       const motEtat = (r) => r.lieu ? dit(r.genre) + (E.dossiers ? ` (${r.lieu})` : '') : dit(r.etat);
       for (const r of vus) {
         const fo = r.fomod && r.fomod.actif, l = lit(r.nom), pack = !fo && Object.keys(r.options).some((o) => o !== '');
         html.push(`<tr data-cle="${h(r.cle)}" class="${r.lieu ? 'hors' : r.actif ? '' : 'coupe'}${r.cle === E.choisi ? ' choisi' : ''}">`
-          + `<td class="case">${r.lieu ? `<input type="checkbox" data-lot="${h(r.cle)}"${E.lot.has(r.cle) ? ' checked' : ''} title="${T`Cocher ce zip rangé pour le remonter, le parquer ou le retirer avec d'autres`}" aria-label="${h(l.titre)}">` : `<input type="checkbox" data-case="${h(r.cle)}"${r.actif ? ' checked' : ''} aria-label="${h(l.titre)}">`}</td>`
+          + `<td class="case">${cochable(r) ? `<input type="checkbox" data-lot="${h(r.cle)}"${E.lot.has(r.cle) ? ' checked' : ''} title="${r.lieu ? T`Cocher ce zip rangé pour le remonter, le parquer ou le retirer avec d'autres` : T`Cocher ce mod coupé pour l'activer, le parquer ou le retirer avec d'autres`}" aria-label="${h(l.titre)}">` : `<input type="checkbox" data-case="${h(r.cle)}"${r.actif ? ' checked' : ''} aria-label="${h(l.titre)}">`}</td>`
           + `<td class="mod" title="${h(r.nom)}">${E.complets ? h(r.nom.replace(/\.zip$/i, '')) : h(l.titre) + (l.variante ? `<small>${h(l.variante)}</small>` : '')}${pack ? '<span class="puce pack">pack</span>' : ''}${fo ? `<span class="puce pack" title="${r.fomod.regle ? T`Posé par son installateur FOMOD. Ses choix : détail du mod, « Installateur… ».` : T`Posé par son installateur FOMOD : choix par défaut, jamais réglés. Ses choix : détail du mod, « Installateur… ».`}">FOMOD</span>` : ''}${pucePrerequis(r)}${pastilleConflits(r.cle)}</td>`
           + `<td class="version">${h(r.version)}</td>`
           + `<td class="etat"><span class="puce ${classe(r)}" title="${h(motEtat(r))}">${h(motEtat(r))}</span></td>`
@@ -2329,7 +2335,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       if (t.checked) E.lot.add(t.dataset.lot); else E.lot.delete(t.dataset.lot);
       dessine();
     } else if (t.dataset.pileLot) {
-      for (const r of E.data.mods) if (r.lieu && r.section === t.dataset.pileCase && garde(r)) { if (t.checked) E.lot.add(r.cle); else E.lot.delete(r.cle); }
+      for (const r of E.data.mods) if (cochable(r) && r.section === t.dataset.pileCase && garde(r)) { if (t.checked) E.lot.add(r.cle); else E.lot.delete(r.cle); }
       dessine();
     } else if (t.dataset.case) {
       // les cases cochées à la suite partent ensemble, après un court silence : aucune relecture ne vient défaire une coche
@@ -2532,8 +2538,15 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     if (b) { E.filtre = b.dataset.filtre; E.lot.clear(); dessine(); }
     else if (l) {                                   // le lot coché : une seule confirmation dans VS Code, le moteur refuse ce qui ne se déplace pas
       const genre = { parques: 'parqué', retires: 'retiré' }[l.dataset.lotvers];
-      const cles = [...E.lot].filter((k) => { const r = E.data.mods.find((x) => x.cle === k); return r && r.genre !== genre; });
+      const cles = [...E.lot].filter((k) => { const r = E.data.mods.find((x) => x.cle === k); return r && (genre ? r.genre !== genre : !!r.lieu); });
       vscode.postMessage({ t: 'deplaceLot', vers: l.dataset.lotvers, cles, retour: 'liste' });   // les cases restent : la page se verrouille, puis l'état relu les retire
+    } else if (e.target.closest('button[data-lotactive]')) {   // mods coupés cochés : activés au profil par la voie des cases, un seul état relu
+      for (const k of [...E.lot]) {
+        const r = E.data.mods.find((x) => x.cle === k);
+        if (!r || r.lieu) continue;
+        r.actif = true; E.attente.set(k, true); E.lot.delete(k);
+      }
+      clearTimeout(E.tBascule); envoieBascules(); dessine();
     } else if (e.target.closest('button[data-lotsuppr]')) {
       vscode.postMessage({ t: 'supprime', cles: [...E.lot].filter((k) => { const r = E.data.mods.find((x) => x.cle === k); return r && r.genre === 'retiré'; }) });
     } else if (e.target.closest('button[data-lotvide]')) { E.lot.clear(); dessine(); }

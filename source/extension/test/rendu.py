@@ -240,6 +240,25 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
                                                "const sur = !window.POSTES.some((x) => x.t === 'bascule') && coches > 0 && barre && lot.length === 1 && lot[0].vers === 'retires' && lot[0].retour === 'liste' && lot[0].cles.length === coches && document.querySelectorAll('#liste input[data-lot]:checked').length === coches;"
                                                "document.title = 'ranges ' + (base && sur ? 'ok' : 'non ' + base + ' ' + sur);",
                              ["<title>ranges ok</title>", 'data-filtre="parques" class="on"', 'data-pile-lot="1"', 'data-act="retire"']),
+                            # filtre « Coupés » : la case coche un lot, la ligne reste ; « Activer » part par la voie des cases ; un bouton sans objet n'est pas montré
+                            ("filtre_coupes", "const deux = D.etat.mods.filter((r) => !r.lieu).slice(0, 2); deux.forEach((r) => { r.actif = false; r.etat = 'coupé'; r.fichiers_poses = 0; });"
+                                              "recoit({t:'etat', data: D.etat, profils: D.profils});"
+                                              "document.querySelector('button[data-filtre=coupes]').click();"
+                                              "const n = D.etat.mods.filter((r) => !r.lieu && !r.actif && r.etat.startsWith('coupé')).length, lignes = () => document.querySelectorAll('#liste tr[data-cle]').length;"
+                                              "const q = (s) => !!document.querySelector('#puces ' + s), coche = (x) => { x.checked = true; x.dispatchEvent(new Event('change', {bubbles: true})); };"
+                                              "const vue = lignes() === n && !document.querySelector('#liste input[data-case]') && !q('.lot');"
+                                              "coche(document.querySelector('#liste input[data-lot]'));"
+                                              "const barre = lignes() === n && q('button[data-lotactive]') && q('button[data-lotvers=parques]') && q('button[data-lotvers=retires]') && !q('button[data-lotvers=pile]') && !(window.POSTES || []).some((x) => /^bascule/.test(x.t));"
+                                              "document.querySelector('#puces button[data-lotactive]').click();"
+                                              "const b = window.POSTES.filter((x) => x.t === 'basculeLot');"
+                                              "const actif = b.length === 1 && b[0].mods.length === 1 && b[0].mods[0][1] === true && lignes() === n - 1 && !q('.lot');"
+                                              "document.querySelector('button[data-filtre=parques]').click();"
+                                              "const p = document.querySelector('#liste input[data-lot]'); if (p) coche(p);"
+                                              "const sans = !p || (q('button[data-lotvers=pile]') && q('button[data-lotvers=retires]') && !q('button[data-lotvers=parques]') && !q('button[data-lotactive]'));"
+                                              "document.querySelector('button[data-filtre=coupes]').click();"
+                                              "coche(document.querySelector('#liste input[data-pile-lot]'));"
+                                              "document.title = 'coupes ' + (vue && barre && actif && sans ? 'ok' : 'non ' + [vue, barre, actif, sans]);",
+                             ["<title>coupes ok</title>", 'data-filtre="coupes" class="on"', 'data-lotactive="1"', 'data-pile-lot="1"', "Cocher ce mod coupé pour"]),
                             ("plie_vues", "document.getElementById('maj').click(); recoit({t:'maj', data: D.maj, compte: D.majCompte, dit: ''});"
                                           "const b = document.querySelectorAll('#majs tr.tpile').length; document.getElementById('plieTout').click();"
                                           "const plie = document.querySelectorAll('#majs tr.tpile.plie').length === b && !document.querySelector('#majs tr[data-cle]');"
@@ -337,7 +356,7 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
     bad = [a for a in attendu if a not in text]
     title = re.search(r"<title>(.*?)</title>", text).group(1)
     # « fichier » : le champ de filtre vide aussi la liste, cachée dans cet onglet
-    ok = (rows > 100 or vue in ("fichier", "filtre_neufs", "filtre_parques", "graphe") or (vue == "verrou" and rows > 50) or (vue == "prerequis" and rows > 0)) and not errs and not bad and not title.startswith("ERREUR")
+    ok = (rows > 100 or vue in ("fichier", "filtre_neufs", "filtre_parques", "filtre_coupes", "graphe") or (vue == "verrou" and rows > 50) or (vue == "prerequis" and rows > 0)) and not errs and not bad and not title.startswith("ERREUR")
     print(("  ok   " if ok else "  KO   ") + f"{vue} : {rows} lignes de mods, {len(errs)} erreur(s) de console, manquants {bad}, titre « {title} »")
     for l in errs[:5]:
         print("       " + l[:300])
