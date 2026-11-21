@@ -134,6 +134,7 @@
 <ul>
 <li><b class="b">Installer…</b>: the choice pages of a <a href="#fomod">FOMOD</a>.</li>
 <li><b class="b">Rename the zip…</b>: changes the name of the zip file in the repository. The profile, the store tree and the registry follow; the game is not touched. Keep the Nexus number in the name if you want to keep the updates and the requirements read on Nexus.</li>
+<li><b class="b">Change stack…</b>: moves the zip to the root of another stack of the repository, under the same name; you pick the stack, then confirm. The profile, the store tree and the registry follow; the game is not touched, and an active mod stays active. Only for a zip at the root of its stack: a parked, new or retired zip is first moved into its stack.</li>
 <li><b class="b">In-game names…</b>: install the files of the mod <a href="#noms">under other names</a>, without touching the zip.</li>
 <li><b class="b">Rename the content…</b>: rewrite the zip with names <a href="#arrivages">that follow your convention</a>.</li>
 <li><b class="b">Archive conflicts…</b>: the conflict analysis, centred on this mod.</li>
@@ -334,6 +335,8 @@
 <li>An item is <b>owned</b> if it is on V, in the stash or in the wardrobe. The wardrobe remembers a piece of clothing even once sold: it can still be worn as an appearance. An attachment or a mod installed on an owned item is owned too, and its row says “installed on an item”.</li>
 <li>The chips count the mods with no item owned (first in the list), those partly used and those fully owned; a click shows only them. The kind buttons keep a single kind: weapons, clothing, cyberware, weapon attachments or equipment mods.</li>
 <li>An unfolded row lists the items of the mod, each with where the save holds it. A click on <code>file:line</code> opens the tweak that creates it; “Mod detail” opens its detail.</li>
+<li><b>Group</b>: “By mod” shows one row per mod; “By type” shows one row per type of item (weapons, clothing…), which unfolds every item of that type, owned ones first, each naming the mod it comes from.</li>
+<li><b>Transfer to another save</b>: tick items (the checkbox of an item, the checkbox of a mod for all its items shown, or <b class="b">Tick the owned ones shown</b>), then <b class="b">Copy the console command</b>. Load the other save and paste the command into the Cyber Engine Tweaks console: each ticked item is added to V's inventory. The items are created anew: quality, attachments and installed mods do not follow, a piece of clothing goes to the inventory and not to the wardrobe, and the mods that create the items must be active in that save. Red Stack writes no save; changing the save in the list empties the ticks.</li>
 </ul>
 <div class="note garde">Items are read from the profile's TweakXL tweaks (<code>.yaml</code>). Not seen: items created by a <code>.tweak</code> file of the old format, by CET Lua or by Redscript. The kind of an item is deduced from what its record says about itself; if it is built on a game item, from what the game's database (<code>r6/cache/tweakdb.bin</code>) says about that one. Without it, the name of the game item serves as a clue, and a rare name can leave the item out of the list; the tab says so. The save is read after the format described by WolvenKit (MIT licence), for game 2.0 and later.</div>
 </section>

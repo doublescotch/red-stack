@@ -2285,5 +2285,35 @@
   "one": "Wenn {0} wegfällt, lädt {n} aktiver Mod nicht mehr:",
   "other": "Wenn {0} wegfällt, laden {n} aktive Mods nicht mehr:"
  },
- " (optionnel)": " (optional)"
+ " (optionnel)": " (optional)",
+ "Aucune autre pile dans le dépôt.": "Kein anderer Stapel im Depot.",
+ "Changer « {0} » de pile": "„{0}“ in einen anderen Stapel verschieben",
+ "Pile qui reçoit le zip. Échap = ne rien écrire.": "Stapel, der das Zip aufnimmt. Esc = nichts schreiben.",
+ "Changer « {0} » de pile ?": "„{0}“ in einen anderen Stapel verschieben?",
+ "Changer de pile": "Stapel wechseln",
+ "Entrée = ne rien écrire. Le zip change de dossier ; le profil, l'arbre du magasin et le registre suivent, le jeu n'est pas touché.": "Eingabe = nichts schreiben. Das Zip wechselt den Ordner; Profil, Baum im Lager und Register folgen, das Spiel wird nicht angefasst.",
+ "Déplacer le zip à la racine d'une autre pile du dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "Das Zip in den Stammordner eines anderen Stapels des Depots verschieben. Profil, Baum im Lager und Register folgen; das Spiel wird nicht angefasst.",
+ "Changer de pile…": "Stapel wechseln…",
+ "Changé de pile": "Stapel gewechselt",
+ "changé de pile": "in einen anderen Stapel verschoben",
+ "Ce zip est rangé dans un dossier de sa pile : le remonter avant de le changer de pile.": "Dieses Zip liegt in einem Ordner seines Stapels: Erst in den Stapel zurückholen, dann den Stapel wechseln.",
+ "Ce zip est déjà dans cette pile.": "Dieses Zip liegt bereits in diesem Stapel.",
+ "Pile inconnue : {0}": "Unbekannter Stapel: {0}",
+ "Cocher cet objet pour la commande de console": "Diesen Gegenstand für den Konsolenbefehl markieren",
+ "Ranger": "Gruppieren",
+ "Par sorte": "Nach Typ",
+ "{n} objet coché": {
+  "one": "{n} Gegenstand markiert",
+  "other": "{n} Gegenstände markiert"
+ },
+ "Coche tous les objets possédés des mods montrés ici (sorte, puce et filtre compris)": "Markiert alle Gegenstände im Besitz der hier gezeigten Mods (Typ, Chip und Filter eingeschlossen)",
+ "Cocher les possédés montrés": "Gezeigte im Besitz markieren",
+ "Copie dans le presse-papiers une commande pour la console de Cyber Engine Tweaks : elle ajoute chaque objet coché à l'inventaire de V": "Kopiert einen Befehl für die Konsole von Cyber Engine Tweaks in die Zwischenablage: Er fügt jeden markierten Gegenstand Vs Inventar hinzu",
+ "Copier la commande de console": "Konsolenbefehl kopieren",
+ "<b>Transfert vers une autre partie</b> : cochez des objets, copiez la commande, puis collez-la dans la console de Cyber Engine Tweaks une fois l'autre partie chargée. Les objets sont recréés neufs dans l'inventaire de V : qualité, accessoires et mods montés ne suivent pas, et les mods qui les créent doivent être actifs. Aucune sauvegarde n'est écrite.": "<b>Übertragung in einen anderen Spielstand</b>: Gegenstände markieren, den Befehl kopieren und ihn in die Konsole von Cyber Engine Tweaks einfügen, sobald der andere Spielstand geladen ist. Die Gegenstände werden in Vs Inventar neu erstellt: Qualität, Aufsätze und eingebaute Mods kommen nicht mit, und die Mods, die sie erstellen, müssen aktiv sein. Kein Spielstand wird geschrieben.",
+ "{n} objet, {0} montrés : affinez par le champ de filtre.": {
+  "one": "{n} Gegenstand, {0} gezeigt: mit dem Filterfeld eingrenzen.",
+  "other": "{n} Gegenstände, {0} gezeigt: mit dem Filterfeld eingrenzen."
+ },
+ "Cocher ou décocher les objets de ce mod montrés ici": "Die hier gezeigten Gegenstände dieses Mods markieren oder die Markierung entfernen"
 }

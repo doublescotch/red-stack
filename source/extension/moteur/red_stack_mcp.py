@@ -119,7 +119,7 @@ TOOLS = [
                               "link, reglages = settings backup or restore). Kept since version 0.10; the present state is read with "
                               "red_stack_etat.",
          {"mod": {"type": "string", "description": "Text contained in the name of a zip: its lines only"},
-          "geste": {"type": "string", "enum": ["applique", "parque", "remonte", "retire", "supprime", "renomme", "convertit", "contenu", "maj", "arrive", "reglages"]},
+          "geste": {"type": "string", "enum": ["applique", "parque", "remonte", "pile", "retire", "supprime", "renomme", "convertit", "contenu", "maj", "arrive", "reglages"]},
           "depuis": {"type": "string", "description": "Date YYYY-MM-DD (time allowed: YYYY-MM-DDTHH:MM)"},
           "limite": {"type": "integer", "description": "Maximum number of entries returned (default 20)"}}),
     tool("red_stack_demande_application", "Asks the USER to apply the plan to the game. Does not apply it: files the request, which the user confirms or "

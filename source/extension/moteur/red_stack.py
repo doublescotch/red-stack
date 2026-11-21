@@ -5023,7 +5023,7 @@ def main():
                     "sauvegarde --nom NOM : remet les réglages de cette sauvegarde")
     ap.add_argument("--reference", help="dossier de la référence (défaut : config.json, sinon « <jeu> - Référence »)")
     ap.add_argument("--cle", help="deplace : clé exacte du zip dans l'index (pile/[dossier/]nom.zip)")
-    ap.add_argument("--vers", choices=["parques", "pile", "retires"], help="deplace : vers le dossier des parqués de sa pile, vers celui des retirés, ou vers la racine de sa pile")
+    ap.add_argument("--vers", choices=["parques", "pile", "retires"], help="deplace : vers le dossier des parqués de sa pile, vers celui des retirés, ou vers la racine de sa pile ; avec --section, vers la racine d'une autre pile")
     ap.add_argument("--dossier", help="deplace --vers parques : nom du dossier (défaut : celui qui existe, sinon tiré de la convention)")
     ap.add_argument("--avant", help="ordre : l'archive --nom doit se charger avant celle-ci (elle gagne sur elle)")
     ap.add_argument("--apres", help="ordre : l'archive --nom doit se charger après celle-ci (elle perd contre elle)")
@@ -5604,7 +5604,18 @@ def main():
         if not m or not a.vers:
             sys.exit(T("deplace : --cle <clé exacte de l'index> --vers parques|pile ; clé inconnue : {0}", a.cle))
         base = dossier_pile(a.depot, m["section"])
-        if a.vers == "pile":
+        change = a.vers == "pile" and a.section      # changer de pile : le zip passe à la racine d'une autre pile, sous le même nom
+        if change:
+            # rien à refaire dans le jeu : à la lecture suivante le profil retrouve le zip par l'empreinte de son contenu
+            # (`load_profil`, cas 1), l'arbre du magasin et le registre suivent le nouveau chemin
+            if m["lieu"]:
+                sys.exit(T("Ce zip est rangé dans un dossier de sa pile : le remonter avant de le changer de pile."))
+            if a.section == m["section"]:
+                sys.exit(T("Ce zip est déjà dans cette pile."))
+            if a.section not in sections(a.depot):
+                sys.exit(T("Pile inconnue : {0}", a.section))
+            base, lieu = dossier_pile(a.depot, a.section), ""
+        elif a.vers == "pile":
             if not m["lieu"]:
                 sys.exit(T("Ce zip est déjà à la racine de sa pile."))
             lieu = ""
@@ -5630,8 +5641,8 @@ def main():
         cible = os.path.join(base, lieu, m["nom"])
         if os.path.exists(cible):
             sys.exit(T("Un zip du même nom est déjà là : {0}", cible))
-        cle = "/".join(x for x in (m["section"], lieu, m["nom"]) if x)
-        mot = T("remonté dans la pile") if a.vers == "pile" else C("retiré") if a.vers == "retires" else C("parqué")
+        cle = "/".join(x for x in (a.section if change else m["section"], lieu, m["nom"]) if x)
+        mot = T("changé de pile") if change else T("remonté dans la pile") if a.vers == "pile" else C("retiré") if a.vers == "retires" else C("parqué")
         if a.go:
             os.makedirs(os.path.dirname(cible), exist_ok=True)
             os.rename(m["zip"], cible)
@@ -5648,7 +5659,7 @@ def main():
             with open(logp, "a", encoding="utf-8") as logf:
                 print(file=logf)
                 print(f"=== {datetime.datetime.now():%Y-%m-%d %H:%M} dépôt : {mot} {m['zip']} -> {cible}", file=logf)
-            historise(data, {"pile": "remonte", "retires": "retire"}.get(a.vers, "parque"), de=m["zip"], vers=cible)
+            historise(data, "pile" if change else {"pile": "remonte", "retires": "retire"}.get(a.vers, "parque"), de=m["zip"], vers=cible)
         return out({"de": m["zip"], "vers": cible, "cle": cle, "geste": mot, "ecrit": bool(a.go)},
                    f"{m['zip']}  ->  {cible} : " + (T("fait, {0}.", mot) if a.go else T("rien écrit, relancer avec --go.")))
 
@@ -5781,7 +5792,7 @@ def main():
                          "etat": st, "hors": hors, "mien": bool(d) and MIENS.get(d.lower()) == key,
                          "reglage": bool(d and store and store.est_reglage(d))})
         jeu.save()
-        return out({"cle": key, "nom": mod["nom"], "section": mod["section"], "version": version_de(mod),
+        return out({"cle": key, "nom": mod["nom"], "section": mod["section"], "lieu": mod["lieu"], "version": version_de(mod),
                     "redmod": mod.get("redmod") or [], "fomod": fomod_bref(mod, mp), "prerequis": prerequis(index, prof, jeu, data, conf.get("requis_ignores"))[0].get(key),
                     "actif": bool(mp and mp.get("actif")), "options": options_of(mod), "sel": (mp or {}).get("sel"),
                     "arbre": store.dir_of(mod) if store and os.path.isdir(store.dir_of(mod)) else None, "zip": mod["zip"], "entrees": rows,

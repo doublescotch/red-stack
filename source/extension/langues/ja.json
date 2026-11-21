@@ -2076,5 +2076,33 @@
  "Si {0} part, {n} mod actif ne se charge plus :": {
   "other": "{0} を外すと、有効な MOD {n} 個が読み込めなくなります:"
  },
- " (optionnel)": " (任意)"
+ " (optionnel)": " (任意)",
+ "Aucune autre pile dans le dépôt.": "リポジトリにほかのスタックがありません。",
+ "Changer « {0} » de pile": "「{0}」を別のスタックへ移動",
+ "Pile qui reçoit le zip. Échap = ne rien écrire.": "zip を受け取るスタック。Esc = 何も書き込まない。",
+ "Changer « {0} » de pile ?": "「{0}」を別のスタックへ移動しますか？",
+ "Changer de pile": "スタックを変更",
+ "Entrée = ne rien écrire. Le zip change de dossier ; le profil, l'arbre du magasin et le registre suivent, le jeu n'est pas touché.": "Enter = 何も書き込まない。zip は別のフォルダーに移ります。プロファイル、ストアのツリー、登録簿が追従し、ゲームには触れません。",
+ "Déplacer le zip à la racine d'une autre pile du dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "zip をリポジトリ内の別のスタックのルートへ移動します。プロファイル、ストアのツリー、登録簿が追従します。ゲームには触れません。",
+ "Changer de pile…": "スタックを変更…",
+ "Changé de pile": "スタックを変更",
+ "changé de pile": "スタックを変更しました",
+ "Ce zip est rangé dans un dossier de sa pile : le remonter avant de le changer de pile.": "この zip はスタック内のフォルダーに保管されています。スタックを変更する前に、スタックへ戻してください。",
+ "Ce zip est déjà dans cette pile.": "この zip はすでにこのスタックにあります。",
+ "Pile inconnue : {0}": "不明なスタック: {0}",
+ "Cocher cet objet pour la commande de console": "このアイテムをコンソールコマンド用に選択",
+ "Ranger": "グループ化",
+ "Par sorte": "種別ごと",
+ "{n} objet coché": {
+  "other": "{n} 個のアイテムを選択中"
+ },
+ "Coche tous les objets possédés des mods montrés ici (sorte, puce et filtre compris)": "ここに表示されている MOD の所持アイテムをすべて選択します（種別、チップ、フィルターを含む）",
+ "Cocher les possédés montrés": "表示中の所持アイテムを選択",
+ "Copie dans le presse-papiers une commande pour la console de Cyber Engine Tweaks : elle ajoute chaque objet coché à l'inventaire de V": "Cyber Engine Tweaks のコンソール用コマンドをクリップボードにコピーします。選択した各アイテムを V のインベントリに追加します",
+ "Copier la commande de console": "コンソールコマンドをコピー",
+ "<b>Transfert vers une autre partie</b> : cochez des objets, copiez la commande, puis collez-la dans la console de Cyber Engine Tweaks une fois l'autre partie chargée. Les objets sont recréés neufs dans l'inventaire de V : qualité, accessoires et mods montés ne suivent pas, et les mods qui les créent doivent être actifs. Aucune sauvegarde n'est écrite.": "<b>別のセーブデータへの移行</b>：アイテムを選択してコマンドをコピーし、別のセーブデータを読み込んでから Cyber Engine Tweaks のコンソールに貼り付けます。アイテムは V のインベントリに新規作成されます。品質、アタッチメント、装着した改造パーツは引き継がれず、アイテムを作成する MOD が有効である必要があります。セーブデータには何も書き込みません。",
+ "{n} objet, {0} montrés : affinez par le champ de filtre.": {
+  "other": "アイテム {n} 個、{0} 個を表示：フィルター欄で絞り込んでください。"
+ },
+ "Cocher ou décocher les objets de ce mod montrés ici": "ここに表示されているこの MOD のアイテムを選択または選択解除"
 }

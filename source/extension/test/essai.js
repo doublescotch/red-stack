@@ -555,6 +555,13 @@ const instantane = () => {
   const eb = await attend('etat', n);
   controle('bascules en lot : jouées dans l\'ordre, le mod finit actif', eb.data.mods.find((r) => r.cle === monde.cle).actif === true
     && recus.slice(n).filter((x) => x.t === 'etat').length === 1, recus.slice(n).map((x) => x.t));
+  m0 = modales.length; reponse = 'Entree';         // changer de pile : une liste des autres piles, puis la confirmation ; Entrée n'écrit rien
+  const ZMONDE = path.join(DEPOT, ...monde.cle.split('/'));
+  await libre(); versPage({ t: 'changePile', cle: monde.cle });
+  await jusqua(() => modales.length === m0 + 2);
+  await pause(300);
+  controle("changer de pile : la pile se choisit (jamais la sienne), puis une confirmation ; Entrée n'écrit rien",
+    modales.length === m0 + 2 && /de pile/.test(modales[m0].texte) && /de pile \?/.test(modales[m0 + 1].texte) && fs.existsSync(ZMONDE), modales.slice(m0));
   reponse = undefined;
   console.log('mises à jour Nexus : liste, clé au coffre, ignorer');
   n = recus.length;

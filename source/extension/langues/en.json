@@ -2285,5 +2285,35 @@
   "one": "If {0} goes away, {n} active mod no longer loads:",
   "other": "If {0} goes away, {n} active mods no longer load:"
  },
- " (optionnel)": " (optional)"
+ " (optionnel)": " (optional)",
+ "Aucune autre pile dans le dépôt.": "No other stack in the repository.",
+ "Changer « {0} » de pile": "Move “{0}” to another stack",
+ "Pile qui reçoit le zip. Échap = ne rien écrire.": "Stack that receives the zip. Esc = write nothing.",
+ "Changer « {0} » de pile ?": "Move “{0}” to another stack?",
+ "Changer de pile": "Change stack",
+ "Entrée = ne rien écrire. Le zip change de dossier ; le profil, l'arbre du magasin et le registre suivent, le jeu n'est pas touché.": "Enter = write nothing. The zip moves to another folder; the profile, the store tree and the registry follow, the game is not touched.",
+ "Déplacer le zip à la racine d'une autre pile du dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "Move the zip to the root of another stack of the repository. The profile, the store tree and the registry follow; the game is not touched.",
+ "Changer de pile…": "Change stack…",
+ "Changé de pile": "Moved to another stack",
+ "changé de pile": "moved to another stack",
+ "Ce zip est rangé dans un dossier de sa pile : le remonter avant de le changer de pile.": "This zip is filed in a folder of its stack: move it into the stack before changing its stack.",
+ "Ce zip est déjà dans cette pile.": "This zip is already in this stack.",
+ "Pile inconnue : {0}": "Unknown stack: {0}",
+ "Cocher cet objet pour la commande de console": "Tick this item for the console command",
+ "Ranger": "Group",
+ "Par sorte": "By type",
+ "{n} objet coché": {
+  "one": "{n} item ticked",
+  "other": "{n} items ticked"
+ },
+ "Coche tous les objets possédés des mods montrés ici (sorte, puce et filtre compris)": "Ticks every owned item of the mods shown here (type, chip and filter included)",
+ "Cocher les possédés montrés": "Tick the owned ones shown",
+ "Copie dans le presse-papiers une commande pour la console de Cyber Engine Tweaks : elle ajoute chaque objet coché à l'inventaire de V": "Copies to the clipboard a command for the Cyber Engine Tweaks console: it adds each ticked item to V's inventory",
+ "Copier la commande de console": "Copy the console command",
+ "<b>Transfert vers une autre partie</b> : cochez des objets, copiez la commande, puis collez-la dans la console de Cyber Engine Tweaks une fois l'autre partie chargée. Les objets sont recréés neufs dans l'inventaire de V : qualité, accessoires et mods montés ne suivent pas, et les mods qui les créent doivent être actifs. Aucune sauvegarde n'est écrite.": "<b>Transfer to another save</b>: tick items, copy the command, then paste it into the Cyber Engine Tweaks console once the other save is loaded. The items are created anew in V's inventory: quality, attachments and installed mods do not follow, and the mods that create them must be active. No save is written.",
+ "{n} objet, {0} montrés : affinez par le champ de filtre.": {
+  "one": "{n} item, {0} shown: narrow down with the filter field.",
+  "other": "{n} items, {0} shown: narrow down with the filter field."
+ },
+ "Cocher ou décocher les objets de ce mod montrés ici": "Tick or untick the items of this mod shown here"
 }

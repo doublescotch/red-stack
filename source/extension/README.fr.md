@@ -38,14 +38,17 @@ bibliothèque : Red Stack lit les zips là où vous les rangez, ne les copie pas
   TweakXL, et si la sauvegarde les tient : sur V, dans la planque, dans la garde-robe ou monté sur
   un objet. La sorte d'un objet bâti sur un objet du jeu se lit dans la base du jeu (`tweakdb.bin`). Les mods dont aucun objet n'est possédé viennent
   en tête : de quoi repérer les mods d'objets qui ne servent pas. La sauvegarde est lue, jamais
-  écrite (format d'après WolvenKit, MIT).
+  écrite (format d'après WolvenKit, MIT). Liste par mod ou par sorte d'objet. Pour emporter des
+  objets dans une autre partie : cochez-les, copiez la commande de console, collez-la dans la console
+  de Cyber Engine Tweaks de l'autre partie (objets recréés neufs, aucune sauvegarde écrite).
 - « Arrivages » : les archives des dossiers d'arrivée, les noms au format de l'application Nexus
   et les `.7z` / `.rar`. Red Stack propose le nom du site Nexus (`Nom-modId-version-horodatage`,
   lu par l'API publique de Nexus), vous le retouchez puis vous renommez ; il convertit en `.zip`
   et remonte ou parque un zip, ligne par ligne ou toutes les lignes cochées en une confirmation.
   Dans la liste, les filtres « Nouveaux », « Parqués » et « Retirés » montrent ces dossiers ; un zip
   rangé s'y remonte, s'y parque ou s'y retire (déplacé dans les retirés, jamais effacé), seul ou en lot ;
-  un zip des retirés peut être supprimé (corbeille de Windows, geste inscrit à l'historique). La page se verrouille pendant qu'un
+  un zip des retirés peut être supprimé (corbeille de Windows, geste inscrit à l'historique). Un zip d'une pile passe dans une autre pile
+  depuis sa fiche (« Changer de pile… ») : le profil suit, le jeu n'est pas touché. La page se verrouille pendant qu'un
   geste écrit. Dans le plan, un fichier présent que Red Stack n'a pas posé se remplace par celui du
   zip sur votre désignation, l'ancien copié dans les sauvegardes.
   « Contenu… » propose, mod par mod, de renommer ce que le zip livre (archives, dossiers de

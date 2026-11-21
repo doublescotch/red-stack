@@ -669,6 +669,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       + `<div class="actions"><button data-montre="${h(d.zip)}">${T`Montrer le zip`}</button>`
       + (fo && !fo.erreur ? `<button data-fomodmod="${h(d.cle)}"${parFo ? ' class="plein"' : ''} title="${T`Les pages de choix de l'installateur FOMOD de ce zip`}">${T`Installateur…`}</button>` : '')
       + `<button data-zipnom="${h(d.cle)}" title="${T`Changer le nom du fichier zip dans le dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.`}">${T`Renommer le zip…`}</button>`
+      + (d.lieu ? '' : `<button data-zippile="${h(d.cle)}" title="${T`Déplacer le zip à la racine d'une autre pile du dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.`}">${T`Changer de pile…`}</button>`)
       + `<button data-ctmod="${h(d.cle)}" title="${T`Renommer ce que ce zip livre (archives, dossiers de scripts et de tweaks), après lecture des références du dépôt`}">${T`Renommer le contenu…`}</button>`
       + `<button data-nomsmod="${h(d.cle)}" title="${T`Poser ce mod sous d'autres noms DANS LE JEU (archives, .xl, scripts, tweaks, dossier CET ou REDmod) : le profil le note, le zip ne change pas. Dit qui cite chaque nom.`}">${T`Noms dans le jeu…`}</button>`
       + (d.arbre ? `<button data-montre="${h(d.arbre)}" title="${h(d.arbre)}">${T`Ouvrir son arbre`}</button>` : '')
@@ -792,7 +793,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
         + `${T`Pour les lire : « Réglages », « Convention du dépôt », « Piles » (<code>*</code> prend tout dossier).`}</p>` : '')
       + (e.profonds.length ? `<p>${N(e.profonds.length, '{n} sous-dossier de pile porte des archives sans être un dossier de la convention, il reste hors de la liste :', '{n} sous-dossiers de pile portent des archives sans être des dossiers de la convention, ils restent hors de la liste :')} ${cite(e.profonds)}.</p>` : '');
   }
-  const GESTES = { parque: T('Parqué'), remonte: T('Remonté dans la pile'), retire: T('Retiré'), supprime: T('Supprimé'), renomme: T('Zip renommé'), convertit: T('Converti en .zip'), contenu: T('Contenu du zip renommé'),
+  const GESTES = { parque: T('Parqué'), remonte: T('Remonté dans la pile'), pile: T('Changé de pile'), retire: T('Retiré'), supprime: T('Supprimé'), renomme: T('Zip renommé'), convertit: T('Converti en .zip'), contenu: T('Contenu du zip renommé'),
     maj: T('Mis à jour'), arrive: T('Téléchargé de Nexus') };
   const FAITS = { 'posé': 'vert', 'retiré': 'rouge', 'mis à jour': 'ambre' };
   const ECRITS = { pose: (n) => N(n, '{n} posé', '{n} posés'), remplace: (n) => N(n, '{n} remplacé', '{n} remplacés'), retire: (n) => N(n, '{n} retiré', '{n} retirés'),
@@ -1092,6 +1093,8 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       return;
     }
     const t = $('cherche').value.trim().toLowerCase(), so = C.oSorte || '', fi = C.oFiltre || '';
+    const par = C.oPar || 'mod', choix = C.oChoix || (C.oChoix = new Set());
+    const caseObj = (x) => `<input type="checkbox" data-ochoix="${h(x.rec)}"${choix.has(x.rec) ? ' checked' : ''} title="${T`Cocher cet objet pour la commande de console`}" aria-label="${h(x.rec)}"> `;
     // un mod se compte sur la sorte choisie : ses objets de cette sorte seulement
     const rangs = d.mods.map((m) => { const o = so ? m.objets.filter((x) => x.sorte === so) : m.objets; return { m, o, p: o.filter((x) => x.lieux.length).length }; }).filter((r) => r.o.length);
     const etat = (r) => (r.p === 0 ? 'aucun' : r.p === r.o.length ? 'tous' : 'part');
@@ -1114,7 +1117,15 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
         + (d.a_appliquer ? `<span class="puce attente" title="${T`Cette analyse lit ce que le profil veut. Le jeu le suit après « Aperçu du plan » puis « Appliquer », dans la page.`}">${N(d.a_appliquer, '{n} changement à appliquer au jeu', '{n} changements à appliquer au jeu')}</span>` : '')
         + '</div>'
         + `<div class="grille"><span>${T`Sorte`}</span>` + Object.keys(SORTE_OBJ).filter(nbSorte).map((k) =>
-          `<button data-osorte="${k}" class="${so === k ? 'on' : ''}" aria-pressed="${so === k}">${h(SORTE_OBJ[k][0])} <small>${nbSorte(k)}</small></button>`).join('') + '</div>' : '')
+          `<button data-osorte="${k}" class="${so === k ? 'on' : ''}" aria-pressed="${so === k}">${h(SORTE_OBJ[k][0])} <small>${nbSorte(k)}</small></button>`).join('')
+          + `<span class="pousse"></span><span>${T`Ranger`}</span>` + [['mod', T('Par mod')], ['sorte', T('Par sorte')]].map(([k, mot]) =>
+            `<button data-opar="${k}" class="${par === k ? 'on' : ''}" aria-pressed="${par === k}">${mot}</button>`).join('') + '</div>'
+        // transfert vers une autre partie : des objets cochés, une commande pour la console de CET ; aucune sauvegarde n'est écrite
+        + `<div class="grille"><b>${N(choix.size, '{n} objet coché', '{n} objets cochés')}</b>`
+          + `<button data-ocoche="possedes" title="${T`Coche tous les objets possédés des mods montrés ici (sorte, puce et filtre compris)`}">${T`Cocher les possédés montrés`}</button>`
+          + `<button data-ocoche="rien"${choix.size ? '' : ' disabled'}>${T`Tout décocher`}</button>`
+          + `<button data-ocopie="1"${choix.size ? ' class="plein"' : ' disabled'} title="${T`Copie dans le presse-papiers une commande pour la console de Cyber Engine Tweaks : elle ajoute chaque objet coché à l'inventaire de V`}">${T`Copier la commande de console`}</button></div>`
+        + `<p>${T`<b>Transfert vers une autre partie</b> : cochez des objets, copiez la commande, puis collez-la dans la console de Cyber Engine Tweaks une fois l'autre partie chargée. Les objets sont recréés neufs dans l'inventaire de V : qualité, accessoires et mods montés ne suivent pas, et les mods qui les créent doivent être actifs. Aucune sauvegarde n'est écrite.`}</p>` : '')
       + `<p>${T`<b>Possédé</b> : sur V, dans la planque ou dans la garde-robe de cette sauvegarde, ou monté sur un objet qui y est (lunette sur une arme, mod sur un vêtement). Un mod dont aucun objet n\'est possédé est en tête de liste.`} `
       + `${T`La vue lit les tweaks que le profil veut dans le jeu (plus ceux posés hors Red Stack), et la sauvegarde telle qu\'elle est sur le disque. Lecture seule : rien n\'est écrit, ni dans le jeu ni dans la sauvegarde.`}</p>`
       + `<p>${T`Pas vus ici : les objets créés par un fichier <code>.tweak</code> au format RED, par du Lua de CET ou par Redscript ; les enregistrements qui ne sont pas des objets à porter ou à monter (pièces internes d\'une arme, programmes, recettes, plans de fabrication, apparences, PNJ).`} `
@@ -1123,7 +1134,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
       + `${d.pieces_illisibles ? ' ' + N(d.pieces_illisibles, 'Pièces montées illisibles sur {n} objet de cette sauvegarde : elles ne sont pas comptées.', 'Pièces montées illisibles sur {n} objets de cette sauvegarde : elles ne sont pas comptées.') : ''}</p>`
       + '</div>'];
     const haut = $('conflits').scrollTop;
-    const pose = (corps) => { $('conflits').innerHTML = html.join('') + corps; $('conflits').scrollTop = haut; };
+    const pose = (corps) => { $('conflits').innerHTML = html.join('') + corps; $('conflits').querySelectorAll('[data-mi]').forEach((c) => { c.indeterminate = true; }); $('conflits').scrollTop = haut; };
     if (!d.partie) return pose(`<p class="vide">${T`Aucune sauvegarde trouvée dans ${h(d.dossier)}. Le dossier se règle dans « Réglages », section « Dossier des parties ».`}</p>`);
     if (d.erreur) return pose(`<p class="vide">${T`Sauvegarde ${h(d.partie.nom)} illisible : ${h(d.erreur)}`}</p>`);
     if (fi === 'limites') {
@@ -1132,18 +1143,41 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     }
     const lues = rangs.filter((r) => (!fi || etat(r) === fi) && (!t || nomProv(r.m.prov).toLowerCase().includes(t) || r.m.prov.toLowerCase().includes(t)
       || r.o.some((x) => x.rec.toLowerCase().includes(t)))), MAX = 300;
+    C.oVus = lues;                                   // ce que les gestes de coche prennent : les mods montrés, leurs objets de la sorte choisie
+    if (par === 'sorte') {
+      // vue générale : une ligne par sorte, qui déplie ses objets, possédés d'abord ; chaque objet dit de quel mod il vient
+      const MAXO = 1500, groupes = new Map();
+      for (const r of lues) {
+        const nomMod = nomProv(r.m.prov), duMod = !t || nomMod.toLowerCase().includes(t) || r.m.prov.toLowerCase().includes(t);
+        for (const x of r.o) if (duMod || x.rec.toLowerCase().includes(t)) (groupes.get(x.sorte) || groupes.set(x.sorte, []).get(x.sorte)).push({ x, prov: r.m.prov, nomMod });
+      }
+      return pose(Object.keys(SORTE_OBJ).filter((k) => groupes.has(k)).map((k) => {
+        const g = groupes.get(k).sort((a, b) => (b.x.lieux.length > 0) - (a.x.lieux.length > 0) || a.x.rec.localeCompare(b.x.rec));
+        const id = 'os:' + k, ouvert = C.deplies.has(id), p = g.filter((o) => o.x.lieux.length).length;
+        const tete = `<details class="arch code" data-groupe="${h(id)}"${ouvert ? ' open' : ''}><summary><span class="pastille ${ETAT_OBJ[p === 0 ? 'aucun' : p === g.length ? 'tous' : 'part']}"></span>`
+          + `<b>${h(SORTE_OBJ[k][0])}</b><span class="bilan">${h(N(g.length, '{0} sur {n} objet possédé', '{0} sur {n} objets possédés', p))}</span></summary>`;
+        if (!ouvert) return tete + '</details>';
+        return tete + '<div class="corps">'
+          + (g.length > MAXO ? `<p class="compte">${N(g.length, '{n} objet, {0} montrés : affinez par le champ de filtre.', '{n} objets, {0} montrés : affinez par le champ de filtre.', MAXO)}</p>` : '')
+          + '<ul>' + g.slice(0, MAXO).map(({ x, prov, nomMod }) => `<li class="site${x.lieux.length ? ' gagne' : ''}">${caseObj(x)}<code>${h(x.rec)}</code> · `
+            + (prov.startsWith('hors:') ? h(nomMod) : `<button class="lien" data-va="${h(prov)}" title="${T`Ouvrir le détail de ce mod`}">${h(nomMod)}</button>`)
+            + ` · ${x.lieux.length ? h(x.lieux.map((l) => LIEU_OBJ[l]).join(', ')) : `<small>${T`pas dans cette sauvegarde`}</small>`}`
+            + (x.monte ? ` · ${h(T('monté sur un objet'))}` : '') + '</li>').join('') + '</ul></div></details>';
+      }).join('') + (groupes.size ? '' : `<p class="vide">${T('Rien ne correspond à ces filtres.')}</p>`));
+    }
     // une seule sorte : son nom ; plusieurs : le compte de chacune ; une sorte choisie : rien de plus que le compte
     const bilan = (r) => { const ks = Object.keys(r.m.sortes); return (so ? '' : ks.length > 1 ? ks.map((k) => T`${SORTE_OBJ[k][0]} : ${r.m.sortes[k][0]} sur ${r.m.sortes[k][1]}`).join(' · ') + ' · ' : SORTE_OBJ[ks[0]][0] + ' · ')
       + N(r.o.length, '{0} sur {n} objet possédé', '{0} sur {n} objets possédés', r.p); };
     pose(`<p class="compte">${lues.length > MAX ? N(lues.length, '{n} mod sur {0}, {1} montrés : affinez par une sorte, une puce ou le champ de filtre.', '{n} mods sur {0}, {1} montrés : affinez par une sorte, une puce ou le champ de filtre.', rangs.length, MAX) : N(lues.length, '{n} mod sur {0}.', '{n} mods sur {0}.', rangs.length)}</p>`
       + lues.slice(0, MAX).map((r) => {
         const id = 'o:' + r.m.prov, ouvert = C.deplies.has(id), hors = r.m.prov.startsWith('hors:');
-        const tete = `<details class="arch code" data-groupe="${h(id)}"${ouvert ? ' open' : ''}><summary><span class="pastille ${ETAT_OBJ[etat(r)]}"></span>`
+        const nc = r.o.filter((x) => choix.has(x.rec)).length;
+        const tete = `<details class="arch code" data-groupe="${h(id)}"${ouvert ? ' open' : ''}><summary><input type="checkbox" data-ochoixmod="${h(r.m.prov)}"${nc === 0 ? '' : nc === r.o.length ? ' checked' : ' data-mi="1"'} title="${T`Cocher ou décocher les objets de ce mod montrés ici`}" aria-label="${h(nomProv(r.m.prov))}"><span class="pastille ${ETAT_OBJ[etat(r)]}"></span>`
           + `<b>${h(nomProv(r.m.prov))}</b><span class="du">${h(hors ? '' : r.m.prov.split('/')[0])}</span><span class="bilan">${h(bilan(r))}</span></summary>`;
         if (!ouvert) return tete + '</details>';
         return tete + '<div class="corps">'
           + (hors ? '' : `<p><button class="lien" data-va="${h(r.m.prov)}" title="${T`Ouvrir le détail de ce mod`}">${T`Détail du mod`}</button></p>`)
-          + '<ul>' + r.o.filter((x) => !t || !r.o.some((y) => y.rec.toLowerCase().includes(t)) || x.rec.toLowerCase().includes(t)).map((x) => `<li class="site${x.lieux.length ? ' gagne' : ''}">`
+          + '<ul>' + r.o.filter((x) => !t || !r.o.some((y) => y.rec.toLowerCase().includes(t)) || x.rec.toLowerCase().includes(t)).map((x) => `<li class="site${x.lieux.length ? ' gagne' : ''}">${caseObj(x)}`
             + `<code>${h(x.rec)}</code> <small>${h(SORTE_OBJ[x.sorte][1])}</small> · ${x.lieux.length ? h(x.lieux.map((l) => LIEU_OBJ[l]).join(', ')) : `<small>${T`pas dans cette sauvegarde`}</small>`}`
             + (x.monte ? ` · ${h(T('monté sur un objet'))}` : '')
             + (x.chemin ? `<div><button class="lien fich" data-ouvre="${h(x.chemin)}" data-ligne="${x.ligne}" title="${T`Ouvrir ce fichier du jeu à la ligne ${x.ligne}`}">${h(x.fichier)}:${x.ligne}</button></div>`
@@ -2032,6 +2066,17 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     else if (d.crelit) C.codeEchec = false;
     else if (d.orelit) C.objEchec = false;
     else if (d.ofen) return vscode.postMessage({ t: 'ouvreReglages' });
+    else if (e.target.dataset.ochoix !== undefined || e.target.dataset.ochoixmod !== undefined) return;   // cases des objets : jouées au « change »
+    else if (d.opar) { C.oPar = d.opar; C.deplies.clear(); }
+    else if (d.ocoche) {                             // « rien » vide la sélection ; « possedes » coche les objets possédés de ce qui est montré
+      if (d.ocoche === 'rien') C.oChoix.clear();
+      else for (const r of C.oVus || []) for (const x of r.o) if (x.lieux.length) C.oChoix.add(x.rec);
+    }
+    else if (d.ocopie) {
+      // une commande Lua par objet, sur une seule ligne : la console de CET n'a pas de plafond de ligne (mesuré le 20/11)
+      const recs = [...C.oChoix].filter((r) => /^[\w.\-]+$/.test(r));
+      return vscode.postMessage({ t: 'copie', texte: recs.map((r) => `Game.AddToInventory("${r}", 1)`).join('; ') });
+    }
     else if (e.target.closest('[data-ofiltre]')) {     // une puce ne montre que ce qu'elle compte ; un second clic revient à tous
       const k = e.target.closest('[data-ofiltre]').dataset.ofiltre;
       C.oFiltre = C.oFiltre === k ? '' : k; C.deplies.clear();
@@ -2083,7 +2128,12 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     if (e.target.id === 'egaux') E.conf.egaux = e.target.checked;
     else if (e.target.id === 'internes') E.conf.internes = e.target.checked;
     else if (e.target.id === 'baseSeul') E.conf.baseSeul = e.target.checked;
-    else if (e.target.id === 'opartie') { E.conf.oPartie = e.target.value; E.conf.obj = null; E.conf.objDemande = false; E.conf.deplies.clear(); }
+    else if (e.target.id === 'opartie') { E.conf.oPartie = e.target.value; E.conf.obj = null; E.conf.objDemande = false; E.conf.deplies.clear(); (E.conf.oChoix || new Set()).clear(); }
+    else if (e.target.dataset.ochoix !== undefined) { if (e.target.checked) E.conf.oChoix.add(e.target.dataset.ochoix); else E.conf.oChoix.delete(e.target.dataset.ochoix); }
+    else if (e.target.dataset.ochoixmod !== undefined) {   // la case d'un mod : tous ses objets montrés (sorte choisie comprise)
+      const r = (E.conf.oVus || []).find((v) => v.m.prov === e.target.dataset.ochoixmod);
+      for (const x of (r ? r.o : [])) { if (e.target.checked) E.conf.oChoix.add(x.rec); else E.conf.oChoix.delete(x.rec); }
+    }
     dessineConflits();
   });
   // boîte au survol d'une pastille de conflits, dans la liste des mods
@@ -2470,6 +2520,7 @@ body.analyse header > *:not(h1):not(#cherche):not(.pousse), body.analyse #chiffr
     else if (d.nexus) vscode.postMessage({ t: 'nexus', id: d.nexus });
     else if (d.reqignore || d.reqreprend) { e.target.disabled = true; vscode.postMessage({ t: 'prerequisIgnore', cle: $('volet').dataset.cle, requis: d.reqignore || d.reqreprend, valeur: !!d.reqignore }); }
     else if (d.zipnom) vscode.postMessage({ t: 'zipRenomme', cle: d.zipnom });
+    else if (d.zippile) vscode.postMessage({ t: 'changePile', cle: d.zippile });
     else if (d.reqlit) { e.target.disabled = true; e.target.textContent = T('Lecture de Nexus…'); vscode.postMessage({ t: 'prerequisLit', cle: d.reqlit }); }
     else if (d.va) { E.choisi = d.va; vscode.postMessage({ t: 'detail', cle: d.va }); }
     else if (d.gagne) {

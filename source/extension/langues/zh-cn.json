@@ -2076,5 +2076,33 @@
  "Si {0} part, {n} mod actif ne se charge plus :": {
   "other": "如果移除 {0}，将有 {n} 个已启用的模组无法加载："
  },
- " (optionnel)": " （可选）"
+ " (optionnel)": " （可选）",
+ "Aucune autre pile dans le dépôt.": "仓库中没有其他栈。",
+ "Changer « {0} » de pile": "将“{0}”移到另一个栈",
+ "Pile qui reçoit le zip. Échap = ne rien écrire.": "接收该 zip 的栈。Esc = 不写入任何内容。",
+ "Changer « {0} » de pile ?": "将“{0}”移到另一个栈？",
+ "Changer de pile": "更换栈",
+ "Entrée = ne rien écrire. Le zip change de dossier ; le profil, l'arbre du magasin et le registre suivent, le jeu n'est pas touché.": "回车 = 不写入任何内容。zip 会移到另一个文件夹；配置、存储中的目录树和登记表会随之更新，游戏不受影响。",
+ "Déplacer le zip à la racine d'une autre pile du dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "将 zip 移到仓库中另一个栈的根目录。配置、存储中的目录树和登记表会随之更新；游戏不受影响。",
+ "Changer de pile…": "更换栈…",
+ "Changé de pile": "已更换栈",
+ "changé de pile": "已更换栈",
+ "Ce zip est rangé dans un dossier de sa pile : le remonter avant de le changer de pile.": "此 zip 存放在其栈的某个文件夹中：请先将其取回到栈中，再更换栈。",
+ "Ce zip est déjà dans cette pile.": "此 zip 已在该栈中。",
+ "Pile inconnue : {0}": "未知的栈：{0}",
+ "Cocher cet objet pour la commande de console": "勾选此物品以加入控制台命令",
+ "Ranger": "分组",
+ "Par sorte": "按类别",
+ "{n} objet coché": {
+  "other": "已勾选 {n} 个物品"
+ },
+ "Coche tous les objets possédés des mods montrés ici (sorte, puce et filtre compris)": "勾选此处显示的模组中所有已拥有的物品（包括类别、标签和筛选条件）",
+ "Cocher les possédés montrés": "勾选显示的已拥有物品",
+ "Copie dans le presse-papiers une commande pour la console de Cyber Engine Tweaks : elle ajoute chaque objet coché à l'inventaire de V": "将一条用于 Cyber Engine Tweaks 控制台的命令复制到剪贴板：它会把每个勾选的物品加入 V 的物品栏",
+ "Copier la commande de console": "复制控制台命令",
+ "<b>Transfert vers une autre partie</b> : cochez des objets, copiez la commande, puis collez-la dans la console de Cyber Engine Tweaks une fois l'autre partie chargée. Les objets sont recréés neufs dans l'inventaire de V : qualité, accessoires et mods montés ne suivent pas, et les mods qui les créent doivent être actifs. Aucune sauvegarde n'est écrite.": "<b>转移到另一个存档</b>：勾选物品，复制命令，然后在载入另一个存档后将其粘贴到 Cyber Engine Tweaks 控制台。物品会在 V 的物品栏中重新生成：品质、配件和已安装的改装件不会保留，并且创建这些物品的模组必须处于启用状态。不会写入任何存档。",
+ "{n} objet, {0} montrés : affinez par le champ de filtre.": {
+  "other": "{n} 个物品，显示 {0} 个：请用筛选框缩小范围。"
+ },
+ "Cocher ou décocher les objets de ce mod montrés ici": "勾选或取消勾选此处显示的该模组的物品"
 }

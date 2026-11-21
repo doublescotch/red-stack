@@ -37,7 +37,9 @@ Red Stack reads the zips where you file them, does not copy them and does not mo
   clothing, cyberware, weapon attachments and equipment mods its TweakXL tweaks create, and
   whether the save holds them: on V, in the stash, in the wardrobe or installed on an item. The
   kind of an item built on a game item is read in the game's own database (`tweakdb.bin`). The mods with no item owned come first: a way to spot the item mods
-  you do not use. The save is only read, never written (format after WolvenKit, MIT).
+  you do not use. The save is only read, never written (format after WolvenKit, MIT). Listed by mod
+  or by type of item. To carry items to another save: tick them, copy the console command, paste it
+  into the Cyber Engine Tweaks console of the other save (items created anew, no save written).
 - “Arrivals”: the archives of the arrival folders, the names in the format of the Nexus app and
   the `.7z` / `.rar` files. Red Stack proposes the name of the Nexus site
   (`Name-modId-version-timestamp`, read through the public Nexus API), you edit it and then
@@ -45,7 +47,8 @@ Red Stack reads the zips where you file them, does not copy them and does not mo
   ticked rows in one confirmation.
   In the list, the “New”, “Parked” and “Retired” filters show these folders; a filed zip can be
   moved into the stack, parked or retired there (moved to the retired folder, never erased), alone
-  or as a lot; a retired zip can be deleted (Windows recycle bin, recorded in the history). The page locks while an action
+  or as a lot; a retired zip can be deleted (Windows recycle bin, recorded in the history). A zip of a stack is moved to another stack from its
+  detail (“Change stack…”): the profile follows, the game is not touched. The page locks while an action
   is writing. In the plan, a file that is present and that Red Stack did not install is replaced
   by the one from the zip when you say so, the old one copied to the backups.
   “Content…” proposes, mod by mod, to rename what the zip ships (archives, script and tweak

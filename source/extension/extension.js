@@ -465,7 +465,7 @@ function rafraichit(delai = 0, auto = false) {
 
 // Gestes qui écrivent le dépôt, le magasin ou le jeu : de leur confirmation à leur fin, la page est verrouillée (message
 // `verrou`), et tout autre geste qui écrit ou qui change le profil est refusé, d'où qu'il vienne (page, onglets d'analyse).
-const GESTES_ECRIT = new Set(['adopte', 'deplace', 'deplaceLot', 'supprime', 'conventionRange', 'conventionRenomme', 'conventionConvertit', 'conventionConvertitLot', 'contenuRenomme', 'contenuRenommeLot', 'zipRenomme',
+const GESTES_ECRIT = new Set(['adopte', 'deplace', 'deplaceLot', 'supprime', 'conventionRange', 'conventionRenomme', 'conventionConvertit', 'conventionConvertitLot', 'contenuRenomme', 'contenuRenommeLot', 'zipRenomme', 'changePile',
   'purge', 'retoucheAnnule', 'applique']);
 const CHANGE = new Set(['profilNouveau', 'profilSupprime', 'bascule', 'basculeLot', 'option', 'priorite', 'fomodFixe', 'nomsFixe', 'ordrePasse', 'ordreRenomme',
   'ordreAnnule', 'ordreModlistStop', 'planRemplace', 'reglagesEcrit', 'reference', 'sauvegarde', 'majTelecharge']);
@@ -726,6 +726,23 @@ async function recoit(m) {
       await moteur.run(['convention', '--fixe', '-', '--go'], noms);
       await rafraichit();                           // l'état relu fait suivre le profil, l'arbre et le registre au nouveau nom
       return envoie({ t: 'detail', data: await moteur.run(['detail', ...P, '--mod', m.cle.split('/').slice(0, -1).concat(nom).join('/')]) });
+    }
+    case 'changePile': {                            // un zip de la pile passe à la racine d'une autre pile, sous le même nom : pile choisie, puis confirmé
+      gardeMaj(m.cle);
+      const ici = m.cle.split('/')[0], nom = m.cle.split('/').pop().replace(/\.zip$/i, '');
+      const piles = (await moteur.run(['etat', ...P])).sections.filter((s) => s !== ici);
+      if (!piles.length) throw new Error(T('Aucune autre pile dans le dépôt.'));
+      const choix = await vscode.window.showQuickPick(piles.map((s) => ({ label: s === '(racine)' ? T('(racine du dépôt)') : s, v: s })),
+        { title: T`Changer « ${nom} » de pile`, ignoreFocusOut: true, placeHolder: T('Pile qui reçoit le zip. Échap = ne rien écrire.') });
+      if (!choix) return;
+      const args = ['deplace', ...P, '--cle', m.cle, '--vers', 'pile', '--section', choix.v];
+      const vu = await moteur.run(args);            // sans --go : dit la cible, ou refuse
+      const ok = await confirme(T`Changer « ${nom} » de pile ?`, T('Changer de pile'), T`vers ${path.dirname(vu.vers)}`,
+        T('Entrée = ne rien écrire. Le zip change de dossier ; le profil, l\'arbre du magasin et le registre suivent, le jeu n\'est pas touché.'));
+      if (!ok) return;
+      await moteur.run([...args, '--go']);
+      await rafraichit();                           // l'état relu fait suivre le profil, l'arbre et le registre à la nouvelle pile
+      return envoie({ t: 'detail', data: await moteur.run(['detail', ...P, '--mod', vu.cle]) });
     }
     case 'contenuRenommeLot': {                     // le contenu des zips cochés, aux noms que le moteur propose : une confirmation
       const prets = [], refus = [];

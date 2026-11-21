@@ -2285,5 +2285,35 @@
   "one": "Se {0} for removido, {n} mod ativo deixa de carregar:",
   "other": "Se {0} for removido, {n} mods ativos deixam de carregar:"
  },
- " (optionnel)": " (opcional)"
+ " (optionnel)": " (opcional)",
+ "Aucune autre pile dans le dépôt.": "Nenhuma outra pilha no repositório.",
+ "Changer « {0} » de pile": "Mudar “{0}” de pilha",
+ "Pile qui reçoit le zip. Échap = ne rien écrire.": "Pilha que recebe o zip. Esc = não gravar nada.",
+ "Changer « {0} » de pile ?": "Mudar “{0}” de pilha?",
+ "Changer de pile": "Mudar de pilha",
+ "Entrée = ne rien écrire. Le zip change de dossier ; le profil, l'arbre du magasin et le registre suivent, le jeu n'est pas touché.": "Enter = não gravar nada. O zip muda de pasta; o perfil, a árvore do armazém e o registro acompanham, o jogo não é tocado.",
+ "Déplacer le zip à la racine d'une autre pile du dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "Mover o zip para a raiz de outra pilha do repositório. O perfil, a árvore do armazém e o registro acompanham; o jogo não é tocado.",
+ "Changer de pile…": "Mudar de pilha…",
+ "Changé de pile": "Mudou de pilha",
+ "changé de pile": "mudou de pilha",
+ "Ce zip est rangé dans un dossier de sa pile : le remonter avant de le changer de pile.": "Este zip está guardado em uma pasta da sua pilha: traga-o de volta à pilha antes de mudá-lo de pilha.",
+ "Ce zip est déjà dans cette pile.": "Este zip já está nesta pilha.",
+ "Pile inconnue : {0}": "Pilha desconhecida: {0}",
+ "Cocher cet objet pour la commande de console": "Marcar este item para o comando do console",
+ "Ranger": "Agrupar",
+ "Par sorte": "Por categoria",
+ "{n} objet coché": {
+  "one": "{n} item marcado",
+  "other": "{n} itens marcados"
+ },
+ "Coche tous les objets possédés des mods montrés ici (sorte, puce et filtre compris)": "Marca todos os itens em posse dos mods mostrados aqui (categoria, chip e filtro incluídos)",
+ "Cocher les possédés montrés": "Marcar os em posse mostrados",
+ "Copie dans le presse-papiers une commande pour la console de Cyber Engine Tweaks : elle ajoute chaque objet coché à l'inventaire de V": "Copia para a área de transferência um comando para o console do Cyber Engine Tweaks: ele adiciona cada item marcado ao inventário de V",
+ "Copier la commande de console": "Copiar o comando do console",
+ "<b>Transfert vers une autre partie</b> : cochez des objets, copiez la commande, puis collez-la dans la console de Cyber Engine Tweaks une fois l'autre partie chargée. Les objets sont recréés neufs dans l'inventaire de V : qualité, accessoires et mods montés ne suivent pas, et les mods qui les créent doivent être actifs. Aucune sauvegarde n'est écrite.": "<b>Transferência para outro jogo salvo</b>: marque itens, copie o comando e cole-o no console do Cyber Engine Tweaks depois de carregar o outro jogo salvo. Os itens são recriados novos no inventário de V: qualidade, acessórios e mods instalados não acompanham, e os mods que os criam precisam estar ativos. Nenhum jogo salvo é gravado.",
+ "{n} objet, {0} montrés : affinez par le champ de filtre.": {
+  "one": "{n} item, {0} mostrados: refine com o campo de filtro.",
+  "other": "{n} itens, {0} mostrados: refine com o campo de filtro."
+ },
+ "Cocher ou décocher les objets de ce mod montrés ici": "Marcar ou desmarcar os itens deste mod mostrados aqui"
 }

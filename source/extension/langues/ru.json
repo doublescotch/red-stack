@@ -2703,5 +2703,39 @@
   "many": "Если убрать {0}, {n} активных модов перестанут загружаться:",
   "other": "Если убрать {0}, {n} активного мода перестанут загружаться:"
  },
- " (optionnel)": " (необязательно)"
+ " (optionnel)": " (необязательно)",
+ "Aucune autre pile dans le dépôt.": "В библиотеке нет другой стопки.",
+ "Changer « {0} » de pile": "Перенести «{0}» в другую стопку",
+ "Pile qui reçoit le zip. Échap = ne rien écrire.": "Стопка, которая примет zip. Esc = ничего не записывать.",
+ "Changer « {0} » de pile ?": "Перенести «{0}» в другую стопку?",
+ "Changer de pile": "Сменить стопку",
+ "Entrée = ne rien écrire. Le zip change de dossier ; le profil, l'arbre du magasin et le registre suivent, le jeu n'est pas touché.": "Enter = ничего не записывать. Zip переносится в другую папку; профиль, дерево в хранилище и реестр следуют за ним, игра не затрагивается.",
+ "Déplacer le zip à la racine d'une autre pile du dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "Перенести zip в корень другой стопки библиотеки. Профиль, дерево в хранилище и реестр следуют за ним; игра не затрагивается.",
+ "Changer de pile…": "Сменить стопку…",
+ "Changé de pile": "Перенесён в другую стопку",
+ "changé de pile": "перенесён в другую стопку",
+ "Ce zip est rangé dans un dossier de sa pile : le remonter avant de le changer de pile.": "Этот zip убран в папку своей стопки: сначала верните его в стопку, затем меняйте стопку.",
+ "Ce zip est déjà dans cette pile.": "Этот zip уже в этой стопке.",
+ "Pile inconnue : {0}": "Неизвестная стопка: {0}",
+ "Cocher cet objet pour la commande de console": "Отметить этот предмет для консольной команды",
+ "Ranger": "Группировать",
+ "Par sorte": "По виду",
+ "{n} objet coché": {
+  "one": "{n} предмет отмечен",
+  "few": "{n} предмета отмечено",
+  "many": "{n} предметов отмечено",
+  "other": "{n} предмета отмечено"
+ },
+ "Coche tous les objets possédés des mods montrés ici (sorte, puce et filtre compris)": "Отмечает все имеющиеся предметы показанных здесь модов (с учётом вида, метки и фильтра)",
+ "Cocher les possédés montrés": "Отметить показанные имеющиеся",
+ "Copie dans le presse-papiers une commande pour la console de Cyber Engine Tweaks : elle ajoute chaque objet coché à l'inventaire de V": "Копирует в буфер обмена команду для консоли Cyber Engine Tweaks: она добавляет каждый отмеченный предмет в инвентарь Ви",
+ "Copier la commande de console": "Скопировать консольную команду",
+ "<b>Transfert vers une autre partie</b> : cochez des objets, copiez la commande, puis collez-la dans la console de Cyber Engine Tweaks une fois l'autre partie chargée. Les objets sont recréés neufs dans l'inventaire de V : qualité, accessoires et mods montés ne suivent pas, et les mods qui les créent doivent être actifs. Aucune sauvegarde n'est écrite.": "<b>Перенос в другое сохранение</b>: отметьте предметы, скопируйте команду и вставьте её в консоль Cyber Engine Tweaks после загрузки другого сохранения. Предметы создаются заново в инвентаре Ви: качество, обвесы и установленные модификации не переносятся, а моды, которые их создают, должны быть включены. Ни одно сохранение не записывается.",
+ "{n} objet, {0} montrés : affinez par le champ de filtre.": {
+  "one": "{n} предмет, показано {0}: уточните полем фильтра.",
+  "few": "{n} предмета, показано {0}: уточните полем фильтра.",
+  "many": "{n} предметов, показано {0}: уточните полем фильтра.",
+  "other": "{n} предмета, показано {0}: уточните полем фильтра."
+ },
+ "Cocher ou décocher les objets de ce mod montrés ici": "Отметить или снять отметку с показанных здесь предметов этого мода"
 }

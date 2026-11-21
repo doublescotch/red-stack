@@ -180,6 +180,21 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
                              ['<body class="analyse objets conf"', "sans objet possédé", "Dossier des parties…", 'id="opartie"', 'data-ofiltre="aucun"',
                               'data-osorte="', "Filtrer : mod ou objet", "Détail du mod", 'data-ouvre="', "<b>Possédé</b>",
                               'data-osorte="accessoire"', 'data-osorte="module"', "Accessoires d'armes", "Mods d'équipement", "tweakdb.bin"]),
+                            # transfert : des objets cochés (case d'un mod, « possédés montrés »), rangés par sorte, une commande de console copiée ; rien d'autre n'est envoyé
+                            ("objets_transfert", "recoit({t:'objets', data: D.objets});"
+                                                 "const q = (s) => document.querySelector('#conflits ' + s), n0 = (window.POSTES || []).length;"
+                                                 "const vide = q('button[data-ocopie]').disabled;"
+                                                 "const cm = q('input[data-ochoixmod]'); cm.checked = true; cm.dispatchEvent(new Event('change', {bubbles: true}));"
+                                                 "const duMod = D.objets.mods.find((m) => m.prov === cm.dataset.ochoixmod).objets.length;"
+                                                 "q('button[data-ocoche=rien]').click(); q('button[data-ocoche=possedes]').click();"
+                                                 "const possedes = new Set(D.objets.mods.flatMap((m) => m.objets.filter((x) => x.lieux.length).map((x) => x.rec))).size;"
+                                                 "q('button[data-opar=sorte]').click(); const dt = q('details[data-groupe^=\"os:\"]'); dt.open = true; dt.dispatchEvent(new Event('toggle'));"
+                                                 "const cases = document.querySelectorAll('#conflits input[data-ochoix]').length, cochees = document.querySelectorAll('#conflits input[data-ochoix]:checked').length;"
+                                                 "q('button[data-ocopie]').click();"
+                                                 "const envois = window.POSTES.slice(n0), c = envois.filter((x) => x.t === 'copie');"
+                                                 "const sur = vide && duMod > 0 && cases > 0 && (possedes === 0 || (cochees > 0 && c.length === 1 && c[0].texte.split('; ').length === possedes && /^Game\\.AddToInventory\\(\"[\\w.\\-]+\", 1\\)/.test(c[0].texte)));"
+                                                 "document.title = 'transfert ' + (sur && envois.every((x) => x.t === 'copie') ? 'ok' : 'non ' + [vide, duMod, cases, cochees, possedes, c.length]);",
+                             ["<title>transfert ok</title>", '<body class="analyse objets conf"', 'data-opar="sorte" class="on"', 'data-ocopie="1"', "Copier la commande de console", "Transfert vers une autre partie", 'data-groupe="os:']),
                             ("dependances", "recoit({t:'dependances', data: D.dep});",
                              ['<body class="analyse dependances conf"', "Ici, les mods dont dépendent le plus de mods actifs", 'class="socles"', 'data-ddepart="',
                               "exigé par ", "mods actifs", "lu dans le code", "Filtrer : mod…"]),
@@ -209,7 +224,7 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
                             ("ressource", "document.querySelector('[data-grille=ressource]').click();"
                                           "recoit({t:'conflitsRessources', data: D.cfr});",
                              ["par ressource", "prise dans", "perdue par", "remplace le jeu de base", "Jeu de base seulement"]),
-                            ("detail", "recoit({t:'detail', data: D.detail});", ["Options du pack", "Montrer le zip", 'data-zipnom="', "Renommer le zip…", "Fichiers", "Renommer le contenu…", 'details class="dossier"', 'id="poignee"']),
+                            ("detail", "recoit({t:'detail', data: D.detail});", ["Options du pack", "Montrer le zip", 'data-zipnom="', "Renommer le zip…", 'data-zippile="', "Changer de pile…", "Fichiers", "Renommer le contenu…", 'details class="dossier"', 'id="poignee"']),
                             ("noms", "recoit({t:'detail', data: D.detail}); document.querySelector('[data-nomsmod]').click();"
                                      "E_noms();",
                              ["Noms dans le jeu de", "Nom de l'auteur", "Dans le jeu", 'id="nmNote"', "data-nomde=", "Cité par son nom"]),
@@ -338,8 +353,8 @@ for vue, suite, attendu in (("liste", "", ["mods actifs sur", "Aperçu du plan",
             + "setTimeout(() => { recoit({t:'etat', data: D.etat, profils: D.profils}); recoit({t:'conflits', data: D.conflits}); " + suite + " }, 0); } }; }\n</script>\n")
     html = page.replace("<script nonce=\"banc\">\n(function () {", stub + "<script nonce=\"banc\">\n(function () {", 1)
     assert stub in html
-    if vue in ("plie_conflits", "conflits", "code", "objets", "dependances", "chaine", "graphe", "ordre", "paires", "ressource", "puces", "identiques", "fichier"):   # l'onglet d'analyse : la même page, corps marqué par l'extension
-        html = html.replace("<body>", '<body class="analyse code">' if vue == "code" else '<body class="analyse objets">' if vue == "objets" else '<body class="analyse dependances">' if vue in ("dependances", "chaine", "graphe") else '<body class="analyse">', 1)
+    if vue in ("plie_conflits", "conflits", "code", "objets", "objets_transfert", "dependances", "chaine", "graphe", "ordre", "paires", "ressource", "puces", "identiques", "fichier"):   # l'onglet d'analyse : la même page, corps marqué par l'extension
+        html = html.replace("<body>", '<body class="analyse code">' if vue == "code" else '<body class="analyse objets">' if vue in ("objets", "objets_transfert") else '<body class="analyse dependances">' if vue in ("dependances", "chaine", "graphe") else '<body class="analyse">', 1)
     f = os.path.join(OUT, vue + ".html")
     open(f, "w", encoding="utf-8").write(html)
     url = "file:///" + f.replace("\\", "/").replace(" ", "%20")

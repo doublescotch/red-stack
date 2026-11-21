@@ -2703,5 +2703,39 @@
   "many": "Jeśli {0} zniknie, {n} aktywnych modów przestanie się ładować:",
   "other": "Jeśli {0} zniknie, {n} aktywnego moda przestanie się ładować:"
  },
- " (optionnel)": " (opcjonalne)"
+ " (optionnel)": " (opcjonalne)",
+ "Aucune autre pile dans le dépôt.": "Brak innego stosu w repozytorium.",
+ "Changer « {0} » de pile": "Przenieś „{0}” do innego stosu",
+ "Pile qui reçoit le zip. Échap = ne rien écrire.": "Stos, który przyjmie zip. Esc = nic nie zapisuj.",
+ "Changer « {0} » de pile ?": "Przenieść „{0}” do innego stosu?",
+ "Changer de pile": "Zmień stos",
+ "Entrée = ne rien écrire. Le zip change de dossier ; le profil, l'arbre du magasin et le registre suivent, le jeu n'est pas touché.": "Enter = nic nie zapisuj. Zip trafia do innego folderu; profil, drzewo w magazynie i rejestr podążają za nim, gra pozostaje nietknięta.",
+ "Déplacer le zip à la racine d'une autre pile du dépôt. Le profil, l'arbre du magasin et le registre suivent ; le jeu n'est pas touché.": "Przenieś zip do katalogu głównego innego stosu w repozytorium. Profil, drzewo w magazynie i rejestr podążają za nim; gra pozostaje nietknięta.",
+ "Changer de pile…": "Zmień stos…",
+ "Changé de pile": "Przeniesiony do innego stosu",
+ "changé de pile": "przeniesiony do innego stosu",
+ "Ce zip est rangé dans un dossier de sa pile : le remonter avant de le changer de pile.": "Ten zip jest odłożony w folderze swojego stosu: przywróć go do stosu, zanim zmienisz mu stos.",
+ "Ce zip est déjà dans cette pile.": "Ten zip jest już w tym stosie.",
+ "Pile inconnue : {0}": "Nieznany stos: {0}",
+ "Cocher cet objet pour la commande de console": "Zaznacz ten przedmiot do polecenia konsoli",
+ "Ranger": "Grupuj",
+ "Par sorte": "Według typu",
+ "{n} objet coché": {
+  "one": "{n} zaznaczony przedmiot",
+  "few": "{n} zaznaczone przedmioty",
+  "many": "{n} zaznaczonych przedmiotów",
+  "other": "{n} zaznaczonego przedmiotu"
+ },
+ "Coche tous les objets possédés des mods montrés ici (sorte, puce et filtre compris)": "Zaznacza wszystkie posiadane przedmioty pokazanych tutaj modów (z uwzględnieniem typu, etykiety i filtra)",
+ "Cocher les possédés montrés": "Zaznacz pokazane posiadane",
+ "Copie dans le presse-papiers une commande pour la console de Cyber Engine Tweaks : elle ajoute chaque objet coché à l'inventaire de V": "Kopiuje do schowka polecenie dla konsoli Cyber Engine Tweaks: dodaje ono każdy zaznaczony przedmiot do ekwipunku V",
+ "Copier la commande de console": "Kopiuj polecenie konsoli",
+ "<b>Transfert vers une autre partie</b> : cochez des objets, copiez la commande, puis collez-la dans la console de Cyber Engine Tweaks une fois l'autre partie chargée. Les objets sont recréés neufs dans l'inventaire de V : qualité, accessoires et mods montés ne suivent pas, et les mods qui les créent doivent être actifs. Aucune sauvegarde n'est écrite.": "<b>Przeniesienie do innego zapisu gry</b>: zaznacz przedmioty, skopiuj polecenie i wklej je do konsoli Cyber Engine Tweaks po wczytaniu drugiego zapisu. Przedmioty są tworzone od nowa w ekwipunku V: jakość, dodatki i zamontowane modyfikacje nie są przenoszone, a mody, które je tworzą, muszą być włączone. Żaden zapis gry nie jest zapisywany.",
+ "{n} objet, {0} montrés : affinez par le champ de filtre.": {
+  "one": "{n} przedmiot, pokazano {0}: zawęź polem filtra.",
+  "few": "{n} przedmioty, pokazano {0}: zawęź polem filtra.",
+  "many": "{n} przedmiotów, pokazano {0}: zawęź polem filtra.",
+  "other": "{n} przedmiotu, pokazano {0}: zawęź polem filtra."
+ },
+ "Cocher ou décocher les objets de ce mod montrés ici": "Zaznacz lub odznacz pokazane tutaj przedmioty tego moda"
 }
